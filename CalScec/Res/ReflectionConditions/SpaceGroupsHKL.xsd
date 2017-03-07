@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="HKLConditionsTable">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" name="HKLCondition">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="SpaceGroup" type="xs:string" />
+              <xs:element name="SpaceGroupId" type="xs:int" />
+              <xs:element name="hkl" type="xs:string" />
+              <xs:element name="hko" type="xs:string" />
+              <xs:element name="hol" type="xs:string" />
+              <xs:element name="okl" type="xs:string" />
+              <xs:element name="hoo" type="xs:string" />
+              <xs:element name="oko" type="xs:string" />
+              <xs:element name="ool" type="xs:string" />
+              <xs:element name="hhl" type="xs:string" />
+              <xs:element name="hkk" type="xs:string" />
+              <xs:element name="hkh" type="xs:string" />
+              <xs:element name="hhh" type="xs:string" />
+              <xs:element name="hho" type="xs:string" />
+              <xs:element name="hoh" type="xs:string" />
+              <xs:element name="okk" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,64 @@
+﻿<Window x:Class="CalScec.DataManagment.CODSql.CODSearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CODSearchWindow" Height="550" Width="700">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.15*"/>
+            <RowDefinition Height="0.10*"/>
+            <RowDefinition Height="0.75*"/>
+            <RowDefinition Height="0.1*"/>
+        </Grid.RowDefinitions>
+        <GroupBox Header="Searchparameters for Crystallographic open database">
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="0.2*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Name="ElementsofSearch" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" VerticalContentAlignment="Center" ToolTip="Enter your elements. For multiple elements use ',' as separator. \n If you type the chemical formula please use the follwing convention: 'Fe3 Ti2 C4'"/>
+                <CheckBox Name="HoleFormula" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Check if you want use the chemical formula instead of single elements."/>
+                <ComboBox Name="NumberOfElementsInSearch" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Center" Text="0" ToolTip="The number of elements contained by your sample. If selected to '0' it wont be used in search.">
+                    <ComboBoxItem Content="0"/>
+                    <ComboBoxItem Content="1"/>
+                    <ComboBoxItem Content="2"/>
+                    <ComboBoxItem Content="3"/>
+                    <ComboBoxItem Content="4"/>
+                    <ComboBoxItem Content="5"/>
+                    <ComboBoxItem Content="6"/>
+                    <ComboBoxItem Content="7"/>
+                    <ComboBoxItem Content="8"/>
+                    <ComboBoxItem Content="9"/>
+                </ComboBox>
+                <DatePicker Name="LastUpdatePicker" Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5,0,5,0"/>
+                <Button Content="Search COD" Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Stretch" MaxWidth="120" Click="SearchCOD_Click"/>
+            </Grid>
+        </GroupBox>
+        <ProgressBar Grid.Row="1" Name="StatusProgress" Minimum="0" Maximum="100" Value="0" Width="{Binding ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=StatusBarItem}}" Height="30" Margin="10,0,10,0"/>
+        <GroupBox Header="Crystallographic Data" Grid.Row="2">
+            <ListView Name="CODDataList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Single" Margin="5" AllowDrop="True">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="150" Header="Formula" DisplayMemberBinding="{Binding Path=ChemicalFormula}"/>
+                        <GridViewColumn Width="100" Header="Nr. of Elements" DisplayMemberBinding="{Binding Path=NumberOfDiffrentElements}"/>
+                        <GridViewColumn Width="120" Header="Space Group" DisplayMemberBinding="{Binding Path=SymmetryGroup}"/>
+                        <GridViewColumn Width="120" Header="Measurment T in K" DisplayMemberBinding="{Binding Path=MeasurementTemperature}"/>
+                        <GridViewColumn Width="100" Header="Date" DisplayMemberBinding="{Binding Path=LastUpdate}"/>
+                        <GridViewColumn Width="350" Header="Information" DisplayMemberBinding="{Binding Path=Text}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </GroupBox>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0.4*"/>
+                <ColumnDefinition Width="0.4*"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="Cancel" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" MaxWidth="120" Click="Cancel_Click"/>
+            <Button Content="Select Data" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Stretch" MaxWidth="120" Click="Select_Click"/>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,290 @@
+﻿<Window x:Class="CalScec.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:oxycore="clr-namespace:OxyPlot;assembly=OxyPlot"
+        xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
+        Title="CalScec" Height="800" Width="1600" >
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top" Name="MainMenu" Height="25">
+            <MenuItem Header="_Application">
+                <MenuItem Header="Restart" Click="RestartCalScec_Click"/>
+                <MenuItem Header="Quit" Click="QuitCalScec_Click"/>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Header="_File">
+                <MenuItem Header="Load diffraction pattern">
+                    <MenuItem Header="From files" Click="OpenDiffractionPatternFile_Click"/>
+                    <MenuItem Header="From folder" Click="OpenDiffractionPatternFolder_Click"/>
+                </MenuItem>
+                <MenuItem Header="scec">
+                    <MenuItem Header="Save" Click="SaveToSCEC_Click"/>
+                    <MenuItem Header="Load" Click="LoadFromSCEC_Click"/>
+                </MenuItem>
+                <MenuItem Header="Export">
+                    <MenuItem Header="To xlsx" Click="ExportToxlsx_Click"/>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Crystallographic data">
+                <MenuItem Header="From files" Click="OpenCrystallographyDataFile_Click"/>
+                <MenuItem Header="From database" Click="OpenCrystallographyDataDatabase_Click"/>
+                <MenuItem Header="Manual input" Click="ManualInputCrystallographicData_Click"/>
+                <Separator/>
+                <MenuItem Header="Show loaded data" Click="ModifyCrystallographicData_Click"/>
+            </MenuItem>
+            <MenuItem Header="Data">
+                <MenuItem Header="Sample and pattern data" Click="ChangeSamplePatternData_Click"/>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Header="Peak fitting" Click="OpenPeakFittingWindowNew_Click">
+                <!--<MenuItem Header="Test Fitting Window" Click="OpenPeakFittingWindowNew_Click"/>-->
+            </MenuItem>
+            <MenuItem Header="Plots">
+                <MenuItem Header="Sin²(&#936;)" Click="Sin2PsiPlots_Click"/>
+                <MenuItem Header="Extension-stress" Click="ExtensionStressCalculation_Click"/>
+            </MenuItem>
+            <MenuItem Header="Elastic calculation">
+                <MenuItem Header="REK calculation" Click="REKCalculation_Click"/>
+                <MenuItem Header="Elasticity tensor calculation" Click="ElasticityTensorCalculation_Click"/>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Header="_Settings">
+                <MenuItem Header="Plot">
+                    <MenuItem Header="Y Axes">
+                        <MenuItem Header="Set to linear" Name="DiffractionPlotAxesToLinear" Click="DiffractionPlotAxesToLinear_Click" IsCheckable="True"/>
+                        <MenuItem Header="Set to logarythmic" Name="DiffractionPlotAxesToLog" Click="DiffractionPlotAxesToLog_Click" IsCheckable="True"/>
+                    </MenuItem>
+                    <MenuItem Header="Major grid style">
+                        <MenuItem Name="MajorGridStyleNone" Header="None" IsCheckable="True" Click="ChangeMajorGridLineStyle_Click"/>
+                        <MenuItem Name="MajorGridStyleDot" Header="Dot" IsCheckable="True"  Click="ChangeMajorGridLineStyle_Click"/>
+                        <MenuItem Name="MajorGridStyleDash" Header="Dash" IsCheckable="True"  Click="ChangeMajorGridLineStyle_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="Minor grid style">
+                        <MenuItem Name="MinorGridStyleNone" Header="None" IsCheckable="True" Click="ChangeMinorGridLineStyle_Click"/>
+                        <MenuItem Name="MinorGridStyleDot" Header="Dot" IsCheckable="True"  Click="ChangeMinorGridLineStyle_Click"/>
+                        <MenuItem Name="MinorGridStyleDash" Header="Dash" IsCheckable="True"  Click="ChangeMinorGridLineStyle_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="Plot line style">
+                        <MenuItem Name="ChangeLineStyleNone" Header="None" IsCheckable="True" Click="ChangeLineStyle_Click"/>
+                        <MenuItem Name="ChangeLineStyleDot" Header="Dot" IsCheckable="True"  Click="ChangeLineStyle_Click"/>
+                        <MenuItem Name="ChangeLineStyleDash" Header="Dash" IsCheckable="True"  Click="ChangeLineStyle_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="Plot line thickness">
+                        <MenuItem Name="ChangeLineThickness1" Header="1" IsCheckable="True" Click="ChangeLineThickness_Click"/>
+                        <MenuItem Name="ChangeLineThickness2" Header="2" IsCheckable="True" Click="ChangeLineThickness_Click"/>
+                        <MenuItem Name="ChangeLineThickness3" Header="3" IsCheckable="True" Click="ChangeLineThickness_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="Plot marker size">
+                        <MenuItem Name="ChangeMarkerThickness0" Header="0" IsCheckable="True" Click="ChangeMarkerSize_Click"/>
+                        <MenuItem Name="ChangeMarkerThickness1" Header="1" IsCheckable="True" Click="ChangeMarkerSize_Click"/>
+                        <MenuItem Name="ChangeMarkerThickness15" Header="1.5" IsCheckable="True" Click="ChangeMarkerSize_Click"/>
+                        <MenuItem Name="ChangeMarkerThickness2" Header="2" IsCheckable="True" Click="ChangeMarkerSize_Click"/>
+                        <MenuItem Name="ChangeMarkerThickness25" Header="2.5" IsCheckable="True" Click="ChangeMarkerSize_Click"/>
+                        <MenuItem Name="ChangeMarkerThickness3" Header="3" IsCheckable="True" Click="ChangeMarkerSize_Click"/>
+                        <MenuItem Name="ChangeMarkerThickness35" Header="3.5" IsCheckable="True" Click="ChangeMarkerSize_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="Peak marker style">
+                        <MenuItem Name="ChangePeakLineStyleDot" Header="Dot" IsCheckable="True"  Click="ChangePeakLineStyle_Click"/>
+                        <MenuItem Name="ChangePeakLineStyleDash" Header="Dash" IsCheckable="True"  Click="ChangePeakLineStyle_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="Peak line thickness">
+                        <MenuItem Name="ChangePeakLineThickness1" Header="1" IsCheckable="True" Click="ChangePeakLineThickness_Click"/>
+                        <MenuItem Name="ChangePeakLineThickness2" Header="2" IsCheckable="True" Click="ChangePeakLineThickness_Click"/>
+                        <MenuItem Name="ChangePeakLineThickness3" Header="3" IsCheckable="True" Click="ChangePeakLineThickness_Click"/>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Auto peak detection">
+                    <MenuItem Header="Pattern limits">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Lower limit: " Width="80"/>
+                            <TextBox Name="PatternLowerLimitTextBox" Height="25" Width="35" VerticalContentAlignment="Center" TextChanged="PatternLowerLimitTextBox_TextChanged"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Upper limit: " Width="80"/>
+                            <TextBox Name="PatternUpperLimitTextBox" Height="25" Width="35" VerticalContentAlignment="Center" TextChanged="PatternUpperLimitTextBox_TextChanged"/>
+                        </StackPanel>
+                    </MenuItem>
+                    <MenuItem Header="Hyper detection">
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="Resolution: "/>
+                            <TextBox Name="HyperResolution" Height="25" Width="35" VerticalContentAlignment="Center" TextChanged="HyperResolution_TextChanged" LostFocus="HyperResolution_LostFocus"/>
+                        </StackPanel>
+                    </MenuItem>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Accepted peak background ratio: " Width="230"/>
+                        <TextBox Name="AcceptedPeakBackgroundRation" Height="25" Width="35" VerticalContentAlignment="Center" TextChanged="AcceptedPeakBackgroundRation_TextChanged" LostFocus="AcceptedPeakBackgroundRation_LostFocus"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Accepted difference for HKL association: " Width="230"/>
+                        <TextBox Name="AcceptedDifferenceHKLAssociation" Height="25" Width="35" VerticalContentAlignment="Center" TextChanged="AcceptedHKLDifference_TextChanged" LostFocus="AcceptedHKLDifference_LostFocus"/>
+                    </StackPanel>
+                </MenuItem>
+                <MenuItem Name="AutomaticPeakFitMenuItem" Header="Automatic peak fit" IsCheckable="True" Click="AutomaticPeakFitMenuItem_Click"/>
+                <MenuItem Name="PlotHKLOverviewMenuItem" Header="Plot HKL in overview" IsCheckable="True" Click="PlotHKLOverview_Click"/>
+            </MenuItem>
+        </Menu>
+        <ToolBarTray DockPanel.Dock="Top" Height="40">
+            <ToolBar Height="40">
+                <Button Click="OpenDiffractionPatternFile_Click" ToolTip="Open a new diffraction pattern" MaxHeight="40" MaxWidth="40">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Res\Toolbar\OpenDiffractionPattern.png"/>
+                    </StackPanel>
+                </Button>
+                <Button Click="OpenDiffractionPatternFolder_Click" ToolTip="Open a new diffraction pattern folder" MaxHeight="40" MaxWidth="40">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Res\Toolbar\OpenDiffractionPatternFolder.png"/>
+                    </StackPanel>
+                </Button>
+            </ToolBar>
+            <ToolBar>
+                <StackPanel Orientation="Horizontal">
+                    <Label VerticalContentAlignment="Center" VerticalAlignment="Center">X-Axis:</Label>
+                    <TextBox Name="XAxisMinToolText" VerticalAlignment="Center" Width="30"/>
+                    <Label VerticalContentAlignment="Center" VerticalAlignment="Center">-</Label>
+                    <TextBox Name="XAxisMaxToolText" VerticalAlignment="Center" Width="30"/>
+                    <Rectangle Width="2" Fill="Gray" Margin="5,5,5,5"/>
+                    <Label VerticalContentAlignment="Center" VerticalAlignment="Center">Y-Axis:</Label>
+                    <TextBox Name="YAxisMinToolText" VerticalAlignment="Center" Width="40"/>
+                    <Label VerticalContentAlignment="Center" VerticalAlignment="Center">-</Label>
+                    <TextBox Name="YAxisMaxToolText" VerticalAlignment="Center" Width="40"/>
+                    <Button Name="SetAxesTool" Content="Set" Margin="10,5,5,5" Height="22" Width="30" Click="SetAxesTool_Click"/>
+                    <Button Name="ChangeAxisTool" MaxHeight="38" MaxWidth="40" Margin="10,0,0,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Res\Toolbar\AxisChange.png"/>
+                        </StackPanel>
+                    </Button>
+                    <Button ToolTip="Scale axis to loaded pattern" MaxHeight="38" MaxWidth="40" Margin="10,0,0,0" Click="FitAxisToPattern_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Res\Toolbar\RescaleAxis.png"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </ToolBar>
+        </ToolBarTray>
+        <StatusBar DockPanel.Dock="Bottom" Height="30">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition MinWidth="70" Width="0.06*"/>
+                            <ColumnDefinition MinWidth="70" Width="0.06*"/>
+                            <ColumnDefinition MinWidth="70" Width="0.055*"/>
+                            <ColumnDefinition MinWidth="10" Width="0.015*"/>
+                            <ColumnDefinition MinWidth="100" Width="0.1*"/>
+                            <ColumnDefinition MinWidth="100" Width="0.15*"/>
+                            <ColumnDefinition MinWidth="10" Width="0.01*"/>
+                            <ColumnDefinition MinWidth="100" Width="0.1*"/>
+                            <ColumnDefinition MinWidth="100" Width="0.2*"/>
+                            <ColumnDefinition MinWidth="10" Width="0.01*"/>
+                            <ColumnDefinition MinWidth="100" Width="0.23*"/>
+                            <ColumnDefinition MinWidth="10" Width="0.01*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem Grid.Column="0">
+                <Label Content="CalcScec" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="1">
+                <Label Content="Version" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="2">
+                <Label Content="0.0.1" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="4">
+                <Label Name="ErrorLog1" Foreground="DarkRed"/>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="5">
+                <Label Name="ErrorLog2" Foreground="DarkRed" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="7">
+                <Label Name="StatusLog1"/>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="8">
+                <Label Name="StatusLog2" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="10">
+                <ProgressBar Name="StatusProgress" Minimum="0" Maximum="100" Value="0" Width="{Binding ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=StatusBarItem}}" Height="20"/>
+            </StatusBarItem>
+        </StatusBar>
+        <DockPanel LastChildFill="True" DockPanel.Dock="Top" VerticalAlignment="Stretch" MinHeight="670">
+            <Grid VerticalAlignment="Stretch">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.5*"/>
+                    <RowDefinition Height="0.5*"/>
+                </Grid.RowDefinitions>
+                <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.75*"/>
+                        <ColumnDefinition Width="0.25*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Header="Diffraction pattern" Grid.Column="0">
+                        <oxy:PlotView Name="MainDiffPlot" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
+                    </GroupBox>
+                    <GroupBox Header="Diffraction pattern list" Grid.Column="1">
+                        <ListView Name="DiffractionPatternList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5" AllowDrop="True" Drop="DiffractionPatternList_Drop" KeyDown="DiffractionPatternList_KeyDown" SelectionChanged="DiffractionPatternList_SelectionChanged">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="350" Header="Name" DisplayMemberBinding="{Binding Path=Name}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.3*"/>
+                        <ColumnDefinition Width="0.7*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Header="Peak list">
+                        <ListView Name="PeakList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5,5,5,5" SelectionChanged="PeakList_SelectionChanged" KeyDown="PeakList_KeyDown">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="100" Header="Position" DisplayMemberBinding="{Binding Path=Angle}"/>
+                                    <GridViewColumn Width="120" Header="Symmetry and HKL" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
+                                    <GridViewColumn Width="120" Header="Lattice distance" DisplayMemberBinding="{Binding Path=LatticeDistance}"/>
+                                </GridView>
+                            </ListView.View>
+                            <ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Change HKL association" Click="ChangeHKLAssociationPeak_Click"/>
+                                    <MenuItem Header="Remove HKL association" Click="RemoveHKLAssociationPeak_Click"/>
+                                </ContextMenu>
+                            </ListView.ContextMenu>
+                            <!--<ListView.GroupStyle>
+                                <GroupStyle>
+                                    <GroupStyle.HeaderTemplate>
+                                        <DataTemplate>
+                                            <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </GroupStyle.HeaderTemplate>
+                                </GroupStyle>
+                            </ListView.GroupStyle>-->
+                            <ListView.GroupStyle>
+                                <GroupStyle>
+                                    <GroupStyle.ContainerStyle>
+                                        <Style TargetType="{x:Type GroupItem}">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate>
+                                                        <Expander IsExpanded="False">
+                                                            <Expander.Header>
+                                                                <StackPanel Orientation="Horizontal">
+                                                                    <TextBlock FontWeight="Bold" FontSize="14" Foreground="Black" Text="{Binding Name}"/>
+                                                                </StackPanel>
+                                                            </Expander.Header>
+                                                            <ItemsPresenter/>
+                                                        </Expander>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </GroupStyle.ContainerStyle>
+                                </GroupStyle>
+                            </ListView.GroupStyle>
+                        </ListView>
+                    </GroupBox>
+                </Grid>
+            </Grid>
+        </DockPanel>
+    </DockPanel>
+</Window>

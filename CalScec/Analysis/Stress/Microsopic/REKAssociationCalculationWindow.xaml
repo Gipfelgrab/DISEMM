@@ -1,0 +1,141 @@
+﻿<Window x:Class="CalScec.Analysis.Stress.Microsopic.REKAssociationCalculationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CalScec.Analysis.Stress.Microsopic"
+        xmlns:oxycore="clr-namespace:OxyPlot;assembly=OxyPlot"
+        xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
+        mc:Ignorable="d"
+        Title="REKAssociationCalculationWindow" Height="700" Width="1600">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.01*"/>
+            <ColumnDefinition Width="0.45*"/>
+            <ColumnDefinition Width="0.35*"/>
+            <ColumnDefinition Width="0.23*"/>
+            <ColumnDefinition Width="0.01*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.01*" />
+            <RowDefinition Height="0.98*" />
+            <RowDefinition Height="0.01*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.55*"/>
+                <RowDefinition Height="0.3*"/>
+                <RowDefinition Height="0.15*"/>
+            </Grid.RowDefinitions>
+            <oxy:PlotView Name="MainPlot" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
+            <oxy:PlotView Name="ResPlot" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Grid.Row="0" Grid.Column="1" Header="Selected phase">
+                    <ComboBox Name="PhaseSwitchBox" MaxWidth="350" MaxHeight="30" SelectionChanged="PhaseSwitchBox_SelectionChanged"/>
+                </GroupBox>
+                <Button Grid.Row="1" Grid.Column="1" Name="RefitREK" Content="Refit REK data" MaxHeight="30" MaxWidth="150" Click="RefitREK_Click"/>
+            </Grid>
+        </Grid>
+        <Grid Grid.Column="2" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.55*"/>
+                <RowDefinition Height="0.35*"/>
+                <RowDefinition Height="0.1*"/>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Header="REK's">
+                <ListView Name="REKCalculationList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" SelectionChanged="REKCalculationList_SelectionChanged">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="120" Header="(H K L)" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
+                            <GridViewColumn Width="120" Header="S1" DisplayMemberBinding="{Binding Path=ClassicS1}"/>
+                            <GridViewColumn Width="120" Header="Weighted error" DisplayMemberBinding="{Binding Path=ClassicS1Error}"/>
+                            <GridViewColumn Width="120" Header="S2" DisplayMemberBinding="{Binding Path=ClassicHS2}"/>
+                            <GridViewColumn Width="120" Header="Weighted error" DisplayMemberBinding="{Binding Path=ClassicHS2Error}"/>
+                            <GridViewColumn Width="120" Header="Chi2" DisplayMemberBinding="{Binding Path=ClassicChi2}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Header="Peak list">
+                <ListView Name="REKPeakList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="100" Header="Angle" DisplayMemberBinding="{Binding Path=DifPeak.Angle}"/>
+                            <GridViewColumn Width="100" Header="Lattice distance" DisplayMemberBinding="{Binding Path=DifPeak.LatticeDistance}"/>
+                            <GridViewColumn Width="100" Header="Statistical error" DisplayMemberBinding="{Binding Path=DifPeak.LatticeDistanceError}"/>
+                            <GridViewColumn Width="100" Header="Applied stress" DisplayMemberBinding="{Binding Path=stress}"/>
+                            <GridViewColumn Width="100" Header="Psi angle" DisplayMemberBinding="{Binding Path=psiAngle}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </GroupBox>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Name="RemovePeakFromREK" Content="Remove peak from REK" MaxHeight="30" MaxWidth="150" Click="RemovePeakFromREK_Click"/>
+                <Button Grid.Column="1" Name="DeleteREK" Content="Remove REK" MaxHeight="30" MaxWidth="150" Click="DeleteREK_Click"/>
+                <Button Grid.Column="2" Name="SwitchREK" Content="Switch to macroscopic REK" MaxHeight="30" MaxWidth="150"/>
+            </Grid>
+        </Grid>
+        <Grid Grid.Column="3" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.1*"/>
+                <RowDefinition Height="0.3*"/>
+                <RowDefinition Height="0.6*"/>
+                <RowDefinition Height="0.1*"/>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Header="Diffraction patterns">
+                <ComboBox Name="DiffractionPatternBox" MaxWidth="350" MaxHeight="30" SelectionChanged="DiffractionPatternBox_SelectionChanged"/>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Header="Diffraction pattern information">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Phi angle"/>
+                    <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Psy angle"/>
+                    <Label Grid.Column="0" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Applied stress"/>
+                    <TextBox Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="PhiAngleBox" TextChanged="PhiAngleBox_TextChanged"/>
+                    <TextBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="PsyAngleBox" TextChanged="PsyAngleBox_TextChanged"/>
+                    <TextBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="AppliedStressBox" TextChanged="AppliedStressBox_TextChanged"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="2" Header="Peak list">
+                <ListView Name="DiffractionPeakList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="110" Header="( H K L )" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
+                            <GridViewColumn Width="100" Header="Lattice distrance" DisplayMemberBinding="{Binding Path=LatticeDistance}"/>
+                            <GridViewColumn Width="100" Header="Error" DisplayMemberBinding="{Binding Path=LatticeDistanceError}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </GroupBox>
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Name="AddToREK" Content="Add peak to selected REK" MaxHeight="30" MaxWidth="150" Click="AddToREKList_Click"/>
+                <Button Grid.Column="1" Name="CreateNewREK" Content="Create new REK" MaxHeight="30" MaxWidth="150" Click="CreateNewList_Click"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

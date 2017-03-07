@@ -1,0 +1,284 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D3FB2F69-5B96-4DB3-9010-051B9DA267DD}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CalScec</RootNamespace>
+    <AssemblyName>CalScec</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Google.ProtocolBuffers">
+      <HintPath>..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.ProtocolBuffers.Serialization">
+      <HintPath>..\packages\Google.ProtocolBuffers.2.4.1.555\lib\net40\Google.ProtocolBuffers.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="MathNet.Numerics, Version=3.13.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.3.13.1\lib\net40\MathNet.Numerics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MySql.Data, Version=7.0.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MySql.Data.7.0.3-DMR\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="OxyPlot">
+      <HintPath>..\packages\OxyPlot.Core.1.0.0-unstable2100\lib\net45\OxyPlot.dll</HintPath>
+    </Reference>
+    <Reference Include="OxyPlot.Wpf">
+      <HintPath>..\packages\OxyPlot.Wpf.1.0.0-unstable2100\lib\net45\OxyPlot.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="OxyPlot.Xps">
+      <HintPath>..\packages\OxyPlot.Wpf.1.0.0-unstable2100\lib\net45\OxyPlot.Xps.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Analysis\Fitting\Chi2.cs" />
+    <Compile Include="Analysis\Fitting\LinearFunction.cs" />
+    <Compile Include="Analysis\Fitting\LMA.cs" />
+    <Compile Include="Analysis\Fitting\PeakFittingWindow.xaml.cs">
+      <DependentUpon>PeakFittingWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\Peaks\AssociatePeakToHKLWindow.xaml.cs">
+      <DependentUpon>AssociatePeakToHKLWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\Peaks\Functions\BackgroundPolynomial.cs" />
+    <Compile Include="Analysis\Peaks\Functions\Constraints.cs" />
+    <Compile Include="Analysis\Peaks\Functions\Gaussian.cs" />
+    <Compile Include="Analysis\Peaks\Functions\Lorentz.cs" />
+    <Compile Include="Analysis\Peaks\Functions\PeakFunction.cs" />
+    <Compile Include="Analysis\Peaks\Functions\PeakRegionFunction.cs" />
+    <Compile Include="Analysis\Peaks\Functions\PseudoVoigt.cs" />
+    <Compile Include="Analysis\Stress\Macroskopic\Elasticity.cs" />
+    <Compile Include="Analysis\Stress\Macroskopic\ElasticityWindow.xaml.cs">
+      <DependentUpon>ElasticityWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\Stress\Macroskopic\SinPsyWindow.xaml.cs">
+      <DependentUpon>SinPsyWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\Stress\Microsopic\ElasticityCalculationWindow.xaml.cs">
+      <DependentUpon>ElasticityCalculationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\Stress\Microsopic\ElasticityTensors.cs" />
+    <Compile Include="Analysis\Stress\Microsopic\REK.cs" />
+    <Compile Include="Analysis\Stress\Microsopic\REKAssociationCalculationWindow.xaml.cs">
+      <DependentUpon>REKAssociationCalculationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataManagment\CrystalData\AddCrystalDataWindow.xaml.cs">
+      <DependentUpon>AddCrystalDataWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataManagment\CrystalData\ReflexCondition.cs" />
+    <Compile Include="DataManagment\CrystalData\ShowCrystalDataWindow.xaml.cs">
+      <DependentUpon>ShowCrystalDataWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataManagment\Files\SCEC\ElasticityTensorInformation.cs" />
+    <Compile Include="DataManagment\Files\SCEC\Header.cs" />
+    <Compile Include="DataManagment\Files\SCEC\MacroElasticInformation.cs" />
+    <Compile Include="DataManagment\Files\SCEC\PatternInformation.cs" />
+    <Compile Include="DataManagment\Files\SCEC\PeakFunctionInformation.cs" />
+    <Compile Include="DataManagment\Files\SCEC\PeakRegionInformation.cs" />
+    <Compile Include="DataManagment\Files\SCEC\REKInformation.cs" />
+    <Compile Include="Pattern\DiffractionDataWindow.xaml.cs">
+      <DependentUpon>DiffractionDataWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Calculation.cs" />
+    <Compile Include="Tools\IdManagment.cs" />
+    <Page Include="Analysis\Fitting\PeakFittingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Analysis\Peaks\AssociatePeakToHKLWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Analysis\Stress\Macroskopic\ElasticityWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Analysis\Stress\Macroskopic\SinPsyWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Analysis\Stress\Microsopic\ElasticityCalculationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Analysis\Stress\Microsopic\REKAssociationCalculationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataManagment\CODSql\CODSearchWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataManagment\CrystalData\AddCrystalDataWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataManagment\CrystalData\ShowCrystalDataWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="Analysis\Peaks\Detection.cs" />
+    <Compile Include="Analysis\Peaks\DiffractionPeak.cs" />
+    <Compile Include="Analysis\Sample.cs" />
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataManagment\CODSql\CODSearchWindow.xaml.cs">
+      <DependentUpon>CODSearchWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataManagment\CODSql\GetCODData.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Pattern\DiffractionDataWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Pattern\Counts.cs" />
+    <Compile Include="Pattern\DiffractionPattern.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+    <None Include="Res\ReflectionConditions\SpaceGroupsHKL.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\Toolbar\OpenDiffractionPatternFolder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\Toolbar\OpenDiffractionPattern.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\Toolbar\AxisChange.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\Toolbar\RescaleAxis.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ReadMe\COD.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Res\Menu\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Res\ReflectionConditions\SpaceGroupsHKL.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>5</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.Office.Interop.Excel">
+      <Guid>{00020813-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>7</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,268 @@
+﻿<Window x:Class="CalScec.Analysis.Fitting.PeakFittingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:oxycore="clr-namespace:OxyPlot;assembly=OxyPlot"
+        xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
+        Title="PeakFittingWindow" Height="800" Width="1300">
+    <Grid Margin="5,5,5,5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="27"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.25*"/>
+            <ColumnDefinition Width="0.75*"/>
+        </Grid.ColumnDefinitions>
+        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+            <Menu.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <DockPanel HorizontalAlignment="Stretch" FlowDirection="LeftToRight" LastChildFill="True"/>
+                </ItemsPanelTemplate>
+            </Menu.ItemsPanel>
+            <MenuItem Header="Graphs">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Function plot resolution: " Width="230"/>
+                    <TextBox Name="FunctionPlotResolution" Height="25" Width="35" VerticalContentAlignment="Center" TextChanged="FunctionPlotResolution_TextChanged"/>
+                </StackPanel>
+                <MenuItem Header="Residual sigma lines">
+                    <MenuItem Header="1 sigma line" Name="OneSigmaLine" IsCheckable="True" Click="OneSigmaLine_Click"/>
+                    <MenuItem Header="3 sigma line" Name="ThreeSigmaLine" IsCheckable="True" Click="ThreeSigmaLine_Click"/>
+                </MenuItem>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Header="Plot">
+                <MenuItem Header="Axis reset">
+                    <MenuItem Header="Reset fitting x-axis"/>
+                    <MenuItem Header="Reset fitting y-axis"/>
+                    <MenuItem Header="Reset residual x-axis"/>
+                    <MenuItem Header="Reset residual y-axis"/>
+                </MenuItem>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Header="Settings">
+                <MenuItem Header="Fitting plot">
+                    <MenuItem Header="Y Axes">
+                        <MenuItem Header="Set to linear" Name="FittingPlotAxesToLinear" Click="FittingPlotAxesToLinear_Click" IsCheckable="True"/>
+                        <MenuItem Header="Set to logarythmic" Name="FittingPlotAxesToLog" Click="FittingPlotAxesToLog_Click" IsCheckable="True"/>
+                    </MenuItem>
+                    <MenuItem Header="Major grid style">
+                        <MenuItem Name="FittingMajorGridStyleNone" Header="None" IsCheckable="True" Click="ChangeFittingMajorGridLineStyle_Click"/>
+                        <MenuItem Name="FittingMajorGridStyleDot" Header="Dot" IsCheckable="True"  Click="ChangeFittingMajorGridLineStyle_Click"/>
+                        <MenuItem Name="FittingMajorGridStyleDash" Header="Dash" IsCheckable="True"  Click="ChangeFittingMajorGridLineStyle_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="Minor grid style">
+                        <MenuItem Name="FittingMinorGridStyleNone" Header="None" IsCheckable="True" Click="ChangeFittingMinorGridLineStyle_Click"/>
+                        <MenuItem Name="FittingMinorGridStyleDot" Header="Dot" IsCheckable="True"  Click="ChangeFittingMinorGridLineStyle_Click"/>
+                        <MenuItem Name="FittingMinorGridStyleDash" Header="Dash" IsCheckable="True"  Click="ChangeFittingMinorGridLineStyle_Click"/>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Residual plot">
+                    <MenuItem Header="Major grid style">
+                        <MenuItem Name="ResidualMajorGridStyleNone" Header="None" IsCheckable="True" Click="ChangeResidualMajorGridLineStyle_Click"/>
+                        <MenuItem Name="ResidualMajorGridStyleDot" Header="Dot" IsCheckable="True"  Click="ChangeResidualMajorGridLineStyle_Click"/>
+                        <MenuItem Name="ResidualMajorGridStyleDash" Header="Dash" IsCheckable="True"  Click="ChangeResidualMajorGridLineStyle_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="Minor grid style">
+                        <MenuItem Name="ResidualMinorGridStyleNone" Header="None" IsCheckable="True" Click="ChangeResidualMinorGridLineStyle_Click"/>
+                        <MenuItem Name="ResidualMinorGridStyleDot" Header="Dot" IsCheckable="True"  Click="ChangeResidualMinorGridLineStyle_Click"/>
+                        <MenuItem Name="ResidualMinorGridStyleDash" Header="Dash" IsCheckable="True"  Click="ChangeResidualMinorGridLineStyle_Click"/>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Reflex auto correction active" IsCheckable="True" Name="ReflexAutoCorrection" Click="ReflexAutoCorrection_Click"/>
+            </MenuItem>
+            <Separator Width="35"/>
+            <MenuItem Header="Region manipulations">
+                <MenuItem Header="Split region" Name="SplitRegionMenu" IsCheckable="True" Click="RegionManipulation_Click"/>
+                <MenuItem Header="Reselect fitting data" Name="ReselectFittingDataMenu" IsCheckable="True" Click="RegionManipulation_Click"/>
+                <MenuItem Header="Insert peak" Name="InsertPeakMenu" IsCheckable="True" Click="RegionManipulation_Click"/>
+                <MenuItem Header="Do action" IsCheckable="False" Click="DoRegionManipulationAction_Click"/>
+                <MenuItem Header="Show cif data" Name="ShowCifDataRegion" IsCheckable="True" Click="RegionManipulation_Click"/>
+            </MenuItem>
+            <Separator Width="35"/>
+            <Grid Width="300" Height="22" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                <ProgressBar Name="FittingProgrssBar" Minimum="0" Maximum="100" Value="100" IsIndeterminate="False"/>
+                <TextBlock Name="FittingProgressText" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            Fitting 0 of 0 Regions and 0 of 0 peaks
+                </TextBlock>
+            </Grid>
+        </Menu>
+        <Grid Grid.Column="0" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.60*"/>
+                <RowDefinition Height="0.4*"/>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Header="Found peak regions">
+                <ListView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="RegionView" SelectionChanged="RegionView_SelectionChanged">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="100" Header="Position" DisplayMemberBinding="{Binding Path=Position}"/>
+                            <GridViewColumn Width="120" Header="Number of peaks" DisplayMemberBinding="{Binding Path=Count}"/>
+                            <GridViewColumn Width="80" Header="Chi2" DisplayMemberBinding="{Binding Path=ReducedChi2Function}"/>
+                        </GridView>
+                    </ListView.View>
+                    <ListView.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate>
+                                                <Expander IsExpanded="False">
+                                                    <Expander.Header>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock FontWeight="Bold" FontSize="14" Foreground="Black" Text="{Binding Name}"/>
+                                                        </StackPanel>
+                                                    </Expander.Header>
+                                                    <ItemsPresenter/>
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                    </ListView.GroupStyle>
+                </ListView>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Header="Peak regions in Fitting">
+                <ListView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="FittingRegionView">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="100" Header="Position" DisplayMemberBinding="{Binding Path=Position}"/>
+                            <GridViewColumn Width="120" Header="Number of peaks" DisplayMemberBinding="{Binding Path=Count}"/>
+                            <GridViewColumn Width="80" Header="Chi2" DisplayMemberBinding="{Binding Path=ReducedChi2Function}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </GroupBox>
+        </Grid>
+        <Grid Grid.Column="1" Grid.Row="1" Margin="5,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.6*"/>
+                <RowDefinition Height="0.4*"/>
+            </Grid.RowDefinitions>
+            <GroupBox Header="Fitting plots">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.6*"/>
+                        <RowDefinition Height="0.4*"/>
+                    </Grid.RowDefinitions>
+                    <oxy:PlotView Name="MainFitPlot" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" MouseLeftButtonUp="MainFitPlot_MouseLeftButtonUp"/>
+                    <oxy:PlotView Name="MainResPlot" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                </Grid>
+            </GroupBox>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.25*"/>
+                    <ColumnDefinition Width="0.75*"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Grid.Column="0" Header="Peaks in region">
+                    <ListView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="PeakView" SelectionChanged="PeakView_SelectionChanged">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="100" Header="Position" DisplayMemberBinding="{Binding Path=Angle}"/>
+                                <GridViewColumn Width="80" Header="Intensity" DisplayMemberBinding="{Binding Path=Intensity}"/>
+                                <GridViewColumn Width="80" Header="Chi2" DisplayMemberBinding="{Binding Path=ReducedChi2Function}"/>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                </GroupBox>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.85*"/>
+                        <RowDefinition Height="0.15*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.5*"/>
+                        <ColumnDefinition Width="0.5*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Grid.Column="0" Grid.Row="0" Header="Constrained parameters">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.35*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="0.25*"/>
+                                <ColumnDefinition Width="0.25*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition   Height="*"/>
+                                <RowDefinition   Height="*"/>
+                                <RowDefinition   Height="*"/>
+                                <RowDefinition   Height="*"/>
+                                <RowDefinition   Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center" Content="Angle:"/>
+                            <Label Grid.Row="1" Grid.Column="0" VerticalContentAlignment="Center" Content="FWHM:"/>
+                            <Label Grid.Row="2" Grid.Column="0" VerticalContentAlignment="Center" Content="Lorentz ratio:"/>
+                            <Label Grid.Row="3" Grid.Column="0" VerticalContentAlignment="Center" Content="Used peak function:"/>
+                            <TextBox Name="AngleTextBox" Grid.Row="0" Grid.Column="1" MaxHeight="27" Margin="5,0,5,0" TextChanged="AngleTextBox_TextChanged"/>
+                            <TextBox Name="FWHMTextBox" Grid.Row="1" Grid.Column="1" MaxHeight="27" Margin="5,0,5,0" TextChanged="FWHMTextBox_TextChanged"/>
+                            <TextBox Name="LorentzRatioTextBox" Grid.Row="2" Grid.Column="1" MaxHeight="27" Margin="5,0,5,0" TextChanged="LorentzRatioTextBox_TextChanged"/>
+                            <TextBox Name="AngleConstraintTextBox" Grid.Row="0" Grid.Column="2" MaxHeight="27" Margin="5,0,5,0" TextChanged="AngleConstraintTextBox_TextChanged"/>
+                            <TextBox Name="FWHMConstraintTextBox" Grid.Row="1" Grid.Column="2" MaxHeight="27" Margin="5,0,5,0" TextChanged="FWHMConstraintTextBox_TextChanged"/>
+                            <TextBox Name="LorentzRatioConstraintTextBox" Grid.Row="2" Grid.Column="2" MaxHeight="27" Margin="5,0,5,0" TextChanged="LorentzRatioConstraintTextBox_TextChanged"/>
+                            <CheckBox Name="AngleConstraintActive" Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Sets if the constraint of the angle is in use!" Checked="AngleConstraintActive_Checked" Unchecked="AngleConstraintActive_Unchecked"/>
+                            <CheckBox Name="FWHMConstraintActive" Grid.Row="1" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Sets if the constraint of the fwhm is in use!" Checked="FWHMConstraintActive_Checked" Unchecked="FWHMConstraintActive_Unchecked"/>
+                            <CheckBox Name="LorentzRatioConstraintActive" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Sets if the constraint of the lorentz ratio is in use!" Checked="LorentzRatioConstraintActive_Checked" Unchecked="LorentzRatioConstraintActive_Unchecked"/>
+                            <CheckBox Name="AngleFitActive" Grid.Row="0" Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Sets if the fit of the angle is in use!" Checked="AngleFitActive_Checked" Unchecked="AngleFitActive_Unchecked"/>
+                            <CheckBox Name="FWHMFitActive" Grid.Row="1" Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Sets if the fit of the fwhm is in use!" Checked="FWHMFitActive_Checked" Unchecked="FWHMFitActive_Unchecked"/>
+                            <CheckBox Name="LorentzRatioFitActive" Grid.Row="2" Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center" ToolTip="Sets if the fit of the lorentz ratio is in use!" Checked="LorentzRatioFitActive_Checked" Unchecked="LorentzRatioFitActive_Unchecked"/>
+                            <ComboBox Name="PeakFunctionBox" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="5,0,5,0" SelectionChanged="PeakFunctionBox_SelectionChanged"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Grid.Column="1" Grid.Row="0" Header="Remaining parameters">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0.20*"/>
+                                <RowDefinition Height="0.8*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center" Content="Peak Intensity:"/>
+                                <TextBox Name="IntensityTextBox" Grid.Row="0" Grid.Column="1" MaxHeight="27" Margin="5,0,5,0" TextChanged="IntensityTextBox_TextChanged"/>
+                                <CheckBox Name="IntensityFitActive" Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Checked="IntensityFitActive_Checked" Unchecked="IntensityFitActive_Unchecked"/>
+                            </Grid>
+                            <GroupBox Grid.Row="1" Header="Background parameters">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="0.2*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center" Content="Constant Background:"/>
+                                    <Label Grid.Row="1" Grid.Column="0" VerticalContentAlignment="Center" Content="Center of Background:"/>
+                                    <Label Grid.Row="2" Grid.Column="0" VerticalContentAlignment="Center" Content="Aclivity of Background:"/>
+                                    <TextBox Name="ConstantBackgroundTextBox" Grid.Row="0" Grid.Column="1" MaxHeight="27" Margin="5,0,5,0" TextChanged="ConstantBackgroundTextBox_TextChanged"/>
+                                    <TextBox Name="CenterBackgroundTextBox" Grid.Row="1" Grid.Column="1" MaxHeight="27" Margin="5,0,5,0" TextChanged="CenterBackgroundTextBox_TextChanged"/>
+                                    <TextBox Name="AclivityBackgroundTextBox" Grid.Row="2" Grid.Column="1" MaxHeight="27" Margin="5,0,5,0" TextChanged="AclivityBackgroundTextBox_TextChanged"/>
+                                    <CheckBox Name="ConstantBackgroundFitActive" Grid.Row="0" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Checked="ConstantBackgroundFitActive_Checked" Unchecked="ConstantBackgroundFitActive_Unchecked"/>
+                                    <CheckBox Name="CenterBackgroundFitActive" Grid.Row="1" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Checked="CenterBackgroundFitActive_Checked" Unchecked="CenterBackgroundFitActive_Unchecked"/>
+                                    <CheckBox Name="AclivityBackgroundFitActive" Grid.Row="2" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center" Checked="AclivityBackgroundFitActive_Checked" Unchecked="AclivityBackgroundFitActive_Unchecked"/>
+                                </Grid>
+                            </GroupBox>
+                        </Grid>
+                    </GroupBox>
+                    <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.2*"/>
+                            <ColumnDefinition Width="0.2*"/>
+                            <ColumnDefinition Width="0.6*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="Refit region" MaxHeight="28" MaxWidth="100" Click="StartRegionFit_Click"/>
+                        <Button Grid.Column="1" Content="Refit peak" MaxHeight="28" MaxWidth="100" Click="StartPeakFit_Click"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

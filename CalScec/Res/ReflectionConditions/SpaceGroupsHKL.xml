@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<HKLConditionsTable>
+  <HKLCondition>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <hkl>h+k,h+l,k+l=2n</hkl>
+    <hko>k,h=2n</hko>
+    <hol>h,l=2n</hol>
+    <okl>k,l=2n</okl>
+    <hoo>h=2n</hoo>
+    <oko>-</oko>
+    <ool>-</ool>
+    <hhl>h+l=2n</hhl>
+    <hkk>h+k=2n</hkk>
+    <hkh>-</hkh>
+    <hhh>-</hhh>
+    <hho>h=2n</hho>
+    <hoh>-</hoh>
+    <okk>-</okk>
+  </HKLCondition>
+  <HKLCondition>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <hkl>h+k+l=2n</hkl>
+    <hko>h+k=2n</hko>
+    <hol>-</hol>
+    <okl>k+l=2n</okl>
+    <hoo>h=2n</hoo>
+    <oko>-</oko>
+    <ool>-</ool>
+    <hhl>l=2n</hhl>
+    <hkk>h=2n</hkk>
+    <hkh>-</hkh>
+    <hhh>h=2n</hhh>
+    <hho>-</hho>
+    <hoh>-</hoh>
+    <okk>-</okk>
+  </HKLCondition>
+  <HKLCondition>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <hkl>-</hkl>
+    <hko>-</hko>
+    <hol>-</hol>
+    <okl>-</okl>
+    <hoo>-</hoo>
+    <oko>-</oko>
+    <ool>l=2n</ool>
+    <hhl>l=2n</hhl>
+    <hkk>-</hkk>
+    <hkh>-</hkh>
+    <hhh>h=2n</hhh>
+    <hho>-</hho>
+    <hoh>-</hoh>
+    <okk>-</okk>
+  </HKLCondition>
+</HKLConditionsTable>

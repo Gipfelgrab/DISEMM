@@ -1,0 +1,61 @@
+﻿<Window x:Class="CalScec.Analysis.Stress.Macroskopic.SinPsyWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CalScec.Analysis.Stress.Macroskopic"
+        xmlns:oxycore="clr-namespace:OxyPlot;assembly=OxyPlot"
+        xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
+        mc:Ignorable="d"
+        Title="SinPsyWindow" Height="500" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="27"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.70*"/>
+            <ColumnDefinition Width="0.30*"/>
+        </Grid.ColumnDefinitions>
+        <Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+            <MenuItem IsCheckable="True" Header="Use sin²" Name="SinItem" Click="SinItem_Click"/>
+            <MenuItem IsCheckable="True" Header="Use cos²" Name="CosItem" Click="CosItem_Click"/>
+            <Separator />
+            <MenuItem IsCheckable="True" Header="Use lattice distance" Name="LatticeDistanceItem" Click="LatticeDistanceItem_Click"/>
+            <MenuItem IsCheckable="True" Header="Use extension" Name="ExtensionItem" Click="ExtensionItem_Click"/>
+        </Menu>
+        <GroupBox Grid.Column="1" Grid.Row="1" Header="Reflex list">
+            <ListView HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="ReflexView" SelectionMode="Extended" SelectionChanged="ReflexView_SelectionChanged">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="100" Header="Lattice distance" DisplayMemberBinding="{Binding Path=DifPeak.LatticeDistance}"/>
+                        <GridViewColumn Width="120" Header="Psi" DisplayMemberBinding="{Binding Path=psiAngle}"/>
+                    </GridView>
+                </ListView.View>
+                <ListView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Expander IsExpanded="False">
+                                                <Expander.Header>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock FontWeight="DemiBold"  FontSize="14" Foreground="Black" Text="{Binding Name}"/>
+                                                    </StackPanel>
+                                                </Expander.Header>
+                                                <ItemsPresenter/>
+                                            </Expander>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </ListView.GroupStyle>
+            </ListView>
+        </GroupBox>
+        <oxy:PlotView Name="SinPsyPlot" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+    </Grid>
+</Window>
