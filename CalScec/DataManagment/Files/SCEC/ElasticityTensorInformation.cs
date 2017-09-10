@@ -20,6 +20,11 @@ namespace CalScec.DataManagment.Files.SCEC
         public bool IsIsotropic = false;
         public bool FitConverged = false;
 
+        public double[] _kroenerShearModulus;
+        public double[] _deWittShearModulus;
+
+        public ODFInformation ODF;
+
         public ElasticityTensorInformation(Analysis.Stress.Microsopic.ElasticityTensors ET)
         {
             this._stiffnessTensor = ET._stiffnessTensor.Clone();
@@ -30,7 +35,19 @@ namespace CalScec.DataManagment.Files.SCEC
             this.IsIsotropic = ET.IsIsotropic;
             this.FitConverged = ET.FitConverged;
 
+            this._kroenerShearModulus = ET._kroenerShearModulus;
+            this._deWittShearModulus = ET._deWittShearModulus;
+
             this._symmetry = ET.Symmetry;
+
+            if (ET.ODF != null)
+            {
+                this.ODF = new ODFInformation(ET.ODF);
+            }
+            else
+            {
+                this.ODF = null;
+            }
         }
 
         public Analysis.Stress.Microsopic.ElasticityTensors GetElasticityTensor()
@@ -46,6 +63,34 @@ namespace CalScec.DataManagment.Files.SCEC
             Ret.FitConverged = this.FitConverged;
 
             Ret.Symmetry = this._symmetry;
+
+            if(this._kroenerShearModulus != null)
+            {
+                Ret._kroenerShearModulus = this._kroenerShearModulus;
+            }
+            else
+            {
+                double[] Tmp = { 0.0, 0.0, 0.0 };
+                Ret._kroenerShearModulus = Tmp;
+            }
+            if (this._deWittShearModulus != null)
+            {
+                Ret._deWittShearModulus = this._deWittShearModulus;
+            }
+            else
+            {
+                double[] Tmp = { 0.0, 0.0, 0.0 };
+                Ret._deWittShearModulus = Tmp;
+            }
+
+            if (this.ODF != null)
+            {
+                Ret.ODF = this.ODF.GetODF();
+            }
+            else
+            {
+                Ret.ODF = null;
+            }
 
             return Ret;
         }

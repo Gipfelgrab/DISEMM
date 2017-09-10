@@ -13,8 +13,10 @@ namespace CalScec.DataManagment.Files.SCEC
 
         public MacroElasticInformation(Analysis.Stress.Macroskopic.Elasticity E)
         {
-            this.FittingFunction = E.FittingFunction.Clone() as Analysis.Fitting.LinearFunction;
-
+            if (E.FittingFunction != null)
+            {
+                this.FittingFunction = E.FittingFunction.Clone() as Analysis.Fitting.LinearFunction;
+            }
             for(int n = 0; n < E.Count; n++)
             {
                 this.Add(new PeakStressInformation(E[n]));

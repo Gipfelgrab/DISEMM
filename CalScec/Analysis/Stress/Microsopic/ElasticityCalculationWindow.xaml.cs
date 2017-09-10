@@ -22,6 +22,8 @@ namespace CalScec.Analysis.Stress.Microsopic
         public Sample ActSample;
         bool TextEventsActive = true;
 
+        List<Tools.TextureFitInformation> TextureFitObjects = new List<Tools.TextureFitInformation>();
+
         public ElasticityCalculationWindow(Sample usedSample)
         {
             InitializeComponent();
@@ -38,6 +40,46 @@ namespace CalScec.Analysis.Stress.Microsopic
             {
                 this.ActSample.VoigtTensorData[n].DiffractionConstants = ActSample.DiffractionConstants[n];
                 this.ActSample.ReussTensorData[n].DiffractionConstants = ActSample.DiffractionConstants[n];
+                this.ActSample.HillTensorData[n].DiffractionConstants = ActSample.DiffractionConstants[n];
+                this.ActSample.KroenerTensorData[n].DiffractionConstants = ActSample.DiffractionConstants[n];
+                this.ActSample.DeWittTensorData[n].DiffractionConstants = ActSample.DiffractionConstants[n];
+                this.ActSample.GeometricHillTensorData[n].DiffractionConstants = ActSample.DiffractionConstants[n];
+
+                if (this.ActSample.HillTensorData[n].ODF != null)
+                {
+                    this.ActSample.VoigtTensorData[n].ODF.BaseTensor.DiffractionConstants = ActSample.DiffractionConstants[n];
+                    this.ActSample.ReussTensorData[n].ODF.BaseTensor.DiffractionConstants = ActSample.DiffractionConstants[n];
+                    this.ActSample.HillTensorData[n].ODF.BaseTensor.DiffractionConstants = ActSample.DiffractionConstants[n];
+                    this.ActSample.KroenerTensorData[n].ODF.BaseTensor.DiffractionConstants = ActSample.DiffractionConstants[n];
+                    this.ActSample.DeWittTensorData[n].ODF.BaseTensor.DiffractionConstants = ActSample.DiffractionConstants[n];
+                    this.ActSample.GeometricHillTensorData[n].ODF.BaseTensor.DiffractionConstants = ActSample.DiffractionConstants[n];
+                    this.ActSample.VoigtTensorData[n].ODF.TextureTensor.DiffractionConstants = ActSample.DiffractionConstants[n];
+                    this.ActSample.ReussTensorData[n].ODF.TextureTensor.DiffractionConstants = ActSample.DiffractionConstants[n];
+                    this.ActSample.HillTensorData[n].ODF.TextureTensor.DiffractionConstants = ActSample.DiffractionConstants[n];
+                    this.ActSample.KroenerTensorData[n].ODF.TextureTensor.DiffractionConstants = ActSample.DiffractionConstants[n];
+                    this.ActSample.DeWittTensorData[n].ODF.TextureTensor.DiffractionConstants = ActSample.DiffractionConstants[n];
+                    this.ActSample.GeometricHillTensorData[n].ODF.TextureTensor.DiffractionConstants = ActSample.DiffractionConstants[n];
+
+                    this.ActSample.VoigtTensorData[n].ODF.FitStarted += this.TextureFitStarted;
+                    this.ActSample.VoigtTensorData[n].ODF.FitFinished += this.TextureFitFinished;
+                    this.ActSample.ReussTensorData[n].ODF.FitStarted += this.TextureFitStarted;
+                    this.ActSample.ReussTensorData[n].ODF.FitFinished += this.TextureFitFinished;
+                    this.ActSample.HillTensorData[n].ODF.FitStarted += this.TextureFitStarted;
+                    this.ActSample.HillTensorData[n].ODF.FitFinished += this.TextureFitFinished;
+                    this.ActSample.GeometricHillTensorData[n].ODF.FitStarted += this.TextureFitStarted;
+                    this.ActSample.GeometricHillTensorData[n].ODF.FitFinished += this.TextureFitFinished;
+                    this.ActSample.KroenerTensorData[n].ODF.FitStarted += this.TextureFitStarted;
+                    this.ActSample.KroenerTensorData[n].ODF.FitFinished += this.TextureFitFinished;
+                    this.ActSample.DeWittTensorData[n].ODF.FitStarted += this.TextureFitStarted;
+                    this.ActSample.DeWittTensorData[n].ODF.FitFinished += this.TextureFitFinished;
+
+                    this.ActSample.VoigtTensorData[n].ODF.SetResetEvent(new System.Threading.ManualResetEvent(true));
+                    this.ActSample.ReussTensorData[n].ODF.SetResetEvent(new System.Threading.ManualResetEvent(true));
+                    this.ActSample.HillTensorData[n].ODF.SetResetEvent(new System.Threading.ManualResetEvent(true));
+                    this.ActSample.GeometricHillTensorData[n].ODF.SetResetEvent(new System.Threading.ManualResetEvent(true));
+                    this.ActSample.KroenerTensorData[n].ODF.SetResetEvent(new System.Threading.ManualResetEvent(true));
+                    this.ActSample.DeWittTensorData[n].ODF.SetResetEvent(new System.Threading.ManualResetEvent(true));
+                }
             }
         }
 
@@ -61,10 +103,19 @@ namespace CalScec.Analysis.Stress.Microsopic
             ModelItem2.Content = "Reuss";
             ComboBoxItem ModelItem3 = new ComboBoxItem();
             ModelItem3.Content = "Hill";
+            ComboBoxItem ModelItem4 = new ComboBoxItem();
+            ModelItem4.Content = "Kroener";
+            ComboBoxItem ModelItem5 = new ComboBoxItem();
+            ModelItem5.Content = "DeWitt";
+            ComboBoxItem ModelItem6 = new ComboBoxItem();
+            ModelItem6.Content = "Geometric Hill";
 
             this.ModelSwitchBox.Items.Add(ModelItem1);
             this.ModelSwitchBox.Items.Add(ModelItem2);
             this.ModelSwitchBox.Items.Add(ModelItem3);
+            this.ModelSwitchBox.Items.Add(ModelItem4);
+            this.ModelSwitchBox.Items.Add(ModelItem5);
+            this.ModelSwitchBox.Items.Add(ModelItem6);
 
             this.ModelSwitchBox.SelectedIndex = 0;
 
@@ -97,25 +148,106 @@ namespace CalScec.Analysis.Stress.Microsopic
         {
             Stress.Microsopic.ElasticityTensors UsedTensor = null;
 
-            switch(this.ModelSwitchBox.SelectedIndex)
+            #region Tensor selection
+
+            if (Convert.ToBoolean(this.ActivateTexture.IsChecked))
             {
-                case 0:
-                    UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex];
-                    break;
-                case 1:
-                    UsedTensor = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex];
-                    break;
-                case 2:
-                    UsedTensor = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex];
-                    break;
-                default:
-                    UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex];
-                    break;
+                if (Convert.ToBoolean(this.ActivateWeightedTensor.IsChecked))
+                {
+                    switch (this.ModelSwitchBox.SelectedIndex)
+                    {
+                        case 0:
+                            UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                            break;
+                        case 1:
+                            UsedTensor = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                            break;
+                        case 2:
+                            UsedTensor = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                            break;
+                        case 3:
+                            UsedTensor = this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                            break;
+                        case 4:
+                            UsedTensor = this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                            break;
+                        case 5:
+                            UsedTensor = this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                            break;
+                        default:
+                            UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (this.ModelSwitchBox.SelectedIndex)
+                    {
+                        case 0:
+                            UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                            break;
+                        case 1:
+                            UsedTensor = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                            break;
+                        case 2:
+                            UsedTensor = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                            break;
+                        case 3:
+                            UsedTensor = this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                            break;
+                        case 4:
+                            UsedTensor = this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                            break;
+                        case 5:
+                            UsedTensor = this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                            break;
+                        default:
+                            UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                            break;
+                    }
+                }
             }
+            else
+            {
+                switch (this.ModelSwitchBox.SelectedIndex)
+                {
+                    case 0:
+                        UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex];
+                        break;
+                    case 1:
+                        UsedTensor = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex];
+                        break;
+                    case 2:
+                        UsedTensor = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex];
+                        break;
+                    case 3:
+                        UsedTensor = this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex];
+                        break;
+                    case 4:
+                        UsedTensor = this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex];
+                        break;
+                    case 5:
+                        UsedTensor = this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex];
+                        break;
+                    default:
+                        UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex];
+                        break;
+                }
+            }
+
+
+            #endregion
 
             #region TensorData
 
-            if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 0)
+            bool Compliance = true;
+
+            if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
+            {
+                Compliance = false;
+            }
+
+            if (Compliance)
             {
                 this.T11.Text = UsedTensor.S11.ToString("G3");
                 this.T12.Text = UsedTensor.S12.ToString("G3");
@@ -203,90 +335,119 @@ namespace CalScec.Analysis.Stress.Microsopic
             }
             else
             {
-                this.T11.Text = UsedTensor.C11.ToString("F3");
-                this.T12.Text = UsedTensor.C12.ToString("F3");
-                this.T13.Text = UsedTensor.C13.ToString("F3");
-                this.T14.Text = UsedTensor.C14.ToString("F3");
-                this.T15.Text = UsedTensor.C15.ToString("F3");
-                this.T16.Text = UsedTensor.C16.ToString("F3");
+                this.T11.Text = UsedTensor.C11.ToString("F0");
+                this.T12.Text = UsedTensor.C12.ToString("F0");
+                this.T13.Text = UsedTensor.C13.ToString("F0");
+                this.T14.Text = UsedTensor.C14.ToString("F0");
+                this.T15.Text = UsedTensor.C15.ToString("F0");
+                this.T16.Text = UsedTensor.C16.ToString("F0");
 
-                this.T21.Text = UsedTensor.C21.ToString("F3");
-                this.T22.Text = UsedTensor.C22.ToString("F3");
-                this.T23.Text = UsedTensor.C23.ToString("F3");
-                this.T24.Text = UsedTensor.C24.ToString("F3");
-                this.T25.Text = UsedTensor.C25.ToString("F3");
-                this.T26.Text = UsedTensor.C26.ToString("F3");
+                this.T21.Text = UsedTensor.C21.ToString("F0");
+                this.T22.Text = UsedTensor.C22.ToString("F0");
+                this.T23.Text = UsedTensor.C23.ToString("F0");
+                this.T24.Text = UsedTensor.C24.ToString("F0");
+                this.T25.Text = UsedTensor.C25.ToString("F0");
+                this.T26.Text = UsedTensor.C26.ToString("F0");
 
-                this.T31.Text = UsedTensor.C31.ToString("F3");
-                this.T32.Text = UsedTensor.C32.ToString("F3");
-                this.T33.Text = UsedTensor.C33.ToString("F3");
-                this.T34.Text = UsedTensor.C34.ToString("F3");
-                this.T35.Text = UsedTensor.C35.ToString("F3");
-                this.T36.Text = UsedTensor.C36.ToString("F3");
+                this.T31.Text = UsedTensor.C31.ToString("F0");
+                this.T32.Text = UsedTensor.C32.ToString("F0");
+                this.T33.Text = UsedTensor.C33.ToString("F0");
+                this.T34.Text = UsedTensor.C34.ToString("F0");
+                this.T35.Text = UsedTensor.C35.ToString("F0");
+                this.T36.Text = UsedTensor.C36.ToString("F0");
 
-                this.T41.Text = UsedTensor.C41.ToString("F3");
-                this.T42.Text = UsedTensor.C42.ToString("F3");
-                this.T43.Text = UsedTensor.C43.ToString("F3");
-                this.T44.Text = UsedTensor.C44.ToString("F3");
-                this.T45.Text = UsedTensor.C45.ToString("F3");
-                this.T46.Text = UsedTensor.C46.ToString("F3");
+                this.T41.Text = UsedTensor.C41.ToString("F0");
+                this.T42.Text = UsedTensor.C42.ToString("F0");
+                this.T43.Text = UsedTensor.C43.ToString("F0");
+                this.T44.Text = UsedTensor.C44.ToString("F0");
+                this.T45.Text = UsedTensor.C45.ToString("F0");
+                this.T46.Text = UsedTensor.C46.ToString("F0");
 
-                this.T51.Text = UsedTensor.C51.ToString("F3");
-                this.T52.Text = UsedTensor.C52.ToString("F3");
-                this.T53.Text = UsedTensor.C53.ToString("F3");
-                this.T54.Text = UsedTensor.C54.ToString("F3");
-                this.T55.Text = UsedTensor.C55.ToString("F3");
-                this.T56.Text = UsedTensor.C56.ToString("F3");
+                this.T51.Text = UsedTensor.C51.ToString("F0");
+                this.T52.Text = UsedTensor.C52.ToString("F0");
+                this.T53.Text = UsedTensor.C53.ToString("F0");
+                this.T54.Text = UsedTensor.C54.ToString("F0");
+                this.T55.Text = UsedTensor.C55.ToString("F0");
+                this.T56.Text = UsedTensor.C56.ToString("F0");
 
-                this.T61.Text = UsedTensor.C61.ToString("F3");
-                this.T62.Text = UsedTensor.C62.ToString("F3");
-                this.T63.Text = UsedTensor.C63.ToString("F3");
-                this.T64.Text = UsedTensor.C64.ToString("F3");
-                this.T65.Text = UsedTensor.C65.ToString("F3");
-                this.T66.Text = UsedTensor.C66.ToString("F3");
+                this.T61.Text = UsedTensor.C61.ToString("F0");
+                this.T62.Text = UsedTensor.C62.ToString("F0");
+                this.T63.Text = UsedTensor.C63.ToString("F0");
+                this.T64.Text = UsedTensor.C64.ToString("F0");
+                this.T65.Text = UsedTensor.C65.ToString("F0");
+                this.T66.Text = UsedTensor.C66.ToString("F0");
 
-                this.T11E.Content = UsedTensor.C11Error.ToString("F3");
-                this.T12E.Content = UsedTensor.C12Error.ToString("F3");
-                this.T13E.Content = UsedTensor.C13Error.ToString("F3");
-                this.T14E.Content = UsedTensor.C14Error.ToString("F3");
-                this.T15E.Content = UsedTensor.C15Error.ToString("F3");
-                this.T16E.Content = UsedTensor.C16Error.ToString("F3");
+                this.T11E.Content = UsedTensor.C11Error.ToString("F0");
+                this.T12E.Content = UsedTensor.C12Error.ToString("F0");
+                this.T13E.Content = UsedTensor.C13Error.ToString("F0");
+                this.T14E.Content = UsedTensor.C14Error.ToString("F0");
+                this.T15E.Content = UsedTensor.C15Error.ToString("F0");
+                this.T16E.Content = UsedTensor.C16Error.ToString("F0");
 
-                this.T21E.Content = UsedTensor.C21Error.ToString("F3");
-                this.T22E.Content = UsedTensor.C22Error.ToString("F3");
-                this.T23E.Content = UsedTensor.C23Error.ToString("F3");
-                this.T24E.Content = UsedTensor.C24Error.ToString("F3");
-                this.T25E.Content = UsedTensor.C25Error.ToString("F3");
-                this.T26E.Content = UsedTensor.C26Error.ToString("F3");
+                this.T21E.Content = UsedTensor.C21Error.ToString("F0");
+                this.T22E.Content = UsedTensor.C22Error.ToString("F0");
+                this.T23E.Content = UsedTensor.C23Error.ToString("F0");
+                this.T24E.Content = UsedTensor.C24Error.ToString("F0");
+                this.T25E.Content = UsedTensor.C25Error.ToString("F0");
+                this.T26E.Content = UsedTensor.C26Error.ToString("F0");
 
-                this.T31E.Content = UsedTensor.C31Error.ToString("F3");
-                this.T32E.Content = UsedTensor.C32Error.ToString("F3");
-                this.T33E.Content = UsedTensor.C33Error.ToString("F3");
-                this.T34E.Content = UsedTensor.C34Error.ToString("F3");
-                this.T35E.Content = UsedTensor.C35Error.ToString("F3");
-                this.T36E.Content = UsedTensor.C36Error.ToString("F3");
+                this.T31E.Content = UsedTensor.C31Error.ToString("F0");
+                this.T32E.Content = UsedTensor.C32Error.ToString("F0");
+                this.T33E.Content = UsedTensor.C33Error.ToString("F0");
+                this.T34E.Content = UsedTensor.C34Error.ToString("F0");
+                this.T35E.Content = UsedTensor.C35Error.ToString("F0");
+                this.T36E.Content = UsedTensor.C36Error.ToString("F0");
 
-                this.T41E.Content = UsedTensor.C41Error.ToString("F3");
-                this.T42E.Content = UsedTensor.C42Error.ToString("F3");
-                this.T43E.Content = UsedTensor.C43Error.ToString("F3");
-                this.T44E.Content = UsedTensor.C44Error.ToString("F3");
-                this.T45E.Content = UsedTensor.C45Error.ToString("F3");
-                this.T46E.Content = UsedTensor.C46Error.ToString("F3");
+                this.T41E.Content = UsedTensor.C41Error.ToString("F0");
+                this.T42E.Content = UsedTensor.C42Error.ToString("F0");
+                this.T43E.Content = UsedTensor.C43Error.ToString("F0");
+                this.T44E.Content = UsedTensor.C44Error.ToString("F0");
+                this.T45E.Content = UsedTensor.C45Error.ToString("F0");
+                this.T46E.Content = UsedTensor.C46Error.ToString("F0");
 
-                this.T51E.Content = UsedTensor.C51Error.ToString("F3");
-                this.T52E.Content = UsedTensor.C52Error.ToString("F3");
-                this.T53E.Content = UsedTensor.C53Error.ToString("F3");
-                this.T54E.Content = UsedTensor.C54Error.ToString("F3");
-                this.T55E.Content = UsedTensor.C55Error.ToString("F3");
-                this.T56E.Content = UsedTensor.C56Error.ToString("F3");
+                this.T51E.Content = UsedTensor.C51Error.ToString("F0");
+                this.T52E.Content = UsedTensor.C52Error.ToString("F0");
+                this.T53E.Content = UsedTensor.C53Error.ToString("F0");
+                this.T54E.Content = UsedTensor.C54Error.ToString("F0");
+                this.T55E.Content = UsedTensor.C55Error.ToString("F0");
+                this.T56E.Content = UsedTensor.C56Error.ToString("F0");
 
-                this.T61E.Content = UsedTensor.C61Error.ToString("F3");
-                this.T62E.Content = UsedTensor.C62Error.ToString("F3");
-                this.T63E.Content = UsedTensor.C63Error.ToString("F3");
-                this.T64E.Content = UsedTensor.C64Error.ToString("F3");
-                this.T65E.Content = UsedTensor.C65Error.ToString("F3");
+                this.T61E.Content = UsedTensor.C61Error.ToString("F0");
+                this.T62E.Content = UsedTensor.C62Error.ToString("F0");
+                this.T63E.Content = UsedTensor.C63Error.ToString("F0");
+                this.T64E.Content = UsedTensor.C64Error.ToString("F0");
+                this.T65E.Content = UsedTensor.C65Error.ToString("F0");
                 this.T66E.Content = UsedTensor.C66Error.ToString("F3");
             }
+
+            #endregion
+
+            #region Results
+
+            List<REK> CalculatedREK = UsedTensor.GetCalculatedDiffractionConstants(this.ModelSwitchBox.SelectedIndex, this.ActSample.CrystalData[this.PhaseSwitchBox.SelectedIndex], this.StiffnessComlplianceSwitchBox.SelectedIndex);
+
+            UsedTensor.SetAverageParameters(CalculatedREK);
+            UsedTensor.SetAverageParametersFit();
+
+            this.AEModulusLabel.Content = UsedTensor.AveragedEModul.ToString("F3");
+            this.ANuLabel.Content = UsedTensor.AveragedNu.ToString("F3");
+            this.AShearModulusLabel.Content = UsedTensor.AveragedSchearModul.ToString("F3");
+            this.ABulkModulusLabel.Content = UsedTensor.AveragedBulkModul.ToString("e3");
+            this.AEModulusFitLabel.Content = UsedTensor.AveragedEModulFit.ToString("F3");
+            this.ANuFitLabel.Content = UsedTensor.AveragedNuFit.ToString("F3");
+            this.AShearModulusFitLabel.Content = UsedTensor.AveragedSchearModulFit.ToString("F3");
+            this.ABulkModulusFitLabel.Content = UsedTensor.AveragedBulkModulFit.ToString("e3");
+
+            double Chi2Tmp = 0.0;
+            if (UsedTensor.Symmetry == "cubic")
+            {
+                Chi2Tmp = UsedTensor.GetFittingChi2Cubic(this.ModelSwitchBox.SelectedIndex, Compliance);
+            }
+            else
+            {
+                Chi2Tmp = UsedTensor.GetFittingChi2Hexagonal(this.ModelSwitchBox.SelectedIndex, Compliance);
+            }
+            this.Chi2TensorFitLabel.Content = Chi2Tmp.ToString("F3");
 
             #endregion
 
@@ -294,6 +455,7 @@ namespace CalScec.Analysis.Stress.Microsopic
 
             this.REKClassicCalculationList.ItemsSource = UsedTensor.DiffractionConstants;
             this.REKMacroskopicCalculationList.ItemsSource = UsedTensor.DiffractionConstants;
+            this.REKMatrixCalculationList.ItemsSource = CalculatedREK;
 
             #endregion
         }
@@ -312,41 +474,212 @@ namespace CalScec.Analysis.Stress.Microsopic
         {
             this.TextEventsActive = false;
 
-            switch (this.ModelSwitchBox.SelectedIndex)
+            if (Convert.ToBoolean(this.ActivateTexture.IsChecked))
             {
-                case 0:
-                    if (REKSwitchBox.SelectedIndex == 0)
-                    {
-                        this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(true);
-                    }
-                    else
-                    {
-                        this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(false);
-                    }
-                    break;
-                case 1:
-                    if (REKSwitchBox.SelectedIndex == 0)
-                    {
-                        this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(true);
-                    }
-                    else
-                    {
-                        this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(false);
-                    }
-                    break;
-                case 2:
-                    this.ActSample.SetHillTensorData(this.PhaseSwitchBox.SelectedIndex);
-                    break;
-                default:
-                    if (REKSwitchBox.SelectedIndex == 0)
-                    {
-                        this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(true);
-                    }
-                    else
-                    {
-                        this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(false);
-                    }
-                    break;
+                switch (this.ModelSwitchBox.SelectedIndex)
+                {
+                    case 0:
+                        if (!this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
+                        {
+                            this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 0;
+                            if (REKSwitchBox.SelectedIndex == 0)
+                            {
+                                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
+                            }
+                            else
+                            {
+                                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false;
+                            }
+                            System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
+                        }
+                        break;
+                    case 1:
+                        if (!this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
+                        {
+                            this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 1;
+                            if (REKSwitchBox.SelectedIndex == 0)
+                            {
+                                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
+                            }
+                            else
+                            {
+                                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false;
+                            }
+                            System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
+                        }
+                        break;
+                    case 2:
+                        if (!this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
+                        {
+                            this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 2;
+                            if (REKSwitchBox.SelectedIndex == 0)
+                            {
+                                this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
+                            }
+                            else
+                            {
+                                this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false; ;
+                            }
+                            System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
+                        }
+                        break;
+                    case 3:
+                        if (!this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
+                        {
+                            this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.UseStifnessCalculation = false;
+                            if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
+                            {
+                                this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.UseStifnessCalculation = true;
+                            }
+                            this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 4;
+                            if (REKSwitchBox.SelectedIndex == 0)
+                            {
+                                this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
+                            }
+                            else
+                            {
+                                this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false;
+                            }
+                            System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
+                        }
+                        break;
+                    case 4:
+                        if (!this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
+                        {
+                            this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.UseStifnessCalculation = false;
+                            if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
+                            {
+                                this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.UseStifnessCalculation = true;
+                            }
+                            this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 5;
+                            if (REKSwitchBox.SelectedIndex == 0)
+                            {
+                                this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
+                            }
+                            else
+                            {
+                                this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false;
+                            }
+                            System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
+                        }
+                        break;
+                    case 5:
+                        if (!this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
+                        {
+                            this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 3;
+                            if (REKSwitchBox.SelectedIndex == 0)
+                            {
+                                this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
+                            }
+                            else
+                            {
+                                this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false;
+                            }
+                            System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
+                        }
+                        break;
+                    default:
+                        if (!this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
+                        {
+                            this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 0;
+                            if (REKSwitchBox.SelectedIndex == 0)
+                            {
+                                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
+                            }
+                            else
+                            {
+                                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false;
+                            }
+                            System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
+                        }
+                        break;
+                }
+            }
+            else
+            {
+                switch (this.ModelSwitchBox.SelectedIndex)
+                {
+                    case 0:
+                        if (REKSwitchBox.SelectedIndex == 0)
+                        {
+                            this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(true);
+                        }
+                        else
+                        {
+                            this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(false);
+                        }
+                        break;
+                    case 1:
+                        if (REKSwitchBox.SelectedIndex == 0)
+                        {
+                            this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(true);
+                        }
+                        else
+                        {
+                            this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(false);
+                        }
+                        break;
+                    case 2:
+                        if (REKSwitchBox.SelectedIndex == 0)
+                        {
+                            this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].FitHill(true);
+                        }
+                        else
+                        {
+                            this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].FitHill(false);
+                        }
+                        break;
+                    case 3:
+                        bool SC = false;
+                        if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
+                        {
+                            SC = true;
+                        }
+                        if (REKSwitchBox.SelectedIndex == 0)
+                        {
+                            this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].FitKroener(true, SC);
+                        }
+                        else
+                        {
+                            this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].FitKroener(false, SC);
+                        }
+                        break;
+                    case 4:
+                        bool SC1 = false;
+                        if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
+                        {
+                            SC1 = true;
+                        }
+                        if (REKSwitchBox.SelectedIndex == 0)
+                        {
+                            this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].FitDeWitt(true, SC1);
+                        }
+                        else
+                        {
+                            this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].FitDeWitt(false, SC1);
+                        }
+                        break;
+                    case 5:
+                        if (REKSwitchBox.SelectedIndex == 0)
+                        {
+                            this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].FitGeometricHill(true);
+                        }
+                        else
+                        {
+                            this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].FitGeometricHill(false);
+                        }
+                        break;
+                    default:
+                        if (REKSwitchBox.SelectedIndex == 0)
+                        {
+                            this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(true);
+                        }
+                        else
+                        {
+                            this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(false);
+                        }
+                        break;
+                }
             }
 
             this.SetTensorData();
@@ -360,21 +693,95 @@ namespace CalScec.Analysis.Stress.Microsopic
             {
                 Stress.Microsopic.ElasticityTensors UsedTensor = null;
 
-                switch (this.ModelSwitchBox.SelectedIndex)
+                #region Tensor selection
+
+                if (Convert.ToBoolean(this.ActivateTexture.IsChecked))
                 {
-                    case 0:
-                        UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex];
-                        break;
-                    case 1:
-                        UsedTensor = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex];
-                        break;
-                    case 2:
-                        UsedTensor = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex];
-                        break;
-                    default:
-                        UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex];
-                        break;
+                    if (Convert.ToBoolean(this.ActivateWeightedTensor.IsChecked))
+                    {
+                        switch (this.ModelSwitchBox.SelectedIndex)
+                        {
+                            case 0:
+                                UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                                break;
+                            case 1:
+                                UsedTensor = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                                break;
+                            case 2:
+                                UsedTensor = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                                break;
+                            case 3:
+                                UsedTensor = this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                                break;
+                            case 4:
+                                UsedTensor = this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                                break;
+                            case 5:
+                                UsedTensor = this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                                break;
+                            default:
+                                UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (this.ModelSwitchBox.SelectedIndex)
+                        {
+                            case 0:
+                                UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                                break;
+                            case 1:
+                                UsedTensor = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                                break;
+                            case 2:
+                                UsedTensor = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                                break;
+                            case 3:
+                                UsedTensor = this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                                break;
+                            case 4:
+                                UsedTensor = this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                                break;
+                            case 5:
+                                UsedTensor = this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                                break;
+                            default:
+                                UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
+                                break;
+                        }
+                    }
                 }
+                else
+                {
+                    switch (this.ModelSwitchBox.SelectedIndex)
+                    {
+                        case 0:
+                            UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex];
+                            break;
+                        case 1:
+                            UsedTensor = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex];
+                            break;
+                        case 2:
+                            UsedTensor = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex];
+                            break;
+                        case 3:
+                            UsedTensor = this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex];
+                            break;
+                        case 4:
+                            UsedTensor = this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex];
+                            break;
+                        case 5:
+                            UsedTensor = this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex];
+                            break;
+                        default:
+                            UsedTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex];
+                            break;
+                    }
+                }
+
+
+                #endregion
 
                 TextBox UsedTextBox = sender as TextBox;
 
@@ -763,6 +1170,169 @@ namespace CalScec.Analysis.Stress.Microsopic
                 }
             }
         }
+
+        #region Texture
+
+        private void ActivateTexture_Checked(object sender, RoutedEventArgs e)
+        {
+            this.TextEventsActive = false;
+            this.SetTensorData();
+            this.TextEventsActive = true;
+        }
+
+        private void ActivateTexture_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.TextEventsActive = false;
+            this.SetTensorData();
+            this.TextEventsActive = true;
+        }
+
+        private void SetTextureTensor_Click(object sender, RoutedEventArgs e)
+        {
+            this.TextEventsActive = false;
+            switch (this.ModelSwitchBox.SelectedIndex)
+            {
+                case 0:
+                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
+                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+                    break;
+                case 1:
+                    this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
+                    this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+                    break;
+                case 2:
+                    this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
+                    this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+                    break;
+                case 3:
+                    this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
+                    this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+                    break;
+                case 4:
+                    this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
+                    this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+                    break;
+                case 5:
+                    this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
+                    this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+                    break;
+                default:
+                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
+                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+                    break;
+            }
+
+            this.SetTensorData();
+            this.TextEventsActive = true;
+        }
+
+        private void SetWeightedTensor_Click(object sender, RoutedEventArgs e)
+        {
+            this.TextEventsActive = false;
+            switch (this.ModelSwitchBox.SelectedIndex)
+            {
+                case 0:
+                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetTextureTensor();
+                    break;
+                case 1:
+                    this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetTextureTensor();
+                    break;
+                case 2:
+                    this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetTextureTensor();
+                    break;
+                case 3:
+                    this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetTextureTensor();
+                    break;
+                case 4:
+                    this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetTextureTensor();
+                    break;
+                case 5:
+                    this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetTextureTensor();
+                    break;
+                default:
+                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetTextureTensor();
+                    break;
+            }
+
+            this.SetTensorData();
+            this.TextEventsActive = true;
+        }
+
+        private void ActivateWeightedTensor_Checked(object sender, RoutedEventArgs e)
+        {
+            this.TextEventsActive = false;
+            
+            this.SetTensorData();
+            this.TextEventsActive = true;
+        }
+
+        private void ActivateWeightedTensor_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.TextEventsActive = false;
+            this.SetTensorData();
+            this.TextEventsActive = true;
+        }
+
+        #region Multi threading und thread-pooling
+
+        public delegate void FitTextureUpdateDelegate(Texture.OrientationDistributionFunction oDF);
+
+        private void TextureFitStarted(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            FitTextureUpdateDelegate FittingDelegate = TextureFitStartedHandler;
+
+            Dispatcher.Invoke(FittingDelegate, sender as Texture.OrientationDistributionFunction);
+        }
+
+        private void TextureFitFinished(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            FitTextureUpdateDelegate FittingDelegate = TextureFitFinishedHandler;
+
+            Dispatcher.Invoke(FittingDelegate, sender as Texture.OrientationDistributionFunction);
+        }
         
+
+        private void TextureFitStartedHandler(Texture.OrientationDistributionFunction oDF)
+        {
+            Tools.TextureFitInformation newTextureFitObject = new Tools.TextureFitInformation(oDF.fittingModel);
+            this.TextureFitObjects.Add(newTextureFitObject);
+
+            this.TextureFittingPoolList.Items.Refresh();
+
+            if (this.TextureProgress.IsIndeterminate)
+            {
+                this.TextureProgress.ToolTip = "Fitting " + Convert.ToString(this.TextureFitObjects.Count) + " Tensors";
+            }
+            else
+            {
+                this.TextureProgress.IsIndeterminate = true;
+                this.TextureProgress.ToolTip = "Fitting " + Convert.ToString(this.TextureFitObjects.Count) + " Tensors";
+            }
+        }
+
+        private void TextureFitFinishedHandler(Texture.OrientationDistributionFunction oDF)
+        {
+            for(int n = 0; n < TextureFitObjects.Count; n++)
+            {
+                if(oDF.fittingModel == TextureFitObjects[n].ModelName)
+                {
+                    TextureFitObjects.RemoveAt(n);
+                    break;
+                }
+            }
+
+            this.TextureFittingPoolList.Items.Refresh();
+
+            this.TextureProgress.ToolTip = "Fitting " + Convert.ToString(this.TextureFitObjects.Count) + " Tensors";
+
+            if (this.TextureFitObjects.Count == 0)
+            {
+                this.TextureProgress.IsIndeterminate = false;
+            }
+        }
+
+        #endregion
+
+        #endregion
     }
 }

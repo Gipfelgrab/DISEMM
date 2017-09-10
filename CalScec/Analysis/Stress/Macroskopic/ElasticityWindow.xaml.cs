@@ -133,8 +133,8 @@ namespace CalScec.Analysis.Stress.Macroskopic
                     {
                         if(PatternName == this.ActSample.DiffractionPatterns[n].Name)
                         {
-                            PhiAngleBox.Text = this.ActSample.DiffractionPatterns[n].PhiAngle.ToString("F3");
-                            PsyAngleBox.Text = this.ActSample.DiffractionPatterns[n].PsiAngle.ToString("F3");
+                            OmegaAngleBox.Text = this.ActSample.DiffractionPatterns[n].OmegaAngle.ToString("F3");
+                            ChiAngleBox.Text = this.ActSample.DiffractionPatterns[n].ChiAngle.ToString("F3");
                             AppliedStressBox.Text = this.ActSample.DiffractionPatterns[n].Stress.ToString("F3");
 
                             DiffractionPeakList.ItemsSource = this.ActSample.DiffractionPatterns[n].FoundPeaks;
@@ -147,8 +147,8 @@ namespace CalScec.Analysis.Stress.Macroskopic
                 {
                     DiffractionPeakList.ItemsSource = null;
 
-                    PhiAngleBox.Text = "";
-                    PsyAngleBox.Text = "";
+                    OmegaAngleBox.Text = "";
+                    ChiAngleBox.Text = "";
                     AppliedStressBox.Text = "";
                 }
             }
@@ -156,15 +156,15 @@ namespace CalScec.Analysis.Stress.Macroskopic
             {
                 DiffractionPeakList.ItemsSource = null;
 
-                PhiAngleBox.Text = "";
-                PsyAngleBox.Text = "";
+                OmegaAngleBox.Text = "";
+                ChiAngleBox.Text = "";
                 AppliedStressBox.Text = "";
             }
 
             this.TextEventsActive = true; ;
         }
 
-        private void PhiAngleBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void OmegaAngleBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (this.DiffractionPatternBox.SelectedIndex != -1 && this.DiffractionPatternBox.Text != "")
             {
@@ -172,7 +172,7 @@ namespace CalScec.Analysis.Stress.Macroskopic
                 {
                     try
                     {
-                        double NewValue = Convert.ToDouble(PhiAngleBox.Text);
+                        double NewValue = Convert.ToDouble(OmegaAngleBox.Text);
 
                         string PatternName = this.DiffractionPatternBox.Text;
                         Pattern.DiffractionPattern SelectedPattern = null;
@@ -185,19 +185,19 @@ namespace CalScec.Analysis.Stress.Macroskopic
                             }
                         }
 
-                        SelectedPattern.PhiAngle = NewValue;
+                        SelectedPattern.OmegaAngle = NewValue;
 
-                        PhiAngleBox.Foreground = Brushes.DarkGreen;
+                        OmegaAngleBox.Foreground = Brushes.DarkGreen;
                     }
                     catch
                     {
-                        PhiAngleBox.Foreground = Brushes.DarkRed;
+                        OmegaAngleBox.Foreground = Brushes.DarkRed;
                     }
                 }
             }
         }
 
-        private void PsyAngleBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void ChiAngleBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (this.DiffractionPatternBox.SelectedIndex != -1 && this.DiffractionPatternBox.Text != "")
             {
@@ -205,7 +205,7 @@ namespace CalScec.Analysis.Stress.Macroskopic
                 {
                     try
                     {
-                        double NewValue = Convert.ToDouble(PsyAngleBox.Text);
+                        double NewValue = Convert.ToDouble(ChiAngleBox.Text);
 
                         string PatternName = this.DiffractionPatternBox.Text;
                         Pattern.DiffractionPattern SelectedPattern = null;
@@ -218,13 +218,46 @@ namespace CalScec.Analysis.Stress.Macroskopic
                             }
                         }
 
-                        SelectedPattern.PsiAngle = NewValue;
+                        SelectedPattern.ChiAngle = NewValue;
 
-                        PsyAngleBox.Foreground = Brushes.DarkGreen;
+                        ChiAngleBox.Foreground = Brushes.DarkGreen;
                     }
                     catch
                     {
-                        PsyAngleBox.Foreground = Brushes.DarkRed;
+                        ChiAngleBox.Foreground = Brushes.DarkRed;
+                    }
+                }
+            }
+        }
+
+        private void PhiSampleAngleBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.DiffractionPatternBox.SelectedIndex != -1 && this.DiffractionPatternBox.Text != "")
+            {
+                if (this.TextEventsActive)
+                {
+                    try
+                    {
+                        double NewValue = Convert.ToDouble(PhiSampleAngleBox.Text);
+
+                        string PatternName = this.DiffractionPatternBox.Text;
+                        Pattern.DiffractionPattern SelectedPattern = null;
+                        for (int n = 0; n < this.ActSample.DiffractionPatterns.Count; n++)
+                        {
+                            if (this.ActSample.DiffractionPatterns[n].Name == PatternName)
+                            {
+                                SelectedPattern = this.ActSample.DiffractionPatterns[n];
+                                break;
+                            }
+                        }
+
+                        SelectedPattern.PhiSampleAngle = NewValue;
+
+                        PhiSampleAngleBox.Foreground = Brushes.DarkGreen;
+                    }
+                    catch
+                    {
+                        PhiSampleAngleBox.Foreground = Brushes.DarkRed;
                     }
                 }
             }
@@ -275,11 +308,26 @@ namespace CalScec.Analysis.Stress.Macroskopic
 
                     try
                     {
-                        double appStress = Convert.ToDouble(this.AppliedStressBox.Text);
-                        double psyAngle = Convert.ToDouble(this.PsyAngleBox.Text);
-                        PeakStressAssociation NewAssociation = new PeakStressAssociation(appStress , psyAngle, SelectedPeak);
+                        if (this.DiffractionPatternBox.SelectedIndex != -1)
+                        {
+                            ComboBoxItem ActItem = (ComboBoxItem)this.DiffractionPatternBox.SelectedItem;
+                            string PatternName = Convert.ToString(ActItem.Content);
 
-                        UsedDataSet.Add(NewAssociation);
+                            if (PatternName != "")
+                            {
+                                for (int n = 0; n < this.ActSample.DiffractionPatterns.Count; n++)
+                                {
+                                    if (PatternName == this.ActSample.DiffractionPatterns[n].Name)
+                                    {
+                                        double appStress = this.ActSample.DiffractionPatterns[n].Stress;
+                                        double psyAngle = this.ActSample.DiffractionPatterns[n].PsiAngle(SelectedPeak.Angle);
+                                        PeakStressAssociation NewAssociation = new PeakStressAssociation(appStress, psyAngle, SelectedPeak);
+
+                                        UsedDataSet.Add(NewAssociation);
+                                    }
+                                }
+                            }
+                        }
                     }
                     catch
                     {
@@ -302,14 +350,29 @@ namespace CalScec.Analysis.Stress.Macroskopic
 
                 try
                 {
-                    double appStress = Convert.ToDouble(this.AppliedStressBox.Text);
-                    double psyAngle = Convert.ToDouble(this.PsyAngleBox.Text);
-                    PeakStressAssociation NewAssociation = new PeakStressAssociation(appStress, psyAngle, SelectedPeak);
+                    if (this.DiffractionPatternBox.SelectedIndex != -1)
+                    {
+                        ComboBoxItem ActItem = (ComboBoxItem)this.DiffractionPatternBox.SelectedItem;
+                        string PatternName = Convert.ToString(ActItem.Content);
 
-                    Elasticity NewDataSet = new Elasticity();
-                    NewDataSet.Add(NewAssociation);
+                        if (PatternName != "")
+                        {
+                            for (int n = 0; n < this.ActSample.DiffractionPatterns.Count; n++)
+                            {
+                                if (PatternName == this.ActSample.DiffractionPatterns[n].Name)
+                                {
+                                    double appStress = this.ActSample.DiffractionPatterns[n].Stress;
+                                    double psyAngle = this.ActSample.DiffractionPatterns[n].PsiAngle(SelectedPeak.Angle);
+                                    PeakStressAssociation NewAssociation = new PeakStressAssociation(appStress, psyAngle, SelectedPeak);
 
-                    this.ActSample.MacroElasticData.Add(NewDataSet);
+                                    Elasticity NewDataSet = new Elasticity();
+                                    NewDataSet.Add(NewAssociation);
+
+                                    this.ActSample.MacroElasticData.Add(NewDataSet);
+                                }
+                            }
+                        }
+                    }
                 }
                 catch
                 {
@@ -649,21 +712,21 @@ namespace CalScec.Analysis.Stress.Macroskopic
         {
             for (int n = 0; n < this.ActSample.DiffractionPatterns.Count; n++)
             {
-                if (this.ActSample.DiffractionPatterns[n].PsiAngle == 0 || this.ActSample.DiffractionPatterns[n].PsiAngle == 90)
+                for (int i = 0; i < this.ActSample.DiffractionPatterns[n].FoundPeaks.Count; i++)
                 {
-                    for (int i = 0; i < this.ActSample.DiffractionPatterns[n].FoundPeaks.Count; i++)
-                    {
-                        bool PeakAdded = false;
+                    bool PeakAdded = false;
 
-                        for (int j = 0; j < ActSample.MacroElasticData.Count; j++)
+                    for (int j = 0; j < ActSample.MacroElasticData.Count; j++)
+                    {
+                        if (this.ActSample.DiffractionPatterns[n].PsiAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle || Math.Abs(this.ActSample.DiffractionPatterns[n].PsiAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle) - 90.0) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
                         {
                             if (ActSample.MacroElasticData[j].Count != 0)
                             {
-                                if (ActSample.MacroElasticData[j].PsiAngle == this.ActSample.DiffractionPatterns[n].PsiAngle)
+                                if (Math.Abs(ActSample.MacroElasticData[j].PsiAngle - this.ActSample.DiffractionPatterns[n].PsiAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle)) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
                                 {
                                     if (ActSample.MacroElasticData[j][0].DPeak.HKLAssociation == this.ActSample.DiffractionPatterns[n].FoundPeaks[i].HKLAssociation)
                                     {
-                                        PeakStressAssociation PSATmp = new PeakStressAssociation(this.ActSample.DiffractionPatterns[n].Stress, this.ActSample.DiffractionPatterns[n].PsiAngle, this.ActSample.DiffractionPatterns[n].FoundPeaks[i]);
+                                        PeakStressAssociation PSATmp = new PeakStressAssociation(this.ActSample.DiffractionPatterns[n].Stress, this.ActSample.DiffractionPatterns[n].PsiAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle), this.ActSample.DiffractionPatterns[n].FoundPeaks[i]);
                                         ActSample.MacroElasticData[j].Add(PSATmp);
 
                                         PeakAdded = true;
@@ -671,15 +734,15 @@ namespace CalScec.Analysis.Stress.Macroskopic
                                 }
                             }
                         }
+                    }
 
-                        if (!PeakAdded)
-                        {
-                            PeakStressAssociation PSATmp = new PeakStressAssociation(this.ActSample.DiffractionPatterns[n].Stress, this.ActSample.DiffractionPatterns[n].PsiAngle, this.ActSample.DiffractionPatterns[n].FoundPeaks[i]);
-                            Elasticity NewDataSet = new Elasticity();
-                            NewDataSet.Add(PSATmp);
+                    if (!PeakAdded)
+                    {
+                        PeakStressAssociation PSATmp = new PeakStressAssociation(this.ActSample.DiffractionPatterns[n].Stress, this.ActSample.DiffractionPatterns[n].PsiAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle), this.ActSample.DiffractionPatterns[n].FoundPeaks[i]);
+                        Elasticity NewDataSet = new Elasticity();
+                        NewDataSet.Add(PSATmp);
 
-                            this.ActSample.MacroElasticData.Add(NewDataSet);
-                        }
+                        this.ActSample.MacroElasticData.Add(NewDataSet);
                     }
                 }
             }

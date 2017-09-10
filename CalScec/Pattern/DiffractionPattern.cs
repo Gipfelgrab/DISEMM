@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using DiffractionOrientation;
+
 namespace CalScec.Pattern
 {
     public class DiffractionPattern : ICloneable
@@ -49,30 +51,176 @@ namespace CalScec.Pattern
             }
         }
 
-        private double _psiAngle;
-        public double PsiAngle
+        private MathNet.Numerics.LinearAlgebra.Vector<double> GetRotatedS1()
+        {
+            DiffractionOrientation.OrientationMatrix RotationMatrix = new OrientationMatrix();
+
+            double[] RotationAngles = { this._omegaAngle * (Math.PI / 180.0), this._chiAngle * (Math.PI / 180.0), this._phiSampleAngle * (Math.PI / 180.0) };
+
+            RotationMatrix.EulerAngles = RotationAngles;
+
+            #region Martin Master
+
+            //MathNet.Numerics.LinearAlgebra.Matrix<double> FirstRotation = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0);
+            //MathNet.Numerics.LinearAlgebra.Matrix<double> SecondRotation = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0);
+            //MathNet.Numerics.LinearAlgebra.Matrix<double> ThirdRotation = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0);
+
+            //double RadOmega = this._omegaAngle * (Math.PI / 180.0);
+            //FirstRotation[0, 0] = Math.Cos(RadOmega);
+            //FirstRotation[0, 1] = Math.Sin(RadOmega);
+            //FirstRotation[1, 0] = -1 * Math.Sin(RadOmega);
+            //FirstRotation[1, 1] = Math.Cos(RadOmega);
+            //FirstRotation[2, 2] = 1;
+
+            //double RadChi = this._chiAngle * (Math.PI / 180.0);
+            //SecondRotation[0, 0] = Math.Cos(RadChi);
+            //SecondRotation[0, 2] = -1 * Math.Sin(RadChi);
+            //SecondRotation[2, 0] = Math.Sin(RadChi);
+            //SecondRotation[1, 1] = 1;
+            //SecondRotation[2, 2] = Math.Cos(RadChi);
+
+            //double RadPhiSample = this._phiSampleAngle * (Math.PI / 180.0);
+            //ThirdRotation[0, 0] = Math.Cos(RadPhiSample);
+            //ThirdRotation[0, 1] = Math.Sin(RadPhiSample);
+            //ThirdRotation[1, 0] = -1 * Math.Sin(RadPhiSample);
+            //ThirdRotation[1, 1] = Math.Cos(RadPhiSample);
+            //ThirdRotation[2, 2] = 1;
+
+            //MathNet.Numerics.LinearAlgebra.Matrix<double> RotationMatrix = FirstRotation * SecondRotation * ThirdRotation;
+            //MathNet.Numerics.LinearAlgebra.Matrix<double> RotationMatrix = FirstRotation * SecondRotation;
+
+            #endregion
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> S1 = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3, 0);
+            S1[0] = 1;
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> Ret = RotationMatrix.OM * S1;
+
+            return Ret;
+        }
+        private MathNet.Numerics.LinearAlgebra.Vector<double> GetRotatedS3()
+        {
+            //X-Achse wird erst um Omega in position gedreht. Es wird von einem Rechtshändigen Koordinatensystemausgegangen
+            //Dabei ist ein positiver Drehwinkel im Uhrzeigersinn!!!!!
+            //Somit muss in negative Oemga gedreht werden da die Drehung im Experiment gegen den Uhrzeigersinn läuft
+            DiffractionOrientation.OrientationMatrix RotationMatrixXAxis = new OrientationMatrix();
+            double[] RotationAngles1 = { -1 * this._omegaAngle * (Math.PI / 180.0), 0, 0 };
+            MathNet.Numerics.LinearAlgebra.Vector<double> XAxis = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3, 0);
+            XAxis[0] = 1;
+            RotationMatrixXAxis.EulerAngles = RotationAngles1;
+
+            XAxis = RotationMatrixXAxis.OM * XAxis;
+
+            //Nun wird die Drehung um Chi vollzogen. Dabei wird um die neue X-Achse gedreht!!!
+            //positiver Winkel heißt im Urzeigersinn und Negativer Winkel gegen Uhrzeigersinn
+            //Die Chi-Kippung wird im Uhrzeigersinn vollzogen --> positiver winkel
+            DiffractionOrientation.OrientationMatrix RotationMatrixChiAxis = new OrientationMatrix();
+
+            double[] AngleAxisPairValues = { this._chiAngle * (Math.PI / 180.0), XAxis[0], XAxis[1], XAxis[2] };
+            RotationMatrixChiAxis.AngleAxisPair = AngleAxisPairValues;
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> S3 = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3, 0);
+            S3[2] = 1;
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> Ret = RotationMatrixChiAxis.OM * S3;
+
+            return Ret;
+        }
+        private MathNet.Numerics.LinearAlgebra.Vector<double> GetQI(double Measured2Theta)
+        {
+            MathNet.Numerics.LinearAlgebra.Vector<double> Ret = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3, 0);
+
+            double XYAngle = Measured2Theta / 2.0;
+            XYAngle += 90;
+            //XYAngle *= -1;
+
+            XYAngle *= (Math.PI / 180.0);
+
+            Ret[0] = Math.Cos(XYAngle);
+            Ret[1] = Math.Sin(XYAngle);
+            //Ret[0] = 0;
+            //Ret[1] = 1;
+            //Ret[2] = 0;
+
+            return Ret;
+        }
+
+        private double _phiSampleAngle;
+        public double PhiSampleAngle
         {
             get
             {
-                return this._psiAngle;
+                return this._phiSampleAngle;
             }
             set
             {
-                this._psiAngle = value;
+                this._phiSampleAngle = value;
             }
         }
 
-        private double _phiAngle;
-        public double PhiAngle
+        private double _macroStrain;
+        public double MacroStrain
         {
             get
             {
-                return this._phiAngle;
+                return this._macroStrain;
             }
             set
             {
-                this._phiAngle = value;
+                this._macroStrain = value;
             }
+        }
+
+        private double _chiAngle;
+        public double ChiAngle
+        {
+            get
+            {
+                return this._chiAngle;
+            }
+            set
+            {
+                this._chiAngle = value;
+            }
+        }
+        public double PsiAngle(double Measured2Theta)
+        {
+            MathNet.Numerics.LinearAlgebra.Vector<double> QI = this.GetQI(Measured2Theta);
+            MathNet.Numerics.LinearAlgebra.Vector<double> S3 = this.GetRotatedS3();
+
+            double ScalarProduct = QI * S3;
+            double TotalLength = QI.Norm(2);
+            TotalLength *= S3.Norm(2);
+
+            double Ret = Math.Acos(ScalarProduct / TotalLength);
+            Ret /= (Math.PI / 180.0);
+            return Ret;
+        }
+        
+        private double _omegaAngle;
+        public double OmegaAngle
+        {
+            get
+            {
+                return this._omegaAngle;
+            }
+            set
+            {
+                this._omegaAngle = value;
+            }
+        }
+        public double PhiAngle(double Measured2Theta)
+        {
+            MathNet.Numerics.LinearAlgebra.Vector<double> QI = this.GetQI(Measured2Theta);
+            MathNet.Numerics.LinearAlgebra.Vector<double> S1 = this.GetRotatedS1();
+
+            double ScalarProduct = QI * S1;
+            double TotalLength = QI.Norm(2);
+            TotalLength += S1.Norm(2);
+
+            double Ret = Math.Acos(ScalarProduct / TotalLength);
+            Ret /= (Math.PI / 180.0);
+            return Ret;
         }
 
         private double _stress;
@@ -235,8 +383,10 @@ namespace CalScec.Pattern
             
             Ret._name = this._name;
             Ret._path = this._path;
-            Ret._psiAngle = this._psiAngle;
-            Ret._phiAngle = this._phiAngle;
+            Ret._chiAngle = this._chiAngle;
+            Ret._omegaAngle = this._omegaAngle;
+            Ret._phiSampleAngle = this._phiSampleAngle;
+            Ret._macroStrain = this._macroStrain;
             Ret._stress = this._stress;
             Ret._force = this._force;
 

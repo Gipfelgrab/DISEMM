@@ -233,7 +233,7 @@ namespace CalScec.Analysis
             {
                 for(int i = 0; i < this.DiffractionPatterns[n].FoundPeaks.Count; i++)
                 {
-                    ret.Add(new Stress.Macroskopic.PeakStressAssociation(this.DiffractionPatterns[n].Stress, this.DiffractionPatterns[n].PsiAngle, this.DiffractionPatterns[n].FoundPeaks[i]));
+                    ret.Add(new Stress.Macroskopic.PeakStressAssociation(this.DiffractionPatterns[n].Stress, this.DiffractionPatterns[n].PsiAngle(this.DiffractionPatterns[n].FoundPeaks[i].Angle), this.DiffractionPatterns[n].FoundPeaks[i]));
                 }
             }
 
@@ -249,6 +249,9 @@ namespace CalScec.Analysis
         public List<Stress.Microsopic.ElasticityTensors> VoigtTensorData = new List<Stress.Microsopic.ElasticityTensors>();
         public List<Stress.Microsopic.ElasticityTensors> ReussTensorData = new List<Stress.Microsopic.ElasticityTensors>();
         public List<Stress.Microsopic.ElasticityTensors> HillTensorData = new List<Stress.Microsopic.ElasticityTensors>();
+        public List<Stress.Microsopic.ElasticityTensors> KroenerTensorData = new List<Stress.Microsopic.ElasticityTensors>();
+        public List<Stress.Microsopic.ElasticityTensors> DeWittTensorData = new List<Stress.Microsopic.ElasticityTensors>();
+        public List<Stress.Microsopic.ElasticityTensors> GeometricHillTensorData = new List<Stress.Microsopic.ElasticityTensors>();
 
         public void SetHillTensorData(int phase)
         {
@@ -395,6 +398,18 @@ namespace CalScec.Analysis
 
         #endregion
 
+        #region Texture
+
+        public List<Texture.OrientationDistributionFunction> ODFList = new List<Texture.OrientationDistributionFunction>();
+
+        #endregion
+
+        #region Elasto plastic calculation
+
+        public List<Stress.Plasticity.YieldSurface> YieldSurfaceData = new List<Stress.Plasticity.YieldSurface>();
+
+        #endregion
+
         public Sample()
         {
             this._name = "Default";
@@ -429,6 +444,16 @@ namespace CalScec.Analysis
             foreach (Stress.Macroskopic.Elasticity ME in this.MacroElasticData)
             {
                 Ret.MacroElasticData.Add(ME.Clone() as Stress.Macroskopic.Elasticity);
+            }
+
+            for(int n = 0; n < this.HillTensorData.Count; n++ )
+            {
+                Ret.VoigtTensorData.Add(this.VoigtTensorData[n].Clone() as Stress.Microsopic.ElasticityTensors);
+                Ret.ReussTensorData.Add(this.ReussTensorData[n].Clone() as Stress.Microsopic.ElasticityTensors);
+                Ret.HillTensorData.Add(this.HillTensorData[n].Clone() as Stress.Microsopic.ElasticityTensors);
+                Ret.KroenerTensorData.Add(this.KroenerTensorData[n].Clone() as Stress.Microsopic.ElasticityTensors);
+                Ret.DeWittTensorData.Add(this.DeWittTensorData[n].Clone() as Stress.Microsopic.ElasticityTensors);
+                Ret.GeometricHillTensorData.Add(this.GeometricHillTensorData[n].Clone() as Stress.Microsopic.ElasticityTensors);
             }
 
             return Ret;

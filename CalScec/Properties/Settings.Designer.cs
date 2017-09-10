@@ -265,7 +265,7 @@ namespace CalScec.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.5483")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.5488")]
         public double UsedWaveLength {
             get {
                 return ((double)(this["UsedWaveLength"]));
@@ -553,7 +553,7 @@ namespace CalScec.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
         public bool AutomaticPeakFit {
             get {
                 return ((bool)(this["AutomaticPeakFit"]));
@@ -625,7 +625,7 @@ namespace CalScec.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public int PatternVersion {
             get {
                 return ((int)(this["PatternVersion"]));
@@ -668,6 +668,66 @@ namespace CalScec.Properties {
             }
             set {
                 this["ReflexFitAutoCorrection"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public double PsyAcceptanceAngle {
+            get {
+                return ((double)(this["PsyAcceptanceAngle"]));
+            }
+            set {
+                this["PsyAcceptanceAngle"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int REKAutoAusociationType {
+            get {
+                return ((int)(this["REKAutoAusociationType"]));
+            }
+            set {
+                this["REKAutoAusociationType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int CubicFittingModel {
+            get {
+                return ((int)(this["CubicFittingModel"]));
+            }
+            set {
+                this["CubicFittingModel"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public double RandomProbabilityIntervall {
+            get {
+                return ((double)(this["RandomProbabilityIntervall"]));
+            }
+            set {
+                this["RandomProbabilityIntervall"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int UsedPeakDetectionId {
+            get {
+                return ((int)(this["UsedPeakDetectionId"]));
+            }
+            set {
+                this["UsedPeakDetectionId"] = value;
             }
         }
     }

@@ -35,8 +35,12 @@
                 <MenuItem Header="Sample and pattern data" Click="ChangeSamplePatternData_Click"/>
             </MenuItem>
             <Separator/>
-            <MenuItem Header="Peak fitting" Click="OpenPeakFittingWindowNew_Click">
-                <!--<MenuItem Header="Test Fitting Window" Click="OpenPeakFittingWindowNew_Click"/>-->
+            <MenuItem Header="Peak fitting">
+                <MenuItem Header="Fitting Window" Click="OpenPeakFittingWindowNew_Click"/>
+                <MenuItem Header="Peak list manipulation">
+                    <MenuItem Header="Select new peak" IsCheckable="True" Click="SelectNewPeak_Click"/>
+                    <MenuItem Header="Add new peak" IsCheckable="False" Click="AddNewPeak_Click"/>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="Plots">
                 <MenuItem Header="Sin²(&#936;)" Click="Sin2PsiPlots_Click"/>
@@ -45,6 +49,11 @@
             <MenuItem Header="Elastic calculation">
                 <MenuItem Header="REK calculation" Click="REKCalculation_Click"/>
                 <MenuItem Header="Elasticity tensor calculation" Click="ElasticityTensorCalculation_Click"/>
+                <MenuItem Header="Model Fitting simulation" Click="OpenModelSimulationWindow_Click"/>
+            </MenuItem>
+            <MenuItem Header="Texture">
+                <MenuItem Header="Load texture" Click="LoadTexture_Click"/>
+                <MenuItem Header="Show polefigures" Click="ShowPoleFigures_Click"/>
             </MenuItem>
             <Separator/>
             <MenuItem Header="_Settings">
@@ -93,6 +102,10 @@
                     </MenuItem>
                 </MenuItem>
                 <MenuItem Header="Auto peak detection">
+                    <MenuItem Header="Used detection">
+                        <MenuItem Name="PeakDetectionRoutineCIF" Header="CIF-based detection" IsCheckable="True" Checked="PeakDetectionRoutineCIF_Checked" Unchecked="PeakDetectionRoutineCIF_Unchecked"/>
+                        <MenuItem Name="PeakDetectionRoutineHyper" Header="Hyper detection" IsCheckable="True" Checked="PeakDetectionRoutineHyper_Checked" Unchecked="PeakDetectionRoutineHyper_Unchecked"/>
+                    </MenuItem>
                     <MenuItem Header="Pattern limits">
                         <StackPanel Orientation="Horizontal">
                             <Label Content="Lower limit: " Width="80"/>
@@ -218,7 +231,7 @@
                         <ColumnDefinition Width="0.25*"/>
                     </Grid.ColumnDefinitions>
                     <GroupBox Header="Diffraction pattern" Grid.Column="0">
-                        <oxy:PlotView Name="MainDiffPlot" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
+                        <oxy:PlotView Name="MainDiffPlot" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5" MouseLeftButtonUp="MainPlot_MouseLeftButtonUp"/>
                     </GroupBox>
                     <GroupBox Header="Diffraction pattern list" Grid.Column="1">
                         <ListView Name="DiffractionPatternList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5" AllowDrop="True" Drop="DiffractionPatternList_Drop" KeyDown="DiffractionPatternList_KeyDown" SelectionChanged="DiffractionPatternList_SelectionChanged">

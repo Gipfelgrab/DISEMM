@@ -1,0 +1,288 @@
+﻿<Window x:Class="CalScec.Analysis.MC.RandomAnalysisWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:oxycore="clr-namespace:OxyPlot;assembly=OxyPlot"
+        xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
+        xmlns:local="clr-namespace:CalScec.Analysis.MC"
+        mc:Ignorable="d"
+        Title="RandomAnalysisWindow" Height="800" Width="1300">
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top" Name="MainMenu" Height="25">
+            <MenuItem Header="File" Height="25">
+                <MenuItem Header="scecs">
+                    <MenuItem Header="Save" Click="SaveSimulationToSCECS_Click"/>
+                    <MenuItem Header="Load" Click="LoadSimulationToSCECS_Click"/>
+                </MenuItem>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Header="Data">
+                <MenuItem Header="Create new simulation" Click="CreateNewSimulation_Click"/>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Header="Results">
+                <MenuItem Header="Show result matrix"/>
+            </MenuItem>
+        </Menu>
+        <ToolBarTray DockPanel.Dock="Top" Height="40">
+            <ToolBar Height="40">
+                <ComboBox Width="150" Height="30" Margin="15,0,15,0" Name="MainParameterPlot" ToolTip="X-Axis selection" SelectionChanged="RefreshView_SelectionChanged"/>
+                <ComboBox Width="150" Height="30" Margin="15,0,15,0" Name="SecundaryParameterPlot" ToolTip="If a parameter is selected the analysis plot will turn into a heat map"/>
+            </ToolBar>
+            <ToolBar>
+                <Button Name="CalculateSimulation" MaxHeight="38" MaxWidth="40" Margin="10,0,0,0" ToolTip="Create new simulation" Click="CalculateSimulation_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/CalScec;component/Res/Toolbar/playGraphic.png"/>
+                    </StackPanel>
+                </Button>
+                <Separator/>
+                <Button Name="CreateNewSimulation" MaxHeight="38" MaxWidth="40" Margin="10,0,0,0" ToolTip="Create new simulation" Click="CreateNewSimulation_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/CalScec;component/Res/Toolbar/CreateNewFile.png"/>
+                    </StackPanel>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <StatusBar DockPanel.Dock="Bottom" Height="30">
+            <StatusBar.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition MinWidth="140" Width="0.06*"/>
+                            <ColumnDefinition MinWidth="70" Width="0.06*"/>
+                            <ColumnDefinition MinWidth="70" Width="0.055*"/>
+                            <ColumnDefinition MinWidth="10" Width="0.015*"/>
+                            <ColumnDefinition MinWidth="100" Width="0.1*"/>
+                            <ColumnDefinition MinWidth="100" Width="0.15*"/>
+                            <ColumnDefinition MinWidth="10" Width="0.01*"/>
+                            <ColumnDefinition MinWidth="100" Width="0.1*"/>
+                            <ColumnDefinition MinWidth="100" Width="0.2*"/>
+                            <ColumnDefinition MinWidth="10" Width="0.01*"/>
+                            <ColumnDefinition MinWidth="100" Width="0.23*"/>
+                            <ColumnDefinition MinWidth="10" Width="0.01*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ItemsPanelTemplate>
+            </StatusBar.ItemsPanel>
+            <StatusBarItem Grid.Column="0">
+                <Label Content="CalcScec simulation" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="1">
+                <Label Content="Version" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="2">
+                <Label Content="0.0.1" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="4">
+                <Label Name="ErrorLog1" Foreground="DarkRed"/>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="5">
+                <Label Name="ErrorLog2" Foreground="DarkRed" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="7">
+                <Label Name="StatusLog1"/>
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="8">
+                <Label Name="StatusLog2" />
+            </StatusBarItem>
+            <StatusBarItem Grid.Column="10">
+                <ProgressBar Name="StatusProgress" Minimum="0" Maximum="100" Value="0" Width="{Binding ActualWidth, RelativeSource={RelativeSource FindAncestor, AncestorType=StatusBarItem}}" Height="20"/>
+            </StatusBarItem>
+        </StatusBar>
+        <DockPanel LastChildFill="True" DockPanel.Dock="Top" VerticalAlignment="Stretch" MinHeight="670">
+            <Grid VerticalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Grid.Column="0" Header="Analysis plots">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.6*"/>
+                            <RowDefinition Height="0.4*"/>
+                        </Grid.RowDefinitions>
+                        <oxy:PlotView Name="AnalysisPlot" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
+                        <oxy:PlotView Name="SecundaryPlot" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
+                    </Grid>
+                </GroupBox>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.2*"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="50"/>
+                        <RowDefinition Height="0.4*"/>
+                        <RowDefinition Height="0.3*"/>
+                        <RowDefinition Height="0.3*"/>
+                    </Grid.RowDefinitions>
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                        <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Orientation="Horizontal">
+                            <DataGrid Name="ParameterGrid" ItemsSource="{Binding}" AutoGenerateColumns="False" KeyDown="ParameterGrid_KeyDown">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Width="50" Header="c11 LB" Binding="{Binding C11LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c11 UB" Binding="{Binding C11UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c11 s value" Binding="{Binding C11SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c12 LB" Binding="{Binding C12LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c12 UB" Binding="{Binding C12UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c12 s value" Binding="{Binding C12SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c44 LB" Binding="{Binding C44LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c44 UB" Binding="{Binding C44UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c44 s value" Binding="{Binding C44SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c13 LB" Binding="{Binding C13LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c13 UB" Binding="{Binding C13UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c13 s value" Binding="{Binding C13SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c33 LB" Binding="{Binding C33LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c33 UB" Binding="{Binding C33UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c33 s value" Binding="{Binding C33SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c22 LB" Binding="{Binding C22LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c22 UB" Binding="{Binding C22UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c22 s value" Binding="{Binding C22SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c22 LB" Binding="{Binding C22LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c22 UB" Binding="{Binding C22UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c22 s value" Binding="{Binding C22SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c23 LB" Binding="{Binding C23LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c23 UB" Binding="{Binding C23UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c23 s value" Binding="{Binding C23SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c55 LB" Binding="{Binding C55LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c55 UB" Binding="{Binding C55UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c55 s value" Binding="{Binding C55SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c66 LB" Binding="{Binding C66LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c66 UB" Binding="{Binding C66UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c66 s value" Binding="{Binding C66SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c45 LB" Binding="{Binding C45LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c45 UB" Binding="{Binding C45UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c45 s value" Binding="{Binding C45SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c16 LB" Binding="{Binding C16LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c16 UB" Binding="{Binding C16UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c16 s value" Binding="{Binding C16SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c26 LB" Binding="{Binding C26LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c26 UB" Binding="{Binding C26UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c26 s value" Binding="{Binding C26SValueString}"/>
+                                    <DataGridTextColumn Width="50" Header="c36 LB" Binding="{Binding C36LBString}"/>
+                                    <DataGridTextColumn Width="50" Header="c36 UB" Binding="{Binding C36UBString}"/>
+                                    <DataGridTextColumn Width="80" Header="c36 s value" Binding="{Binding C36SValueString}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+                    </ScrollViewer>
+                    <GroupBox Grid.Row="1" Header="Simulation selection">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.5*"/>
+                                <ColumnDefinition Width="0.5*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" MaxHeight="30" HorizontalAlignment="Stretch" Margin="5,0,5,0" Name="SimulationHeaderTextBox" KeyDown="SimulationHeaderTextBox_KeyDown"/>
+                            <ComboBox Grid.Column="1" MaxHeight="30" HorizontalAlignment="Stretch" Margin="5,0,5,0" Name="SimulationComboBox" SelectionChanged="SimulationComboBox_SelectionChanged"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Grid.Row="2" Header="Constant selection">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C11CheckBox" ToolTip="Enable analysis for C11" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C22CheckBox" ToolTip="Enable analysis for C22" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C33CheckBox" ToolTip="Enable analysis for C33" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C44CheckBox" ToolTip="Enable analysis for C44" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="4" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C55CheckBox" ToolTip="Enable analysis for C55" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C66CheckBox" ToolTip="Enable analysis for C66" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="6" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C12CheckBox" ToolTip="Enable analysis for C12" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="7" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C13CheckBox" ToolTip="Enable analysis for C13" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="8" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C23CheckBox" ToolTip="Enable analysis for C23" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="9" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C45CheckBox" ToolTip="Enable analysis for C45" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="10" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C16CheckBox" ToolTip="Enable analysis for C16" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="11" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C26CheckBox" ToolTip="Enable analysis for C26" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                            <CheckBox Grid.Column="12" HorizontalAlignment="Center" VerticalAlignment="Center" Name="C36CheckBox" ToolTip="Enable analysis for C36" Checked="ConstantCheckBox_Checked" Unchecked="ConstantCheckBox_Unchecked"/>
+                        </Grid>
+                    </GroupBox>
+                    <Grid Grid.Row="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Grid.Column="0" Header="Simulation settings">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <GroupBox Grid.Row="0" Header="Simulation model selection">
+                                    <ComboBox Grid.Column="1" MaxHeight="30" HorizontalAlignment="Stretch" Margin="5,0,5,0" Name="SimulationModelComboBox" SelectionChanged="RefreshView_SelectionChanged"/>
+                                </GroupBox>
+                                <GroupBox Grid.Row="1" Header="Simulation mode">
+                                    <ComboBox Grid.Column="1" MaxHeight="30" HorizontalAlignment="Stretch" Margin="5,0,5,0" Name="SimulationModeComboBox" SelectionChanged="SimulationModeComboBox_SelectionChanged"/>
+                                </GroupBox>
+                                <GroupBox Grid.Row="2" Header="Initial value type">
+                                    <ComboBox Grid.Column="1" MaxHeight="30" HorizontalAlignment="Stretch" Margin="5,0,5,0" Name="InitialValueCalculationComboBox"/>
+                                </GroupBox>
+                                <StackPanel Grid.Row="3" Orientation="Horizontal">
+                                    <Label VerticalAlignment="Stretch" VerticalContentAlignment="Center" Content="Number of simulations:"/>
+                                    <Label VerticalAlignment="Stretch" VerticalContentAlignment="Center" Content="" Name="NumberSimulationsLabel"/>
+                                    <Separator Width="15"/>
+                                    <Button VerticalAlignment="Stretch" Content="Start simulation" Margin="10,10,10,10" Click="CalculateSimulation_Click"/>
+                                </StackPanel>
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Grid.Column="1" Header="Results">
+                            
+                        </GroupBox>
+                    </Grid>
+                    <GroupBox Grid.Row="4" Header="Calculated DEKs">
+                        <Grid>
+                            <DataGrid Name="ResultGrid" ItemsSource="{Binding}" AutoGenerateColumns="False" KeyDown="ParameterGrid_KeyDown">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Width="50" Header="c11" Binding="{Binding C11}"/>
+                                    <DataGridTextColumn Width="50" Header="c12" Binding="{Binding C12}"/>
+                                    <DataGridTextColumn Width="50" Header="c44" Binding="{Binding C44}"/>
+                                    <DataGridTextColumn Width="50" Header="c13" Binding="{Binding C13}"/>
+                                    <DataGridTextColumn Width="50" Header="c33" Binding="{Binding C33}"/>
+                                    <DataGridTextColumn Width="50" Header="c22" Binding="{Binding C22}"/>
+                                    <DataGridTextColumn Width="50" Header="c22" Binding="{Binding C22}"/>
+                                    <DataGridTextColumn Width="50" Header="c23" Binding="{Binding C23}"/>
+                                    <DataGridTextColumn Width="50" Header="c55" Binding="{Binding C55}"/>
+                                    <DataGridTextColumn Width="50" Header="c66" Binding="{Binding C66}"/>
+                                    <DataGridTextColumn Width="50" Header="c45" Binding="{Binding C45}"/>
+                                    <DataGridTextColumn Width="50" Header="c16" Binding="{Binding C16}"/>
+                                    <DataGridTextColumn Width="50" Header="c26" Binding="{Binding C26}"/>
+                                    <DataGridTextColumn Width="50" Header="c36" Binding="{Binding C36}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Grid.Row="5" Header="Used DEKs">
+                    <Grid>
+                        <ListView Name="UsedREKsList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Width="100" Header="(H K L)" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
+                                    <GridViewColumn Width="100" Header="S1" DisplayMemberBinding="{Binding Path=ClassicS1}"/>
+                                    <GridViewColumn Width="100" Header="S1 Error" DisplayMemberBinding="{Binding Path=ClassicS1Error}"/>
+                                    <GridViewColumn Width="100" Header="S2" DisplayMemberBinding="{Binding Path=ClassicHS2}"/>
+                                    <GridViewColumn Width="100" Header="S2 Error" DisplayMemberBinding="{Binding Path=ClassicHS2Error}"/>
+                                    <GridViewColumn Width="120" Header="E(hkl)" DisplayMemberBinding="{Binding Path=ClassicEModulus}"/>
+                                    <GridViewColumn Width="120" Header="Nu(hkl)" DisplayMemberBinding="{Binding Path=ClassicTransverseContraction}"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                    </GroupBox>
+                </Grid>
+            </Grid>
+                
+        </DockPanel>
+    </DockPanel>
+</Window>

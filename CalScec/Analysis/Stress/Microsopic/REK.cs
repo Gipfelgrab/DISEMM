@@ -121,7 +121,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 return this.ClassicFittingFunction.Aclivity;
             }
         }
-
+        
         private double _strainFreeD0;
         public double StrainFreeD0
         {
@@ -156,7 +156,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                     bool Contained = false;
                     for (int i = 0; i < UsedPsiAngles.Count; i++)
                     {
-                        if(this.ElasticStressData[n].PsiAngle == UsedPsiAngles[i])
+                        if(Math.Abs(this.ElasticStressData[n].PsiAngle - UsedPsiAngles[i]) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
                         {
                             Contained = true;
                             break;
@@ -175,7 +175,7 @@ namespace CalScec.Analysis.Stress.Microsopic
 
                 for(int n = StartingNumber; n < this.ElasticStressData.Count; n++)
                 {
-                    if (ActPsiAngle == this.ElasticStressData[n].PsiAngle)
+                    if (Math.Abs(ActPsiAngle - this.ElasticStressData[n].PsiAngle) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
                     {
                         ActAngle.Add(this.ElasticStressData[n]);
                         AllDataUsed++;
@@ -259,26 +259,40 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         #region Macroscopic calculation
 
-        public Macroskopic.Elasticity LongitudionalElasticity;
-        public Macroskopic.Elasticity TransversalElasticity;
+        public Macroskopic.Elasticity LongitudionalElasticity = new Macroskopic.Elasticity();
+        public Macroskopic.Elasticity TransversalElasticity = new Macroskopic.Elasticity();
 
         public double MacroscopicS1Error
         {
             get
             {
-                double Ret = this.TransversalElasticity.EModulError;
-                Ret /= Math.Pow(this.TransversalElasticity.EModul, 2);
+                if (this.TransversalElasticity != null)
+                {
+                    double Ret = this.TransversalElasticity.EModulError;
+                    Ret /= Math.Pow(this.TransversalElasticity.EModul, 2);
 
-                return Ret;
+                    return Ret;
+                }
+                else
+                {
+                    return 0.0;
+                }
             }
         }
         public double MacroscopicS1
         {
             get
             {
-                double Ret = 1 / this.TransversalElasticity.EModul;
+                if (this.TransversalElasticity != null)
+                {
+                    double Ret = 1 / this.TransversalElasticity.EModul;
 
-                return Ret;
+                    return Ret;
+                }
+                else
+                {
+                    return 0.0;
+                }
             }
         }
 
@@ -286,26 +300,102 @@ namespace CalScec.Analysis.Stress.Microsopic
         {
             get
             {
-                double Ret = Math.Pow(LongitudionalElasticity.EModulError / Math.Pow(this.LongitudionalElasticity.EModul, 2), 2);
-                Ret += Math.Pow(TransversalElasticity.EModulError / Math.Pow(this.TransversalElasticity.EModul, 2), 2);
-                return Ret;
+                if (this.TransversalElasticity != null && this.LongitudionalElasticity != null)
+                {
+                    double Ret = Math.Pow(LongitudionalElasticity.EModulError / Math.Pow(this.LongitudionalElasticity.EModul, 2), 2);
+                    Ret += Math.Pow(TransversalElasticity.EModulError / Math.Pow(this.TransversalElasticity.EModul, 2), 2);
+                    return Ret;
+                }
+                else
+                {
+                    return 0.0;
+                }
             }
         }
         public double MacroscopicHS2
         {
             get
             {
-                //double Ret = 1.0 - (this.LongitudionalElasticity.EModul / this.TransversalElasticity.EModul);
-                //Ret /= this.LongitudionalElasticity.EModul;
-                double Ret = 1.0 / this.LongitudionalElasticity.EModul;
-                Ret -= 1.0 / this.TransversalElasticity.EModul;
-                return Ret;
+                if (this.TransversalElasticity != null && this.LongitudionalElasticity != null)
+                {
+                    //double Ret = 1.0 - (this.LongitudionalElasticity.EModul / this.TransversalElasticity.EModul);
+                    //Ret /= this.LongitudionalElasticity.EModul;
+                    double Ret = 1.0 / this.LongitudionalElasticity.EModul;
+                    Ret -= 1.0 / this.TransversalElasticity.EModul;
+                    return Ret;
+                }
+                else
+                {
+                    return 0.0;
+                }
             }
         }
 
         #endregion
 
         #region Derived parameters
+
+        public double ClassicTransverseContraction
+        {
+            get
+            {
+                double Ret = -1;
+                double N = this.ClassicHS2 / this.ClassicS1;
+                N += 1;
+
+                Ret /= N;
+                return Ret;
+            }
+        }
+        public double ClassicEModulus
+        {
+            get
+            {
+                double Ret = 1;
+                double N = this.ClassicS1 + this.ClassicHS2;
+
+                Ret /= N;
+                return Ret;
+            }
+        }
+
+        public double ClassicBulkModulus
+        {
+            get
+            {
+                #region Inverse Calculation
+
+                double Ret = this.ClassicS1;
+                Ret += (1.0 / 12.0) * this.ClassicHS2;
+                Ret *= 9.0;
+
+                return Ret;
+
+                #endregion
+
+                #region Linear Calculation
+
+                //double Ret = this.ClassicS1;
+                //Ret += (2.0 / 6.0) / this.ClassicHS2;
+                //Ret *= 9.0;
+
+                //return Ret;
+
+                #endregion
+            }
+        }
+        public double ClassicShearModulus
+        {
+            get
+            {
+                //double Ret = 1.0;
+                double Ret = 0.5;
+                double N = this.ClassicHS2;
+
+                Ret /= N;
+                return Ret;
+            }
+        }
 
         #endregion
 
@@ -328,8 +418,14 @@ namespace CalScec.Analysis.Stress.Microsopic
             Ret.ClassicFittingFunction = this.ClassicFittingFunction.Clone() as Analysis.Fitting.LinearFunction;
             Ret._strainFreeD0 = this._strainFreeD0;
 
-            Ret.LongitudionalElasticity = this.LongitudionalElasticity.Clone() as Macroskopic.Elasticity;
-            Ret.TransversalElasticity = this.TransversalElasticity.Clone() as Macroskopic.Elasticity;
+            if (this.LongitudionalElasticity != null)
+            {
+                Ret.LongitudionalElasticity = this.LongitudionalElasticity.Clone() as Macroskopic.Elasticity;
+            }
+            if (this.TransversalElasticity != null)
+            {
+                Ret.TransversalElasticity = this.TransversalElasticity.Clone() as Macroskopic.Elasticity;
+            }
 
 
             Ret._classicChi2 = this._classicChi2;

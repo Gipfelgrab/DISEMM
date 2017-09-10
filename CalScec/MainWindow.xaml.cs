@@ -41,6 +41,10 @@ namespace CalScec
 
         Analysis.Fitting.PeakFittingWindow PeakFitWindow;
 
+        bool _peakAddingActive = false;
+        private List<OxyPlot.Annotations.Annotation> PeakManipulationLine = new List<OxyPlot.Annotations.Annotation>();
+        double[] _newPeakCharacteristic = { 0.0, 0.0};
+
         public MainWindow()
         {
             InitializeComponent();
@@ -156,6 +160,15 @@ namespace CalScec
             else
             {
                 this.AutomaticPeakFitMenuItem.IsChecked = false;
+            }
+
+            if(CalScec.Properties.Settings.Default.UsedPeakDetectionId == 0)
+            {
+                PeakDetectionRoutineHyper.IsChecked = true;
+            }
+            else
+            {
+                PeakDetectionRoutineCIF.IsChecked = true;
             }
         }
 
@@ -633,8 +646,8 @@ namespace CalScec
                     ExcelLogSheet.Cells[(n * 7) + 6, 1] = "Applied stress (MPa):";
                     
                     ExcelLogSheet.Cells[(n * 7) + 2, 2] = this.InvestigatedSample.DiffractionPatterns[n].Name;
-                    ExcelLogSheet.Cells[(n * 7) + 3, 2] = this.InvestigatedSample.DiffractionPatterns[n].PsiAngle;
-                    ExcelLogSheet.Cells[(n * 7) + 4, 2] = this.InvestigatedSample.DiffractionPatterns[n].PhiAngle;
+                    ExcelLogSheet.Cells[(n * 7) + 3, 2] = this.InvestigatedSample.DiffractionPatterns[n].OmegaAngle;
+                    ExcelLogSheet.Cells[(n * 7) + 4, 2] = this.InvestigatedSample.DiffractionPatterns[n].ChiAngle;
                     ExcelLogSheet.Cells[(n * 7) + 5, 2] = this.InvestigatedSample.DiffractionPatterns[n].Force;
                     ExcelLogSheet.Cells[(n * 7) + 6, 2] = this.InvestigatedSample.DiffractionPatterns[n].Stress;
 
@@ -910,8 +923,15 @@ namespace CalScec
 
             if (NewDiffractionPattern != null)
             {
-                Analysis.Peaks.Detection.HyperDetection(NewDiffractionPattern);
-                Analysis.Peaks.Detection.AssociateFoundPeaksToHKL(NewDiffractionPattern, this.InvestigatedSample.CrystalData);
+                if (CalScec.Properties.Settings.Default.UsedPeakDetectionId == 0)
+                {
+                    Analysis.Peaks.Detection.HyperDetection(NewDiffractionPattern);
+                    Analysis.Peaks.Detection.AssociateFoundPeaksToHKL(NewDiffractionPattern, this.InvestigatedSample.CrystalData);
+                }
+                else
+                {
+                    Analysis.Peaks.Detection.CIFDetection(NewDiffractionPattern, this.InvestigatedSample.CrystalData);
+                }
 
                 NewDiffractionPattern.SetRegions();
 
@@ -1055,8 +1075,15 @@ namespace CalScec
             {
                 Parallel.For(0, AddedPatterns.Count, i =>
                     {
-                        Analysis.Peaks.Detection.HyperDetection(AddedPatterns[i]);
-                        Analysis.Peaks.Detection.AssociateFoundPeaksToHKL(AddedPatterns[i], this.InvestigatedSample.CrystalData);
+                        if (CalScec.Properties.Settings.Default.UsedPeakDetectionId == 0)
+                        {
+                            Analysis.Peaks.Detection.HyperDetection(AddedPatterns[i]);
+                            Analysis.Peaks.Detection.AssociateFoundPeaksToHKL(AddedPatterns[i], this.InvestigatedSample.CrystalData);
+                        }
+                        else
+                        {
+                            Analysis.Peaks.Detection.CIFDetection(AddedPatterns[i], this.InvestigatedSample.CrystalData);
+                        }
 
                         AddedPatterns[i].SetRegions();
 
@@ -1146,6 +1173,110 @@ namespace CalScec
             DDW.ShowDialog();
         }
 
+        #region Peak editing
+
+        private void MainPlot_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (this._peakAddingActive)
+            {
+                Point TMP = e.GetPosition(MainDiffPlot);
+                OxyPlot.ScreenPoint ScPoint = new OxyPlot.ScreenPoint(TMP.X, TMP.Y);
+
+                OxyPlot.TrackerHitResult NearestHitResult = this.MainDiffPlot.Model.Series[0].GetNearestPoint(ScPoint, false);
+                OxyPlot.DataPoint NearestDataPoint = NearestHitResult.DataPoint;
+                //x = (OxyPlot.Series.LineSeries).InverseTransform(e.Position).X;
+                double SelectedXValue = NearestDataPoint.X;
+
+                OxyPlot.Annotations.LineAnnotation NewLA = new OxyPlot.Annotations.LineAnnotation();
+
+                NewLA.Type = OxyPlot.Annotations.LineAnnotationType.Vertical;
+                NewLA.ClipByYAxis = true;
+                NewLA.ClipText = true;
+                NewLA.Color = OxyPlot.OxyColors.DarkBlue;
+
+                NewLA.X = SelectedXValue;
+                NewLA.StrokeThickness = CalScec.Properties.Settings.Default.PeakMarkingThickness;
+                NewLA.LineStyle = OxyPlot.LineStyle.Dot;
+
+                if(this._peakAddingActive)
+                {
+                    _newPeakCharacteristic[0] = SelectedXValue;
+                    _newPeakCharacteristic[1] = NearestDataPoint.Y;
+                    NewLA.Text = "New peak position";
+                    if (PeakManipulationLine.Count == 0)
+                    {
+                        PeakManipulationLine.Add(NewLA);
+                    }
+                    else
+                    {
+                        PeakManipulationLine.Clear();
+                        PeakManipulationLine.Add(NewLA);
+                    }
+                }
+
+                RefreshAnnotationToPlot();
+            }
+        }
+
+        private void SelectNewPeak_Click(object sender, RoutedEventArgs e)
+        {
+            if(_peakAddingActive)
+            {
+                _peakAddingActive = false;
+            }
+            else
+            {
+                _peakAddingActive = true;
+            }
+        }
+
+        private void AddNewPeak_Click(object sender, RoutedEventArgs e)
+        {
+            if (_peakAddingActive && this.DiffractionPatternList.SelectedItems.Count == 1 && PeakManipulationLine.Count == 1)
+            {
+                double FWHMD = Tools.Calculation.GetEstimatedFWHM(_newPeakCharacteristic[0]);
+
+                Pattern.DiffractionPattern ActPattern = this.DiffractionPatternList.SelectedItem as Pattern.DiffractionPattern;
+                
+                Pattern.Counts NewFittingCounts = ActPattern.PatternCounts.GetRange(_newPeakCharacteristic[0] - (FWHMD * CalScec.Properties.Settings.Default.PeakWidthFWHM), _newPeakCharacteristic[0] + (FWHMD * CalScec.Properties.Settings.Default.PeakWidthFWHM));
+                
+
+                double AngleToCount = ActPattern.PatternCounts[1][0] - ActPattern.PatternCounts[0][0];
+
+                Analysis.Peaks.DiffractionPeak NewDifPeak = new Analysis.Peaks.DiffractionPeak(Convert.ToInt32(_newPeakCharacteristic[0] / AngleToCount), _newPeakCharacteristic[0], _newPeakCharacteristic[0], _newPeakCharacteristic[1] - NewFittingCounts[0][1], NewFittingCounts);
+                NewDifPeak.PFunction.functionType = 2;
+                NewDifPeak.AssociatedPatternName = ActPattern.Name;
+                ActPattern.FoundPeaks.Add(NewDifPeak);
+
+                Analysis.Peaks.Functions.PeakRegionFunction NewPRF = new Analysis.Peaks.Functions.PeakRegionFunction(NewDifPeak.PFunction.ConstantBackground, NewFittingCounts, NewDifPeak.PFunction);
+                NewPRF.AssociatedPatternName = ActPattern.Name;
+
+                bool regionMerged = false;
+                for(int n = 0; n < ActPattern.PeakRegions.Count; n++)
+                {
+                    bool FirstCheck = NewPRF.FittingCounts[0][0] > ActPattern.PeakRegions[n].FittingCounts[0][0] && NewPRF.FittingCounts[0][0] < ActPattern.PeakRegions[n].FittingCounts[ActPattern.PeakRegions[n].FittingCounts.Count - 1][0];
+                    bool SecondCheck = NewPRF.FittingCounts[NewPRF.FittingCounts.Count - 1][0] < ActPattern.PeakRegions[n].FittingCounts[ActPattern.PeakRegions[n].FittingCounts.Count - 1][0] && NewPRF.FittingCounts[NewPRF.FittingCounts.Count - 1][0] > ActPattern.PeakRegions[n].FittingCounts[0][0];
+                    bool ThirdCheck = NewPRF.FittingCounts[0][0] < ActPattern.PeakRegions[n].FittingCounts[0][0] && NewPRF.FittingCounts[NewPRF.FittingCounts.Count - 1][0] > ActPattern.PeakRegions[n].FittingCounts[ActPattern.PeakRegions[n].FittingCounts.Count - 1][0];
+                    if (FirstCheck || SecondCheck || ThirdCheck)
+                    {
+                        ActPattern.PeakRegions[n].MergeRegions(NewPRF);
+                        regionMerged = true;
+                        break;
+                    }
+                }
+
+                if(!regionMerged)
+                {
+                    ActPattern.PeakRegions.Add(NewPRF);
+                }
+
+                PeakManipulationLine.Clear();
+                RefreshAnnotationToPlot();
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Crystallographic data
@@ -1175,23 +1306,35 @@ namespace CalScec
                             this.InvestigatedSample.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                             this.InvestigatedSample.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                             this.InvestigatedSample.HillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                            this.InvestigatedSample.KroenerTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                            this.InvestigatedSample.DeWittTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                            this.InvestigatedSample.GeometricHillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
 
-                            switch(this.InvestigatedSample.CrystalData[this.InvestigatedSample.CrystalData.Count - 1].SymmetryGroup)
+                            switch (this.InvestigatedSample.CrystalData[this.InvestigatedSample.CrystalData.Count - 1].SymmetryGroup)
                             {
                                 case "F m -3 m":
                                     this.InvestigatedSample.VoigtTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "cubic";
-                                    this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "cubic";
-                                    this.InvestigatedSample.HillTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.ReussTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.HillTensorData[this.InvestigatedSample.HillTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.KroenerTensorData[this.InvestigatedSample.KroenerTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.DeWittTensorData[this.InvestigatedSample.DeWittTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.GeometricHillTensorData[this.InvestigatedSample.GeometricHillTensorData.Count - 1].Symmetry = "cubic";
                                     break;
                                 case "I m -3 m":
                                     this.InvestigatedSample.VoigtTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "cubic";
-                                    this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "cubic";
-                                    this.InvestigatedSample.HillTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.ReussTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.HillTensorData[this.InvestigatedSample.HillTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.KroenerTensorData[this.InvestigatedSample.KroenerTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.DeWittTensorData[this.InvestigatedSample.DeWittTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.GeometricHillTensorData[this.InvestigatedSample.GeometricHillTensorData.Count - 1].Symmetry = "cubic";
                                     break;
                                 case "P 63/m m c":
                                     this.InvestigatedSample.VoigtTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "hexagonal";
-                                    this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "hexagonal";
-                                    this.InvestigatedSample.HillTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "hexagonal";
+                                    this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.ReussTensorData.Count - 1].Symmetry = "hexagonal";
+                                    this.InvestigatedSample.HillTensorData[this.InvestigatedSample.HillTensorData.Count - 1].Symmetry = "hexagonal";
+                                    this.InvestigatedSample.KroenerTensorData[this.InvestigatedSample.KroenerTensorData.Count - 1].Symmetry = "hexagonal";
+                                    this.InvestigatedSample.DeWittTensorData[this.InvestigatedSample.DeWittTensorData.Count - 1].Symmetry = "hexagonal";
+                                    this.InvestigatedSample.GeometricHillTensorData[this.InvestigatedSample.GeometricHillTensorData.Count - 1].Symmetry = "hexagonal";
                                     break;
                             }
                         }
@@ -1222,6 +1365,37 @@ namespace CalScec
                                 this.InvestigatedSample.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                                 this.InvestigatedSample.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                                 this.InvestigatedSample.HillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                                this.InvestigatedSample.KroenerTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                                this.InvestigatedSample.DeWittTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                                this.InvestigatedSample.GeometricHillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+
+                                switch (this.InvestigatedSample.CrystalData[this.InvestigatedSample.CrystalData.Count - 1].SymmetryGroup)
+                                {
+                                    case "F m -3 m":
+                                        this.InvestigatedSample.VoigtTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.ReussTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.HillTensorData[this.InvestigatedSample.HillTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.KroenerTensorData[this.InvestigatedSample.KroenerTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.DeWittTensorData[this.InvestigatedSample.DeWittTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.GeometricHillTensorData[this.InvestigatedSample.GeometricHillTensorData.Count - 1].Symmetry = "cubic";
+                                        break;
+                                    case "I m -3 m":
+                                        this.InvestigatedSample.VoigtTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.ReussTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.HillTensorData[this.InvestigatedSample.HillTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.KroenerTensorData[this.InvestigatedSample.KroenerTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.DeWittTensorData[this.InvestigatedSample.DeWittTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.GeometricHillTensorData[this.InvestigatedSample.GeometricHillTensorData.Count - 1].Symmetry = "cubic";
+                                        break;
+                                    case "P 63/m m c":
+                                        this.InvestigatedSample.VoigtTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "hexagonal";
+                                        this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.ReussTensorData.Count - 1].Symmetry = "hexagonal";
+                                        this.InvestigatedSample.HillTensorData[this.InvestigatedSample.HillTensorData.Count - 1].Symmetry = "hexagonal";
+                                        this.InvestigatedSample.KroenerTensorData[this.InvestigatedSample.KroenerTensorData.Count - 1].Symmetry = "hexagonal";
+                                        this.InvestigatedSample.DeWittTensorData[this.InvestigatedSample.DeWittTensorData.Count - 1].Symmetry = "hexagonal";
+                                        this.InvestigatedSample.GeometricHillTensorData[this.InvestigatedSample.GeometricHillTensorData.Count - 1].Symmetry = "hexagonal";
+                                        break;
+                                }
                             }
                         }
                     }
@@ -1238,6 +1412,9 @@ namespace CalScec
                             this.InvestigatedSample.VoigtTensorData.Clear();
                             this.InvestigatedSample.ReussTensorData.Clear();
                             this.InvestigatedSample.HillTensorData.Clear();
+                            this.InvestigatedSample.KroenerTensorData.Clear();
+                            this.InvestigatedSample.DeWittTensorData.Clear();
+                            this.InvestigatedSample.GeometricHillTensorData.Clear();
                         }
                     }
                 }
@@ -1271,6 +1448,9 @@ namespace CalScec
                         this.InvestigatedSample.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                         this.InvestigatedSample.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                         this.InvestigatedSample.HillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                        this.InvestigatedSample.KroenerTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                        this.InvestigatedSample.DeWittTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                        this.InvestigatedSample.GeometricHillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                     }
                 }
                 else
@@ -1295,6 +1475,9 @@ namespace CalScec
                             this.InvestigatedSample.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                             this.InvestigatedSample.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                             this.InvestigatedSample.HillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                            this.InvestigatedSample.KroenerTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                            this.InvestigatedSample.DeWittTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                            this.InvestigatedSample.GeometricHillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                         }
                     }
                     else if(Result == MessageBoxResult.No)
@@ -1310,6 +1493,9 @@ namespace CalScec
                             this.InvestigatedSample.VoigtTensorData.Clear();
                             this.InvestigatedSample.ReussTensorData.Clear();
                             this.InvestigatedSample.HillTensorData.Clear();
+                            this.InvestigatedSample.KroenerTensorData.Clear();
+                            this.InvestigatedSample.DeWittTensorData.Clear();
+                            this.InvestigatedSample.GeometricHillTensorData.Clear();
                         }
                     }
                 }
@@ -1368,6 +1554,9 @@ namespace CalScec
                         this.InvestigatedSample.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                         this.InvestigatedSample.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                         this.InvestigatedSample.HillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                        this.InvestigatedSample.KroenerTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                        this.InvestigatedSample.DeWittTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                        this.InvestigatedSample.GeometricHillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                     }
                 }
                 else
@@ -1387,6 +1576,9 @@ namespace CalScec
                             this.InvestigatedSample.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                             this.InvestigatedSample.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                             this.InvestigatedSample.HillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                            this.InvestigatedSample.KroenerTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                            this.InvestigatedSample.DeWittTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                            this.InvestigatedSample.GeometricHillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                         }
                     }
                     else
@@ -1402,6 +1594,9 @@ namespace CalScec
                             this.InvestigatedSample.VoigtTensorData.Clear();
                             this.InvestigatedSample.ReussTensorData.Clear();
                             this.InvestigatedSample.HillTensorData.Clear();
+                            this.InvestigatedSample.KroenerTensorData.Clear();
+                            this.InvestigatedSample.DeWittTensorData.Clear();
+                            this.InvestigatedSample.GeometricHillTensorData.Clear();
                         }
                     }
                 }
@@ -1483,6 +1678,91 @@ namespace CalScec
             }
 
             PlotHKLToPlot();
+        }
+
+        #endregion
+
+        #region Texture
+
+        private void LoadTexture_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog OpenDiffractionFile = new Microsoft.Win32.OpenFileDialog();
+            OpenDiffractionFile.Multiselect = false;
+            OpenDiffractionFile.DefaultExt = ".cif";
+            Nullable<bool> Opened = OpenDiffractionFile.ShowDialog();
+
+            if (Opened == true)
+            {
+                string FilePath = OpenDiffractionFile.FileName;
+
+                if (this.InvestigatedSample.CrystalData.Count == 1)
+                {
+                    Analysis.Texture.OrientationDistributionFunction NewODF = new Analysis.Texture.OrientationDistributionFunction(FilePath);
+
+                    this.InvestigatedSample.VoigtTensorData[0].ODF = NewODF.Clone() as Analysis.Texture.OrientationDistributionFunction;
+                    this.InvestigatedSample.ReussTensorData[0].ODF = NewODF.Clone() as Analysis.Texture.OrientationDistributionFunction;
+                    this.InvestigatedSample.HillTensorData[0].ODF = NewODF.Clone() as Analysis.Texture.OrientationDistributionFunction;
+                    this.InvestigatedSample.KroenerTensorData[0].ODF = NewODF.Clone() as Analysis.Texture.OrientationDistributionFunction;
+                    this.InvestigatedSample.DeWittTensorData[0].ODF = NewODF.Clone() as Analysis.Texture.OrientationDistributionFunction;
+                    this.InvestigatedSample.GeometricHillTensorData[0].ODF = NewODF.Clone() as Analysis.Texture.OrientationDistributionFunction;
+                }
+                else if (this.InvestigatedSample.CrystalData.Count > 1)
+                {
+                    Analysis.Texture.PhaseSelectionWindow PSW = new Analysis.Texture.PhaseSelectionWindow(this.InvestigatedSample.CrystalData);
+                    PSW.ShowDialog();
+
+                    if(!PSW.Canceled)
+                    {
+                        int SelectedPhase = PSW.PhaseSelectionBox.SelectedIndex;
+
+                        Analysis.Texture.OrientationDistributionFunction NewODF = new Analysis.Texture.OrientationDistributionFunction(FilePath);
+
+                        this.InvestigatedSample.VoigtTensorData[SelectedPhase].ODF = NewODF.Clone() as Analysis.Texture.OrientationDistributionFunction;
+                        this.InvestigatedSample.ReussTensorData[SelectedPhase].ODF = NewODF.Clone() as Analysis.Texture.OrientationDistributionFunction;
+                        this.InvestigatedSample.HillTensorData[SelectedPhase].ODF = NewODF.Clone() as Analysis.Texture.OrientationDistributionFunction;
+                        this.InvestigatedSample.KroenerTensorData[SelectedPhase].ODF = NewODF.Clone() as Analysis.Texture.OrientationDistributionFunction;
+                        this.InvestigatedSample.DeWittTensorData[SelectedPhase].ODF = NewODF.Clone() as Analysis.Texture.OrientationDistributionFunction;
+                        this.InvestigatedSample.GeometricHillTensorData[SelectedPhase].ODF = NewODF.Clone() as Analysis.Texture.OrientationDistributionFunction;
+
+                        this.InvestigatedSample.VoigtTensorData[SelectedPhase].ODF.BaseTensor = this.InvestigatedSample.VoigtTensorData[SelectedPhase].Clone() as Analysis.Stress.Microsopic.ElasticityTensors;
+                        this.InvestigatedSample.ReussTensorData[SelectedPhase].ODF.BaseTensor = this.InvestigatedSample.ReussTensorData[SelectedPhase].Clone() as Analysis.Stress.Microsopic.ElasticityTensors;
+                        this.InvestigatedSample.HillTensorData[SelectedPhase].ODF.BaseTensor = this.InvestigatedSample.HillTensorData[SelectedPhase].Clone() as Analysis.Stress.Microsopic.ElasticityTensors;
+                        this.InvestigatedSample.KroenerTensorData[SelectedPhase].ODF.BaseTensor = this.InvestigatedSample.KroenerTensorData[SelectedPhase].Clone() as Analysis.Stress.Microsopic.ElasticityTensors;
+                        this.InvestigatedSample.DeWittTensorData[SelectedPhase].ODF.BaseTensor = this.InvestigatedSample.DeWittTensorData[SelectedPhase].Clone() as Analysis.Stress.Microsopic.ElasticityTensors;
+                        this.InvestigatedSample.GeometricHillTensorData[SelectedPhase].ODF.BaseTensor = this.InvestigatedSample.GeometricHillTensorData[SelectedPhase].Clone() as Analysis.Stress.Microsopic.ElasticityTensors;
+                        this.InvestigatedSample.VoigtTensorData[SelectedPhase].ODF.TextureTensor = this.InvestigatedSample.VoigtTensorData[SelectedPhase].Clone() as Analysis.Stress.Microsopic.ElasticityTensors;
+                        this.InvestigatedSample.ReussTensorData[SelectedPhase].ODF.TextureTensor = this.InvestigatedSample.ReussTensorData[SelectedPhase].Clone() as Analysis.Stress.Microsopic.ElasticityTensors;
+                        this.InvestigatedSample.HillTensorData[SelectedPhase].ODF.TextureTensor = this.InvestigatedSample.HillTensorData[SelectedPhase].Clone() as Analysis.Stress.Microsopic.ElasticityTensors;
+                        this.InvestigatedSample.KroenerTensorData[SelectedPhase].ODF.TextureTensor = this.InvestigatedSample.KroenerTensorData[SelectedPhase].Clone() as Analysis.Stress.Microsopic.ElasticityTensors;
+                        this.InvestigatedSample.DeWittTensorData[SelectedPhase].ODF.TextureTensor = this.InvestigatedSample.DeWittTensorData[SelectedPhase].Clone() as Analysis.Stress.Microsopic.ElasticityTensors;
+                        this.InvestigatedSample.GeometricHillTensorData[SelectedPhase].ODF.TextureTensor = this.InvestigatedSample.GeometricHillTensorData[SelectedPhase].Clone() as Analysis.Stress.Microsopic.ElasticityTensors;
+
+                        this.InvestigatedSample.VoigtTensorData[SelectedPhase].ODF.BaseTensor.ODF = null;
+                        this.InvestigatedSample.ReussTensorData[SelectedPhase].ODF.BaseTensor.ODF = null;
+                        this.InvestigatedSample.HillTensorData[SelectedPhase].ODF.BaseTensor.ODF = null;
+                        this.InvestigatedSample.KroenerTensorData[SelectedPhase].ODF.BaseTensor.ODF = null;
+                        this.InvestigatedSample.DeWittTensorData[SelectedPhase].ODF.BaseTensor.ODF = null;
+                        this.InvestigatedSample.GeometricHillTensorData[SelectedPhase].ODF.BaseTensor.ODF = null;
+                        this.InvestigatedSample.VoigtTensorData[SelectedPhase].ODF.TextureTensor.ODF = null;
+                        this.InvestigatedSample.ReussTensorData[SelectedPhase].ODF.TextureTensor.ODF = null;
+                        this.InvestigatedSample.HillTensorData[SelectedPhase].ODF.TextureTensor.ODF = null;
+                        this.InvestigatedSample.KroenerTensorData[SelectedPhase].ODF.TextureTensor.ODF = null;
+                        this.InvestigatedSample.DeWittTensorData[SelectedPhase].ODF.TextureTensor.ODF = null;
+                        this.InvestigatedSample.GeometricHillTensorData[SelectedPhase].ODF.TextureTensor.ODF = null;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please load the crystallographic data first!", "No crystal data loaded!", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private void ShowPoleFigures_Click(object sender, RoutedEventArgs e)
+        {
+            Analysis.Texture.PoleFigureWindow PoleWindow = new Analysis.Texture.PoleFigureWindow(this.InvestigatedSample);
+
+            PoleWindow.Show();
         }
 
         #endregion
@@ -2019,6 +2299,10 @@ namespace CalScec
             {
                 DiffractionPlotModel.Annotations.Add(LA);
             }
+            foreach (OxyPlot.Annotations.LineAnnotation LA in this.PeakManipulationLine)
+            {
+                DiffractionPlotModel.Annotations.Add(LA);
+            }
 
             this.MainDiffPlot.Model.InvalidatePlot(true);
         }
@@ -2136,6 +2420,34 @@ namespace CalScec
             }
         }
 
+        private void PeakDetectionRoutineCIF_Checked(object sender, RoutedEventArgs e)
+        {
+            PeakDetectionRoutineHyper.IsChecked = false;
+            PeakDetectionRoutineCIF.IsChecked = true;
+            CalScec.Properties.Settings.Default.UsedPeakDetectionId = 1;
+        }
+
+        private void PeakDetectionRoutineCIF_Unchecked(object sender, RoutedEventArgs e)
+        {
+            PeakDetectionRoutineHyper.IsChecked = true;
+            PeakDetectionRoutineCIF.IsChecked = false;
+            CalScec.Properties.Settings.Default.UsedPeakDetectionId = 0;
+        }
+
+        private void PeakDetectionRoutineHyper_Checked(object sender, RoutedEventArgs e)
+        {
+            PeakDetectionRoutineHyper.IsChecked = true;
+            PeakDetectionRoutineCIF.IsChecked = false;
+            CalScec.Properties.Settings.Default.UsedPeakDetectionId = 0;
+        }
+
+        private void PeakDetectionRoutineHyper_Unchecked(object sender, RoutedEventArgs e)
+        {
+            PeakDetectionRoutineHyper.IsChecked = false;
+            PeakDetectionRoutineCIF.IsChecked = true;
+            CalScec.Properties.Settings.Default.UsedPeakDetectionId = 1;
+        }
+
         #endregion
 
         private void AutomaticPeakFitMenuItem_Click(object sender, RoutedEventArgs e)
@@ -2170,6 +2482,16 @@ namespace CalScec
             Analysis.Stress.Microsopic.ElasticityCalculationWindow ElCW = new Analysis.Stress.Microsopic.ElasticityCalculationWindow(this.InvestigatedSample);
 
             ElCW.ShowDialog();
+        }
+
+        private void OpenModelSimulationWindow_Click(object sender, RoutedEventArgs e)
+        {
+            if(this.InvestigatedSample.ReussTensorData[0].DiffractionConstants.Count == 0)
+            {
+                this.InvestigatedSample.ReussTensorData[0].DiffractionConstants = this.InvestigatedSample.DiffractionConstants[0];
+            }
+            Analysis.MC.RandomAnalysisWindow NewWindow = new Analysis.MC.RandomAnalysisWindow(this.InvestigatedSample.ReussTensorData[0]);
+            NewWindow.Show();
         }
 
         #region Plots

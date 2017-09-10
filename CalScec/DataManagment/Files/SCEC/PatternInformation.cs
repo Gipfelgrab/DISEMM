@@ -28,8 +28,17 @@ namespace CalScec.DataManagment.Files.SCEC
 
         public string Name;
         public string Path;
+
+        /// <summary>
+        /// Remains of version 1 later not really used
+        /// </summary>
         public double PsiAngle;
         public double PhiAngle;
+        //----------------------------------------------
+
+        public double OmegaAngle;
+        public double ChiAngle;
+        public double PhiSampleAngle;
         public double Stress;
         public double Force;
 
@@ -45,8 +54,9 @@ namespace CalScec.DataManagment.Files.SCEC
             this.Id = DP.Id;
             this.Name = DP.Name;
             this.Path = DP.Path;
-            this.PsiAngle = DP.PsiAngle;
-            this.PhiAngle = DP.PhiAngle;
+            this.OmegaAngle = DP.OmegaAngle;
+            this.ChiAngle = DP.ChiAngle;
+            this.PhiSampleAngle = DP.PhiSampleAngle;
             this.Stress = DP.Stress;
             this.Force = DP.Force;
 
@@ -67,8 +77,18 @@ namespace CalScec.DataManagment.Files.SCEC
             Pattern.DiffractionPattern Ret = new Pattern.DiffractionPattern(this.Id);
 
             Ret.Name = this.Name;
-            Ret.PsiAngle = this.PsiAngle;
-            Ret.PhiAngle = this.PhiAngle;
+            if (this._patternVersion == 1)
+            {
+                Ret.ChiAngle = this.PsiAngle;
+                Ret.OmegaAngle = this.PhiAngle;
+                Ret.PhiSampleAngle = 0.0;
+            }
+            else if( this._patternVersion == 2)
+            {
+                Ret.ChiAngle = this.ChiAngle;
+                Ret.OmegaAngle = this.OmegaAngle;
+                Ret.PhiSampleAngle = this.PhiSampleAngle;
+            }
             Ret.Stress = this.Stress;
             Ret.Force = this.Force;
 

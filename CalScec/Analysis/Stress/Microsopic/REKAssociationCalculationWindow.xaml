@@ -59,6 +59,8 @@
                             <GridViewColumn Width="120" Header="Weighted error" DisplayMemberBinding="{Binding Path=ClassicS1Error}"/>
                             <GridViewColumn Width="120" Header="S2" DisplayMemberBinding="{Binding Path=ClassicHS2}"/>
                             <GridViewColumn Width="120" Header="Weighted error" DisplayMemberBinding="{Binding Path=ClassicHS2Error}"/>
+                            <GridViewColumn Width="120" Header="E(hkl)" DisplayMemberBinding="{Binding Path=ClassicEModulus}"/>
+                            <GridViewColumn Width="120" Header="Nu(hkl)" DisplayMemberBinding="{Binding Path=ClassicTransverseContraction}"/>
                             <GridViewColumn Width="120" Header="Chi2" DisplayMemberBinding="{Binding Path=ClassicChi2}"/>
                         </GridView>
                     </ListView.View>
@@ -85,7 +87,7 @@
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0" Name="RemovePeakFromREK" Content="Remove peak from REK" MaxHeight="30" MaxWidth="150" Click="RemovePeakFromREK_Click"/>
                 <Button Grid.Column="1" Name="DeleteREK" Content="Remove REK" MaxHeight="30" MaxWidth="150" Click="DeleteREK_Click"/>
-                <Button Grid.Column="2" Name="SwitchREK" Content="Switch to macroscopic REK" MaxHeight="30" MaxWidth="150"/>
+                <Button Grid.Column="2" Name="AutoREK" Content="Auto association of REKs" MaxHeight="30" MaxWidth="150" Click="AutoREK_Click"/>
             </Grid>
         </Grid>
         <Grid Grid.Column="3" Grid.Row="1">
@@ -104,17 +106,20 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Phi angle"/>
-                    <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Psy angle"/>
-                    <Label Grid.Column="0" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Applied stress"/>
-                    <TextBox Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="PhiAngleBox" TextChanged="PhiAngleBox_TextChanged"/>
-                    <TextBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="PsyAngleBox" TextChanged="PsyAngleBox_TextChanged"/>
-                    <TextBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="AppliedStressBox" TextChanged="AppliedStressBox_TextChanged"/>
+                    <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Omega angle"/>
+                    <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Chi angle"/>
+                    <Label Grid.Column="0" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Phi sample angle"/>
+                    <Label Grid.Column="0" Grid.Row="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Applied stress"/>
+                    <TextBox Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="OmegaAngleBox" TextChanged="OmegaAngleBox_TextChanged"/>
+                    <TextBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="ChiAngleBox" TextChanged="ChiAngleBox_TextChanged"/>
+                    <TextBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="PhiSampleAngleBox" TextChanged="PhiSampleAngleBox_TextChanged"/>
+                    <TextBox Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="AppliedStressBox" TextChanged="AppliedStressBox_TextChanged"/>
                 </Grid>
             </GroupBox>
             <GroupBox Grid.Row="2" Header="Peak list">

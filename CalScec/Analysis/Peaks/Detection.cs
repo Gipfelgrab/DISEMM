@@ -225,10 +225,10 @@ namespace CalScec.Analysis.Peaks
                     DegDifference1 = DegDifference2;
                     PeakIndex = n;
                 }
-                else
-                {
-                    break;
-                }
+                //else
+                //{
+                //    break;
+                //}
             }
 
             if (DegDifference1 < CalScec.Properties.Settings.Default.HKLAssociationRangeDeg)
@@ -240,6 +240,72 @@ namespace CalScec.Analysis.Peaks
             {
                 return false;
             }
+        }
+
+        public static void CIFDetection(Pattern.DiffractionPattern DP, List<DataManagment.CrystalData.CODData> CrystalData)
+        {
+            List<DiffractionPeak> DPeakList = new List<DiffractionPeak>();
+
+            double AngleToCount = DP.PatternCounts[1][0] - DP.PatternCounts[0][0];
+
+            for (int n = 0; n < CrystalData.Count; n++)
+            {
+                for( int i = 0; i < CrystalData[n].HKLList.Count; i++)
+                {
+                    if (CrystalData[n].HKLList[i].EstimatedAngle > CalScec.Properties.Settings.Default.PatternLowerLimit && CrystalData[n].HKLList[i].EstimatedAngle < CalScec.Properties.Settings.Default.PatternUpperLimit)
+                    {
+                        double FWHMD = Tools.Calculation.GetEstimatedFWHM(CrystalData[n].HKLList[i].EstimatedAngle);
+                        int dChannel = 0;
+                        double dHeight = 0.0;
+
+                        double StartDegree = CrystalData[n].HKLList[i].EstimatedAngle - (2.0 * FWHMD);
+                        if (StartDegree < CalScec.Properties.Settings.Default.PatternLowerLimit)
+                        {
+                            StartDegree = CalScec.Properties.Settings.Default.PatternLowerLimit;
+                        }
+
+                        double StopDegree = CrystalData[n].HKLList[i].EstimatedAngle + (2.0 * FWHMD);
+                        if (StopDegree > CalScec.Properties.Settings.Default.PatternUpperLimit)
+                        {
+                            StopDegree = CalScec.Properties.Settings.Default.PatternUpperLimit;
+                        }
+
+                        Pattern.Counts FittingCounts = new Pattern.Counts();
+
+                        for (int j = 0; j < DP.PatternCounts.Count; j++)
+                        {
+                            if (StartDegree < DP.PatternCounts[j][0])
+                            {
+                                if (StopDegree > DP.PatternCounts[j][0])
+                                {
+                                    FittingCounts.Add(DP.PatternCounts[j]);
+
+                                    if (dHeight < DP.PatternCounts[j][1])
+                                    {
+                                        dHeight = DP.PatternCounts[j][1];
+                                        dChannel = j;
+                                    }
+                                }
+                                else
+                                {
+                                    break;
+                                }
+                            }
+                        }
+
+                        double dBackground = FittingCounts[0][1];
+
+                        DiffractionPeak DPeak = new DiffractionPeak(dChannel, CrystalData[n].HKLList[i].EstimatedAngle, dHeight, dBackground, FittingCounts);
+
+                        DPeak.AddHKLAssociation(CrystalData[n].HKLList[i], CrystalData[n]);
+
+                        DPeakList.Add(DPeak);
+                    }
+                }
+            }
+
+            DP.FoundPeaks = DPeakList;
+            DP.SetPeakAssociations();
         }
     }
 }

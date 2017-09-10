@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CalScec.Analysis.Stress.Microsopic"
         mc:Ignorable="d"
-        Title="ElasticityCalculationWindow" Height="700" Width="1400">
+        Title="ElasticityCalculationWindow" Height="900" Width="1400">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.01*"/>
@@ -57,9 +57,9 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T11" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
+                            <TextBox Grid.Column="0" Name="T11" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
                             <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
-                            <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T11E" Margin="2,2,2,2"/>
+                            <Label HorizontalAlignment="Stretch" VerticalAlignment="Top" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T11E" Margin="1.6,2,2.2,0" Height="45"/>
                         </Grid>
                         <Grid Grid.Row="0" Grid.Column="1">
                             <Grid.ColumnDefinitions>
@@ -67,8 +67,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T12" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T12" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T12E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="0" Grid.Column="2">
@@ -77,8 +77,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T13" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T13" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T13E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="0" Grid.Column="3">
@@ -87,8 +87,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T14" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T14" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T14E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="0" Grid.Column="4">
@@ -97,8 +97,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T15" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T15" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T15E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="0" Grid.Column="5">
@@ -107,8 +107,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T16" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T16" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T16E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="1" Grid.Column="0">
@@ -117,8 +117,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T21" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T21" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T21E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="1" Grid.Column="1">
@@ -127,8 +127,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T22" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T22" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T22E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="1" Grid.Column="2">
@@ -137,8 +137,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T23" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T23" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T23E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="1" Grid.Column="3">
@@ -147,8 +147,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T24" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T24" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T24E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="1" Grid.Column="4">
@@ -157,8 +157,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T25" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" />
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T25" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T25E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="1" Grid.Column="5">
@@ -167,8 +167,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T26" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T26" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T26E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="2" Grid.Column="0">
@@ -177,8 +177,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T31" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T31" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T31E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="2" Grid.Column="1">
@@ -187,8 +187,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T32" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T32" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T32E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="2" Grid.Column="2">
@@ -197,8 +197,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T33" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T33" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T33E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="2" Grid.Column="3">
@@ -207,8 +207,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T34" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T34" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T34E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="2" Grid.Column="4">
@@ -217,8 +217,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T35" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T35" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T35E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="2" Grid.Column="5">
@@ -227,8 +227,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T36" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T36" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T36E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="3" Grid.Column="0">
@@ -237,8 +237,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T41" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T41" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T41E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="3" Grid.Column="1">
@@ -247,8 +247,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T42" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T42" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T42E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="3" Grid.Column="2">
@@ -257,8 +257,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T43" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T43" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T43E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="3" Grid.Column="3">
@@ -267,8 +267,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T44" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T44" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T44E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="3" Grid.Column="4">
@@ -277,8 +277,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T45" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T45" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T45E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="3" Grid.Column="5">
@@ -287,8 +287,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T46" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T46" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T46E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="4" Grid.Column="0">
@@ -297,8 +297,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T51" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T51" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T51E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="4" Grid.Column="1">
@@ -307,8 +307,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T52" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T52" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T52E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="4" Grid.Column="2">
@@ -317,8 +317,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T53" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T53" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T53E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="4" Grid.Column="3">
@@ -327,8 +327,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T54" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T54" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T54E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="4" Grid.Column="4">
@@ -337,8 +337,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T55" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T55" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T55E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="4" Grid.Column="5">
@@ -347,8 +347,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T56" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T56" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T56E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="5" Grid.Column="0">
@@ -357,8 +357,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T61" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T61" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T61E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="5" Grid.Column="1">
@@ -367,8 +367,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T62" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T62" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T62E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="5" Grid.Column="2">
@@ -377,8 +377,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T63" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T63" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T63E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="5" Grid.Column="3">
@@ -387,8 +387,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T64" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T64" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T64E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="5" Grid.Column="4">
@@ -397,8 +397,8 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T65" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T65" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T65E" Margin="2,2,2,2"/>
                         </Grid>
                         <Grid Grid.Row="5" Grid.Column="5">
@@ -407,16 +407,16 @@
                                 <ColumnDefinition Width="0.3*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0" Name="T66" Margin="2,2,2,2" TextChanged="Tensor_TextChanged"/>
-                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="14">&#177;</Label>
+                            <TextBox Grid.Column="0" Name="T66" Margin="2,2,2,2" TextChanged="Tensor_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                            <Label Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="16">&#177;</Label>
                             <Label HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Center" FontSize="14" Grid.Column="2" Name="T66E" Margin="2,2,2,2"/>
                         </Grid>
                     </Grid>
                 </GroupBox>
                 <Grid Grid.Row="1" Grid.Column="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="0.3*"/>
-                        <RowDefinition Height="0.7*"/>
+                        <RowDefinition Height="0.2*"/>
+                        <RowDefinition Height="0.8*"/>
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0" Header="Settings and fitting">
                         <Grid>
@@ -442,6 +442,116 @@
                             <Button Grid.Row="0" Grid.Column="4" Name="RefitConstants" Content="Fit tensor" MaxHeight="30" MaxWidth="150" Click="RefitConstants_Click"/>
                         </Grid>
                     </GroupBox>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.5*"/>
+                            <ColumnDefinition Width="0.5*"/>
+                        </Grid.ColumnDefinitions>
+                        <GroupBox Grid.Column="0" Header="Calculated DEKs">
+                            <Grid>
+                                <ListView Name="REKMatrixCalculationList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Width="100" Header="(H K L)" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
+                                            <GridViewColumn Width="100" Header="S1" DisplayMemberBinding="{Binding Path=ClassicS1}"/>
+                                            <GridViewColumn Width="100" Header="S1 Error" DisplayMemberBinding="{Binding Path=ClassicS1Error}"/>
+                                            <GridViewColumn Width="100" Header="S2" DisplayMemberBinding="{Binding Path=ClassicHS2}"/>
+                                            <GridViewColumn Width="100" Header="S2 Error" DisplayMemberBinding="{Binding Path=ClassicHS2Error}"/>
+                                            <GridViewColumn Width="120" Header="E(hkl)" DisplayMemberBinding="{Binding Path=ClassicEModulus}"/>
+                                            <GridViewColumn Width="120" Header="Nu(hkl)" DisplayMemberBinding="{Binding Path=ClassicTransverseContraction}"/>
+                                            <GridViewColumn Width="120" Header="G(hkl)" DisplayMemberBinding="{Binding Path=ClassicShearModulus}"/>
+                                            <GridViewColumn Width="120" Header="Kappa(hkl)" DisplayMemberBinding="{Binding Path=ClassicBulkModulus}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                            </Grid>
+                        </GroupBox>
+                        <Grid Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Grid.Column="0" Header="Bulk parameters">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.55*"/>
+                                        <ColumnDefinition Width="0.45*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Column="0" Grid.Row="0" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg E-Modulus:"/>
+                                    <Label Grid.Column="1" Grid.Row="0" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AEModulusLabel"/>
+                                    <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg nu:"/>
+                                    <Label Grid.Column="1" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ANuLabel"/>
+                                    <Label Grid.Column="0" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg G-Modulus:"/>
+                                    <Label Grid.Column="1" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AShearModulusLabel"/>
+                                    <Label Grid.Column="0" Grid.Row="6" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg Bulk-Modulus:"/>
+                                    <Label Grid.Column="1" Grid.Row="6" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ABulkModulusLabel"/>
+                                    <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg E-Modulus fit:"/>
+                                    <Label Grid.Column="1" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AEModulusFitLabel"/>
+                                    <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg nu fit:"/>
+                                    <Label Grid.Column="1" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ANuFitLabel"/>
+                                    <Label Grid.Column="0" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg G-Modulus fit:"/>
+                                    <Label Grid.Column="1" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AShearModulusFitLabel"/>
+                                    <Label Grid.Column="0" Grid.Row="7" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg Bulk-Modulus fit:"/>
+                                    <Label Grid.Column="1" Grid.Row="7" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ABulkModulusFitLabel"/>
+                                    <Label Grid.Column="0" Grid.Row="8" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Chi2:"/>
+                                    <Label Grid.Column="1" Grid.Row="8" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="Chi2TensorFitLabel"/>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Grid.Column="1" Header="Texture">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="8*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Activate" Name="ActivateTexture" Checked="ActivateTexture_Checked" Unchecked="ActivateTexture_Unchecked"/>
+                                        <Button Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Set tensor" Name="SetTextureTensor" Click="SetTextureTensor_Click"/>
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="0.7*"/>
+                                            <ColumnDefinition Width="0.3*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Show weighted tensor" Name="ActivateWeightedTensor" Checked="ActivateWeightedTensor_Checked" Unchecked="ActivateWeightedTensor_Unchecked"/>
+                                        <Button Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Set weight" Name="SetWeightedTensor" Click="SetTextureTensor_Click"/>
+                                    </Grid>
+                                    <GroupBox Grid.Row="2" Header="Texture Fit Queque">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*"/>
+                                                <RowDefinition Height="4*"/>
+                                            </Grid.RowDefinitions>
+                                            <ProgressBar MaxHeight="32" Name="TextureProgress"/>
+                                            <ListView Grid.Row="1" Name="TextureFittingPoolList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
+                                                <ListView.View>
+                                                    <GridView>
+                                                        <GridViewColumn Width="100" Header="Model" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
+                                                        <GridViewColumn Width="100" Header="Started" DisplayMemberBinding="{Binding Path=MacroscopicS1}"/>
+                                                    </GridView>
+                                                </ListView.View>
+                                            </ListView>
+                                        </Grid>
+                                    </GroupBox>
+                                </Grid>
+                            </GroupBox>
+                        </Grid>
+                    </Grid>
                 </Grid>
                 <GroupBox Grid.Column="1" Grid.Row="0" Header="List of clssic REKs">
                     <ListView Name="REKClassicCalculationList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
@@ -452,6 +562,10 @@
                                 <GridViewColumn Width="100" Header="S1 Error" DisplayMemberBinding="{Binding Path=ClassicS1Error}"/>
                                 <GridViewColumn Width="100" Header="S2" DisplayMemberBinding="{Binding Path=ClassicHS2}"/>
                                 <GridViewColumn Width="100" Header="S2 Error" DisplayMemberBinding="{Binding Path=ClassicHS2Error}"/>
+                                <GridViewColumn Width="120" Header="E(hkl)" DisplayMemberBinding="{Binding Path=ClassicEModulus}"/>
+                                <GridViewColumn Width="120" Header="Nu(hkl)" DisplayMemberBinding="{Binding Path=ClassicTransverseContraction}"/>
+                                <GridViewColumn Width="120" Header="G(hkl)" DisplayMemberBinding="{Binding Path=ClassicShearModulus}"/>
+                                <GridViewColumn Width="120" Header="Kappa(hkl)" DisplayMemberBinding="{Binding Path=ClassicBulkModulus}"/>
                                 <GridViewColumn Width="100" Header="Chi2" DisplayMemberBinding="{Binding Path=ClassicChi2}"/>
                             </GridView>
                         </ListView.View>

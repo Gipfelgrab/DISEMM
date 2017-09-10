@@ -490,7 +490,7 @@ namespace CalScec.Analysis.Stress.Macroskopic
                         double D0 = 100.0;
                         for (int j = 0; j < AllStressData.Count; j++)
                         {
-                            if(AllStressData[j].HKLAssociation == PlotingData[i].HKLAssociation && AllStressData[j].PsiAngle == PlotingData[i].PsiAngle && AllStressData[j].Stress < SmallestStress)
+                            if(AllStressData[j].HKLAssociation == PlotingData[i].HKLAssociation && Math.Abs(AllStressData[j].PsiAngle - PlotingData[i].PsiAngle) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle && AllStressData[j].Stress < SmallestStress)
                             {
                                 SmallestStress = AllStressData[j].Stress;
                                 D0 = AllStressData[j].DPeak.LatticeDistance;
@@ -630,7 +630,7 @@ namespace CalScec.Analysis.Stress.Macroskopic
                         double D0 = 100.0;
                         for (int j = 0; j < AllStressData.Count; j++)
                         {
-                            if (AllStressData[j].HKLAssociation == PlotingData[i].HKLAssociation && AllStressData[j].PsiAngle == PlotingData[i].PsiAngle && AllStressData[j].Stress < SmallestStress)
+                            if (AllStressData[j].HKLAssociation == PlotingData[i].HKLAssociation && Math.Abs(AllStressData[j].PsiAngle - PlotingData[i].PsiAngle) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle && AllStressData[j].Stress < SmallestStress)
                             {
                                 SmallestStress = AllStressData[j].Stress;
                                 D0 = AllStressData[j].DPeak.LatticeDistance;
@@ -658,7 +658,6 @@ namespace CalScec.Analysis.Stress.Macroskopic
             this.SinYAxisLin.Title = "Extension";
         }
         
-
         private void Plot_Completed(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
             this.SinPsyPlot.Model.ResetAllAxes();

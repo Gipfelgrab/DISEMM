@@ -122,19 +122,28 @@ namespace CalScec.Analysis.Peaks.Functions
             }
             set
             {
+                double NewValue = value;
+                if(NewValue < 0.1)
+                {
+                    NewValue = 0.1;
+                }
+                else if(NewValue > 3.0)
+                {
+                    NewValue = 3.0;
+                }
                 switch (this.functionType)
                 {
                     case 0:
-                        this.GaussianFunction.Sigma = value;
+                        this.GaussianFunction.Sigma = NewValue;
                         return;
                     case 1:
-                        this.LorentzFunction.Sigma = value;
+                        this.LorentzFunction.Sigma = NewValue;
                         return;
                     case 2:
-                        this.PseudoVoigtFunction.Sigma = value;
+                        this.PseudoVoigtFunction.Sigma = NewValue;
                         return;
                     default:
-                        this.PseudoVoigtFunction.Sigma = value;
+                        this.PseudoVoigtFunction.Sigma = NewValue;
                         return;
                 }
             }
@@ -329,10 +338,38 @@ namespace CalScec.Analysis.Peaks.Functions
                     case 1:
                         return;
                     case 2:
-                        this.PseudoVoigtFunction.LorentzRatio = value;
+                        if (value > 0.0)
+                        {
+                            if (value < 1.0)
+                            {
+                                this.PseudoVoigtFunction.LorentzRatio = value;
+                            }
+                            else
+                            {
+                                this.PseudoVoigtFunction.LorentzRatio = 1.0;
+                            }
+                        }
+                        else
+                        {
+                            this.PseudoVoigtFunction.LorentzRatio = 0.0;
+                        }
                         return;
                     default:
-                        this.PseudoVoigtFunction.LorentzRatio = value;
+                        if (value > 0.0)
+                        {
+                            if (value < 1.0)
+                            {
+                                this.PseudoVoigtFunction.LorentzRatio = value;
+                            }
+                            else
+                            {
+                                this.PseudoVoigtFunction.LorentzRatio = 1.0;
+                            }
+                        }
+                        else
+                        {
+                            this.PseudoVoigtFunction.LorentzRatio = 0.0;
+                        }
                         return;
                 }
             }
@@ -394,19 +431,24 @@ namespace CalScec.Analysis.Peaks.Functions
             }
             set
             {
+                double NewValue = value;
+                if(NewValue < 100.0)
+                {
+                    NewValue = 100;
+                }
                 switch (this.functionType)
                 {
                     case 0:
-                        this._intensityGaussian = value;
+                        this._intensityGaussian = NewValue;
                         return;
                     case 1:
-                        this._intensityLorentz = value;
+                        this._intensityLorentz = NewValue;
                         return;
                     case 2:
-                        this._intensityPseudoVoigt = value;
+                        this._intensityPseudoVoigt = NewValue;
                         return;
                     default:
-                        this._intensityPseudoVoigt = value;
+                        this._intensityPseudoVoigt = NewValue;
                         return;
                 }
             }

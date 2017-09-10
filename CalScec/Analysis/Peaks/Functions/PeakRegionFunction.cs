@@ -158,6 +158,57 @@ namespace CalScec.Analysis.Peaks.Functions
             this._fitConverged = PRI._fitConverged;
         }
 
+        public void MergeRegions(PeakRegionFunction PRF)
+        {
+            Pattern.Counts NewFittingCounts = new Pattern.Counts();
+
+            if(this.FittingCounts[0][0] < PRF.FittingCounts[0][0])
+            {
+                for(int n = 0; n < this.FittingCounts.Count; n++)
+                {
+                    NewFittingCounts.Add(this.FittingCounts[n]);
+                }
+
+                if(this.FittingCounts[this.FittingCounts.Count - 1][0] < PRF.FittingCounts[PRF.FittingCounts.Count - 1][0])
+                {
+                    for (int n = 0; n < PRF.FittingCounts.Count; n++)
+                    {
+                        if(this.FittingCounts[this.FittingCounts.Count - 1][0] < PRF.FittingCounts[n][0])
+                        {
+                            NewFittingCounts.Add(PRF.FittingCounts[n]);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int n = 0; n < PRF.FittingCounts.Count; n++)
+                {
+                    NewFittingCounts.Add(PRF.FittingCounts[n]);
+                }
+
+                if (PRF.FittingCounts[PRF.FittingCounts.Count - 1][0] < this.FittingCounts[this.FittingCounts.Count - 1][0])
+                {
+                    for (int n = 0; n < this.FittingCounts.Count; n++)
+                    {
+                        if (PRF.FittingCounts[PRF.FittingCounts.Count - 1][0] < this.FittingCounts[n][0])
+                        {
+                            NewFittingCounts.Add(this.FittingCounts[n]);
+                        }
+                    }
+                }
+            }
+
+            this.FittingCounts = NewFittingCounts;
+
+            for(int n = 0; n < PRF.Count; n++)
+            {
+                this.Add(PRF[n]);
+            }
+
+            this.Sort((a, b) => a.Angle.CompareTo(b.Angle));
+        }
+
         #region Calculation
 
         public double Y(double theta)

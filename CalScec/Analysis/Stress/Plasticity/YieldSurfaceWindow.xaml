@@ -1,0 +1,79 @@
+﻿<Window x:Class="CalScec.Analysis.Stress.Plasticity.YieldSurfaceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CalScec.Analysis.Stress.Plasticity"
+        mc:Ignorable="d"
+        xmlns:oxycore="clr-namespace:OxyPlot;assembly=OxyPlot"
+        xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
+        Title="YieldSurfaceWindow" Height="600" Width="900">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.3*"/>
+            <ColumnDefinition Width="0.7*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.4*"/>
+                <RowDefinition Height="0.6*"/>
+            </Grid.RowDefinitions>
+            <ListView Name="ReflexList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="100" Header="Reflex" DisplayMemberBinding="{Binding Path=Name}"/>
+                        <GridViewColumn Width="100" Header="Yield strength" DisplayMemberBinding="{Binding Path=Name}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <ListView Grid.Row="1" Name="PeakList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Width="100" Header="Lattice distance" DisplayMemberBinding="{Binding Path=Name}"/>
+                        <GridViewColumn Width="200" Header="Pattern name" DisplayMemberBinding="{Binding Path=Name}"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.65*"/>
+                <RowDefinition Height="0.35*"/>
+            </Grid.RowDefinitions>
+            <oxy:PlotView Name="MainDiffPlot" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
+            <GroupBox Grid.Row="1" Header="Parameters">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Grid.Column="0" Header="Settings">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="FitParameter"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Grid.Column="1" Header="Region managment">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="ElasticLow"/>
+                            <TextBox Grid.Row="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="ElasticHigh"/>
+                            <TextBox Grid.Row="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="PlasticLow"/>
+                            <TextBox Grid.Row="3" HorizontalAlignment="Stretch" MaxHeight="30" Name="PlasticHigh"/>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+            </GroupBox>
+        </Grid>
+    </Grid>
+</Window>

@@ -297,6 +297,183 @@ namespace CalScec.Analysis.Fitting
             return Ret / (ET.DiffractionConstants.Count - 2);
         }
 
+        public static double Chi2ClassicReussHexagonal(Stress.Microsopic.ElasticityTensors ET)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ET.DiffractionConstants.Count; n++)
+            {
+                double CS1 = ET.S1ReussHexagonal(ET.DiffractionConstants[n].UsedReflex);
+                double CHS2 = ET.HS2ReussHexagonal(ET.DiffractionConstants[n].UsedReflex);
+                CS1 -= ET.DiffractionConstants[n].ClassicS1;
+                CHS2 -= ET.DiffractionConstants[n].ClassicHS2;
+                CS1 /= ET.DiffractionConstants[n].ClassicS1Error;
+                CHS2 /= ET.DiffractionConstants[n].ClassicHS2Error;
+                Ret += Math.Pow(CS1, 2);
+                Ret += Math.Pow(CHS2, 2);
+            }
+
+            return Ret / (ET.DiffractionConstants.Count - 2);
+        }
+        #endregion
+
+        #region Hill
+
+        public static double Chi2ClassicHillCubic(Stress.Microsopic.ElasticityTensors ET)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ET.DiffractionConstants.Count; n++)
+            {
+                double CS1 = ET.S1HillCubic(ET.DiffractionConstants[n].UsedReflex);
+                double CHS2 = ET.HS2HillCubic(ET.DiffractionConstants[n].UsedReflex);
+                CS1 -= ET.DiffractionConstants[n].ClassicS1;
+                CHS2 -= ET.DiffractionConstants[n].ClassicHS2;
+                CS1 /= ET.DiffractionConstants[n].ClassicS1Error;
+                CHS2 /= ET.DiffractionConstants[n].ClassicHS2Error;
+                Ret += Math.Pow(CS1, 2);
+                Ret += Math.Pow(CHS2, 2);
+            }
+
+            return Ret / (ET.DiffractionConstants.Count - 2);
+        }
+
+        public static double Chi2ClassicHillHexagonal(Stress.Microsopic.ElasticityTensors ET)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ET.DiffractionConstants.Count; n++)
+            {
+                double CS1 = ET.S1HillHexagonal(ET.DiffractionConstants[n].UsedReflex);
+                double CHS2 = ET.HS2HillHexagonal(ET.DiffractionConstants[n].UsedReflex);
+                CS1 -= ET.DiffractionConstants[n].ClassicS1;
+                CHS2 -= ET.DiffractionConstants[n].ClassicHS2;
+                CS1 /= ET.DiffractionConstants[n].ClassicS1Error;
+                CHS2 /= ET.DiffractionConstants[n].ClassicHS2Error;
+                Ret += Math.Pow(CS1, 2);
+                Ret += Math.Pow(CHS2, 2);
+            }
+
+            return Ret / (ET.DiffractionConstants.Count - 2);
+        }
+
+        #endregion
+
+        #region  Geometric Hill
+
+        public static double Chi2ClassicGeometricHillCubic(Stress.Microsopic.ElasticityTensors ET)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ET.DiffractionConstants.Count; n++)
+            {
+                double CS1 = ET.S1GeometricHillCubic(ET.DiffractionConstants[n].UsedReflex);
+                double CHS2 = ET.HS2GeometricHillCubic(ET.DiffractionConstants[n].UsedReflex);
+                CS1 -= ET.DiffractionConstants[n].ClassicS1;
+                CHS2 -= ET.DiffractionConstants[n].ClassicHS2;
+                CS1 /= ET.DiffractionConstants[n].ClassicS1Error;
+                CHS2 /= ET.DiffractionConstants[n].ClassicHS2Error;
+                Ret += Math.Pow(CS1, 2);
+                Ret += Math.Pow(CHS2, 2);
+            }
+
+            return Ret / (ET.DiffractionConstants.Count - 2);
+        }
+
+        public static double Chi2ClassicGeometricHillHexagonal(Stress.Microsopic.ElasticityTensors ET)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ET.DiffractionConstants.Count; n++)
+            {
+                double CS1 = ET.S1GeometricHillHexagonal(ET.DiffractionConstants[n].UsedReflex);
+                double CHS2 = ET.HS2GeometricHillHexagonal(ET.DiffractionConstants[n].UsedReflex);
+                CS1 -= ET.DiffractionConstants[n].ClassicS1;
+                CHS2 -= ET.DiffractionConstants[n].ClassicHS2;
+                CS1 /= ET.DiffractionConstants[n].ClassicS1Error;
+                CHS2 /= ET.DiffractionConstants[n].ClassicHS2Error;
+                Ret += Math.Pow(CS1, 2);
+                Ret += Math.Pow(CHS2, 2);
+            }
+
+            return Ret / (ET.DiffractionConstants.Count - 2);
+        }
+
+        #endregion
+
+        #region Kroener
+
+        public static double Chi2ClassicKroenerCubicStiffness(Stress.Microsopic.ElasticityTensors ET)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ET.DiffractionConstants.Count; n++)
+            {
+                double CS1 = ET.S1KroenerCubicStiffness();
+                double CHS2 = ET.HS2KroenerCubicStiffness();
+                CS1 -= ET.DiffractionConstants[n].ClassicS1;
+                CHS2 -= ET.DiffractionConstants[n].ClassicHS2;
+                CS1 /= ET.DiffractionConstants[n].ClassicS1Error;
+                CHS2 /= ET.DiffractionConstants[n].ClassicHS2Error;
+                Ret += Math.Pow(CS1, 2);
+                Ret += Math.Pow(CHS2, 2);
+            }
+
+            return Ret / (ET.DiffractionConstants.Count - 2);
+        }
+
+        public static double Chi2ClassicKroenerCubicCompliance(Stress.Microsopic.ElasticityTensors ET)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ET.DiffractionConstants.Count; n++)
+            {
+                double CS1 = ET.S1KroenerCubicCompliance();
+                double CHS2 = ET.HS2KroenerCubicCompliance();
+                CS1 -= ET.DiffractionConstants[n].ClassicS1;
+                CHS2 -= ET.DiffractionConstants[n].ClassicHS2;
+                CS1 /= ET.DiffractionConstants[n].ClassicS1Error;
+                CHS2 /= ET.DiffractionConstants[n].ClassicHS2Error;
+                Ret += Math.Pow(CS1, 2);
+                Ret += Math.Pow(CHS2, 2);
+            }
+
+            return Ret / (ET.DiffractionConstants.Count - 2);
+        }
+
+        #endregion
+
+        #region DeWitt
+
+        public static double Chi2ClassicDeWittCubicStiffness(Stress.Microsopic.ElasticityTensors ET)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ET.DiffractionConstants.Count; n++)
+            {
+                double CS1 = ET.S1DeWittCubicStiffness(ET.DiffractionConstants[n].UsedReflex);
+                double CHS2 = ET.HS2DeWittCubicStiffness(ET.DiffractionConstants[n].UsedReflex);
+                CS1 -= ET.DiffractionConstants[n].ClassicS1;
+                CHS2 -= ET.DiffractionConstants[n].ClassicHS2;
+                CS1 /= ET.DiffractionConstants[n].ClassicS1Error;
+                CHS2 /= ET.DiffractionConstants[n].ClassicHS2Error;
+                Ret += Math.Pow(CS1, 2);
+                Ret += Math.Pow(CHS2, 2);
+            }
+
+            return Ret / (ET.DiffractionConstants.Count - 2);
+        }
+
+        public static double Chi2ClassicDeWittCubicCompliance(Stress.Microsopic.ElasticityTensors ET)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ET.DiffractionConstants.Count; n++)
+            {
+                double CS1 = ET.S1DeWittCubicCompliance(ET.DiffractionConstants[n].UsedReflex);
+                double CHS2 = ET.HS2DeWittCubicCompliance(ET.DiffractionConstants[n].UsedReflex);
+                CS1 -= ET.DiffractionConstants[n].ClassicS1;
+                CHS2 -= ET.DiffractionConstants[n].ClassicHS2;
+                CS1 /= ET.DiffractionConstants[n].ClassicS1Error;
+                CHS2 /= ET.DiffractionConstants[n].ClassicHS2Error;
+                Ret += Math.Pow(CS1, 2);
+                Ret += Math.Pow(CHS2, 2);
+            }
+
+            return Ret / (ET.DiffractionConstants.Count - 2);
+        }
+
         #endregion
 
         #endregion

@@ -12,14 +12,28 @@ namespace CalScec.Analysis.Stress.Macroskopic
         {
             get
             {
-                return this.FittingFunction.AclivityError;
+                if (this.FittingFunction != null)
+                {
+                    return this.FittingFunction.AclivityError;
+                }
+                else
+                {
+                    return 0.0;
+                }
             }
         }
         public double EModul
         {
             get
             {
-                return this.FittingFunction.Aclivity;
+                if (this.FittingFunction != null)
+                {
+                    return this.FittingFunction.Aclivity;
+                }
+                else
+                {
+                    return 0.0;
+                }
             }
         }
 

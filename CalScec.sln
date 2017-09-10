@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalScec", "CalScec\CalScec.csproj", "{D3FB2F69-5B96-4DB3-9010-051B9DA267DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiffractionOrientation", "..\OrientationBiblothek\Bib\DiffractionOrientation\DiffractionOrientation\DiffractionOrientation.csproj", "{3463C8D3-887D-4B7E-A4AF-AA3BAB8C1B32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{D3FB2F69-5B96-4DB3-9010-051B9DA267DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3FB2F69-5B96-4DB3-9010-051B9DA267DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3FB2F69-5B96-4DB3-9010-051B9DA267DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3463C8D3-887D-4B7E-A4AF-AA3BAB8C1B32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3463C8D3-887D-4B7E-A4AF-AA3BAB8C1B32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3463C8D3-887D-4B7E-A4AF-AA3BAB8C1B32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3463C8D3-887D-4B7E-A4AF-AA3BAB8C1B32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -154,7 +154,14 @@ namespace CalScec.Tools
             Ret += CalScec.Properties.Settings.Default.FWHMV * Math.Tan(Angle);
             Ret += CalScec.Properties.Settings.Default.FWHMW;
 
-            return Math.Sqrt(Ret);
+            Ret = Math.Sqrt(Ret);
+
+            if(Ret > 1)
+            {
+                Ret = 1;
+            }
+
+            return Ret;
         }
     }
 

@@ -63,7 +63,7 @@
       <Value Profile="(Default)">16</Value>
     </Setting>
     <Setting Name="UsedWaveLength" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">1.5483</Value>
+      <Value Profile="(Default)">1.5488</Value>
     </Setting>
     <Setting Name="MaxMeasurmentAngle" Type="System.Double" Scope="User">
       <Value Profile="(Default)">180</Value>
@@ -135,7 +135,7 @@
       <Value Profile="(Default)">0.005</Value>
     </Setting>
     <Setting Name="AutomaticPeakFit" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="PlotFittingOneSigmaLine" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
@@ -153,7 +153,7 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="PatternVersion" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">1</Value>
+      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="CODId" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
@@ -163,6 +163,21 @@
     </Setting>
     <Setting Name="ReflexFitAutoCorrection" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="PsyAcceptanceAngle" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="REKAutoAusociationType" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="CubicFittingModel" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="RandomProbabilityIntervall" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="UsedPeakDetectionId" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
     </Setting>
   </Settings>
 </SettingsFile>

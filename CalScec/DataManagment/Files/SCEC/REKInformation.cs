@@ -39,8 +39,14 @@ namespace CalScec.DataManagment.Files.SCEC
 
             this._strainFreeD0 = rEK.StrainFreeD0;
 
-            this.LongitudionalElasticity = new MacroElasticInformation(rEK.LongitudionalElasticity);
-            this.TransversalElasticity = new MacroElasticInformation(rEK.TransversalElasticity);
+            if (rEK.LongitudionalElasticity != null)
+            {
+                this.LongitudionalElasticity = new MacroElasticInformation(rEK.LongitudionalElasticity);
+            }
+            if (rEK.TransversalElasticity != null)
+            {
+                this.TransversalElasticity = new MacroElasticInformation(rEK.TransversalElasticity);
+            }
         }
 
         public Analysis.Stress.Microsopic.REK GetREK(DataManagment.CrystalData.CODData phaseInformation)

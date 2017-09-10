@@ -65,6 +65,15 @@ namespace CalScec.DataManagment.Files.SCEC
         public List<ElasticityTensorInformation> VoigtTensorInformation = new List<ElasticityTensorInformation>();
         public List<ElasticityTensorInformation> ReussTensorInformation = new List<ElasticityTensorInformation>();
         public List<ElasticityTensorInformation> HillTensorInformation = new List<ElasticityTensorInformation>();
+        public List<ElasticityTensorInformation> KroenerTensorInformation = new List<ElasticityTensorInformation>();
+        public List<ElasticityTensorInformation> DeWittTensorInformation = new List<ElasticityTensorInformation>();
+        public List<ElasticityTensorInformation> GeometricHillTensorInformation = new List<ElasticityTensorInformation>();
+
+        #endregion
+
+        #region Texture
+
+        List<ODFDataInformation> ODFData = new List<ODFDataInformation>();
 
         #endregion
 
@@ -87,6 +96,18 @@ namespace CalScec.DataManagment.Files.SCEC
                 this.VoigtTensorInformation.Add(new ElasticityTensorInformation(sample.VoigtTensorData[n]));
                 this.ReussTensorInformation.Add(new ElasticityTensorInformation(sample.ReussTensorData[n]));
                 this.HillTensorInformation.Add(new ElasticityTensorInformation(sample.HillTensorData[n]));
+                this.KroenerTensorInformation.Add(new ElasticityTensorInformation(sample.KroenerTensorData[n]));
+                this.DeWittTensorInformation.Add(new ElasticityTensorInformation(sample.DeWittTensorData[n]));
+                this.GeometricHillTensorInformation.Add(new ElasticityTensorInformation(sample.DeWittTensorData[n]));
+
+                if (sample.HillTensorData[n].ODF != null)
+                {
+                    ODFDataInformation ODFDataTmp = new ODFDataInformation();
+                    ODFDataTmp.TDData = sample.HillTensorData[n].ODF.TDData;
+                    ODFDataTmp.CrystalData = sample.CrystalData[n];
+
+                    this.ODFData.Add(ODFDataTmp);
+                }
             }
 
             for (int n = 0; n < sample.MacroElasticData.Count; n++)
@@ -110,30 +131,66 @@ namespace CalScec.DataManagment.Files.SCEC
             for(int n = 0; n < this.CrystalData.Count; n++)
             {
                 Ret.CrystalData.Add(new DataManagment.CrystalData.CODData(CrystalData[n]));
-
+                string SymString = "";
                 try
                 {
                     Ret.VoigtTensorData.Add(this.VoigtTensorInformation[n].GetElasticityTensor());
+                    SymString = this.VoigtTensorInformation[n]._symmetry;
                 }
                 catch
                 {
                     Ret.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                    Ret.VoigtTensorData[n].Symmetry = SymString;
                 }
                 try
                 {
                     Ret.ReussTensorData.Add(this.ReussTensorInformation[n].GetElasticityTensor());
+                    SymString = this.ReussTensorInformation[n]._symmetry;
                 }
                 catch
                 {
                     Ret.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                    Ret.ReussTensorData[n].Symmetry = SymString;
                 }
                 try
                 {
                     Ret.HillTensorData.Add(this.HillTensorInformation[n].GetElasticityTensor());
+                    SymString = this.HillTensorInformation[n]._symmetry;
                 }
                 catch
                 {
                     Ret.HillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                    Ret.HillTensorData[n].Symmetry = SymString;
+                }
+                try
+                {
+                    Ret.KroenerTensorData.Add(this.KroenerTensorInformation[n].GetElasticityTensor());
+                    SymString = this.KroenerTensorInformation[n]._symmetry;
+                }
+                catch
+                {
+                    Ret.KroenerTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                    Ret.KroenerTensorData[n].Symmetry = SymString;
+                }
+                try
+                {
+                    Ret.DeWittTensorData.Add(this.DeWittTensorInformation[n].GetElasticityTensor());
+                    SymString = this.DeWittTensorInformation[n]._symmetry;
+                }
+                catch
+                {
+                    Ret.DeWittTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                    Ret.DeWittTensorData[n].Symmetry = SymString;
+                }
+                try
+                {
+                    Ret.GeometricHillTensorData.Add(this.GeometricHillTensorInformation[n].GetElasticityTensor());
+                    SymString = this.GeometricHillTensorInformation[n]._symmetry;
+                }
+                catch
+                {
+                    Ret.GeometricHillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+                    Ret.GeometricHillTensorData[n].Symmetry = SymString;
                 }
 
                 Ret.DiffractionConstants.Add(new List<Analysis.Stress.Microsopic.REK>());
@@ -147,6 +204,54 @@ namespace CalScec.DataManagment.Files.SCEC
                 catch
                 {
 
+                }
+            }
+
+            if (this.ODFData != null && this.ODFData.Count != 0)
+            {
+                for (int n = 0; n < this.CrystalData.Count; n++)
+                {
+                    for(int i = 0; i < this.ODFData.Count; i++)
+                    {
+                        if (this.CrystalData[n].SymmetryGroupID != -1)
+                        {
+                            if (this.CrystalData[n].SymmetryGroupID == this.ODFData[i].CrystalData.SymmetryGroupID)
+                            {
+                                Ret.VoigtTensorData[n].ODF.TDData = this.ODFData[i].TDData;
+                                Ret.ReussTensorData[n].ODF.TDData = this.ODFData[i].TDData;
+                                Ret.HillTensorData[n].ODF.TDData = this.ODFData[i].TDData;
+                                Ret.GeometricHillTensorData[n].ODF.TDData = this.ODFData[i].TDData;
+                                Ret.KroenerTensorData[n].ODF.TDData = this.ODFData[i].TDData;
+                                Ret.DeWittTensorData[n].ODF.TDData = this.ODFData[i].TDData;
+
+                                Ret.VoigtTensorData[n].ODF.SetStepSizes();
+                                Ret.ReussTensorData[n].ODF.SetStepSizes();
+                                Ret.HillTensorData[n].ODF.SetStepSizes();
+                                Ret.GeometricHillTensorData[n].ODF.SetStepSizes();
+                                Ret.KroenerTensorData[n].ODF.SetStepSizes();
+                                Ret.DeWittTensorData[n].ODF.SetStepSizes();
+                            }
+                        }
+                        else
+                        {
+                            if (this.CrystalData[n].SymmetryGroup == this.ODFData[i].CrystalData.SymmetryGroup)
+                            {
+                                Ret.VoigtTensorData[n].ODF.TDData = this.ODFData[i].TDData;
+                                Ret.ReussTensorData[n].ODF.TDData = this.ODFData[i].TDData;
+                                Ret.HillTensorData[n].ODF.TDData = this.ODFData[i].TDData;
+                                Ret.GeometricHillTensorData[n].ODF.TDData = this.ODFData[i].TDData;
+                                Ret.KroenerTensorData[n].ODF.TDData = this.ODFData[i].TDData;
+                                Ret.DeWittTensorData[n].ODF.TDData = this.ODFData[i].TDData;
+
+                                Ret.VoigtTensorData[n].ODF.SetStepSizes();
+                                Ret.ReussTensorData[n].ODF.SetStepSizes();
+                                Ret.HillTensorData[n].ODF.SetStepSizes();
+                                Ret.GeometricHillTensorData[n].ODF.SetStepSizes();
+                                Ret.KroenerTensorData[n].ODF.SetStepSizes();
+                                Ret.DeWittTensorData[n].ODF.SetStepSizes();
+                            }
+                        }
+                    }
                 }
             }
 

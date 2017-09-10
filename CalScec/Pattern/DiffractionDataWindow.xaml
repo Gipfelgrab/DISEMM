@@ -53,17 +53,22 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Label Grid.Column="0" Grid.Row="0" Content="Name:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                    <Label Grid.Column="0" Grid.Row="1" Content="Psi angle:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                    <Label Grid.Column="0" Grid.Row="2" Content="Phi angle:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                    <Label Grid.Column="0" Grid.Row="3" Content="Applied force:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                    <Label Grid.Column="0" Grid.Row="4" Content="Applied stress:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                    <Label Grid.Column="0" Grid.Row="1" Content="Chi angle:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                    <Label Grid.Column="0" Grid.Row="2" Content="Omega angle:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                    <Label Grid.Column="0" Grid.Row="3" Content="Phi sample angle:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                    <Label Grid.Column="0" Grid.Row="4" Content="Applied force:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                    <Label Grid.Column="0" Grid.Row="5" Content="Applied stress:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                    <Label Grid.Column="0" Grid.Row="6" Content="Macro strain:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
                     <TextBox Name="PatternName" Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternName_TextChanged"/>
-                    <TextBox Name="PatternPsiAngle" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternPsiAngle_TextChanged"/>
-                    <TextBox Name="PatternPhiAngle" Grid.Row="2" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternPhiAngle_TextChanged"/>
-                    <TextBox Name="PatternAppliedForce" Grid.Row="3" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternAppliedForce_TextChanged"/>
-                    <TextBox Name="PatternAppliedStress" Grid.Row="4" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternAppliedStress_TextChanged"/>
+                    <TextBox Name="PatternChiAngle" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternChiAngle_TextChanged"/>
+                    <TextBox Name="PatternOmegaAngle" Grid.Row="2" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternOmegaAngle_TextChanged"/>
+                    <TextBox Name="PatternPhiSampleAngle" Grid.Row="3" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternPhiSampleAngle_TextChanged"/>
+                    <TextBox Name="PatternAppliedForce" Grid.Row="4" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternAppliedForce_TextChanged"/>
+                    <TextBox Name="PatternAppliedStress" Grid.Row="5" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternAppliedStress_TextChanged"/>
+                    <TextBox Name="PatternMacroStrain" Grid.Row="5" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternMacroStrain_TextChanged"/>
                 </Grid>
             </GroupBox>
         </Grid>
