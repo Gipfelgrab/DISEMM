@@ -9,26 +9,48 @@ namespace CalScec.Analysis.Stress.Plasticity
     public class YieldSurface
     {
         public bool _useAnisotropy = false;
-        List<ReflexYield> ReflexYieldData = new List<ReflexYield>();
+        public List<ReflexYield> ReflexYieldData = new List<ReflexYield>();
 
-        public double GetYieldStrenght(DataManagment.CrystalData.HKLReflex reflex)
+        public YieldSurface(DataManagment.CrystalData.CODData crystalData)
+        {
+            for(int n = 0; n < crystalData.HKLList.Count; n++)
+            {
+                ReflexYield RYTmp = new ReflexYield(crystalData.HKLList[n], crystalData);
+
+                this.ReflexYieldData.Add(RYTmp);
+            }
+        }
+
+        public double GetMainYieldStrenght(DataManagment.CrystalData.HKLReflex reflex)
         {
             for(int n = 0; n < ReflexYieldData.Count; n++)
             {
-                if(reflex.H == ReflexYieldData[n].Reflex.H && reflex.K == ReflexYieldData[n].Reflex.K && reflex.L == ReflexYieldData[n].Reflex.L)
+                if(reflex.H == ReflexYieldData[n].SlipPlane.H && reflex.K == ReflexYieldData[n].SlipPlane.K && reflex.L == ReflexYieldData[n].SlipPlane.L)
                 {
                     if (_useAnisotropy)
                     {
-                        return ReflexYieldData[n].YieldStrength;
+                        return ReflexYieldData[n].YieldMainStrength;
                     }
                     else
                     {
-                        return ReflexYieldData[n].YieldStrength;
+                        return ReflexYieldData[n].YieldMainStrength;
                     }
                 }
             }
 
             return -1;
+        }
+
+        public List<ReflexYield> GetPotentiallyActiveSlipSystems(MathNet.Numerics.LinearAlgebra.Vector<double> aStress)
+        {
+            List<ReflexYield> Ret = new List<ReflexYield>();
+
+            for (int n = 0; n < this.ReflexYieldData.Count; n++)
+            {
+
+            }
+
+            return Ret;
         }
 
         /// <summary>
@@ -46,7 +68,7 @@ namespace CalScec.Analysis.Stress.Plasticity
         /// <returns>false: systemYield > shearForce, true slip system is active</returns>
         public bool CheckForMise(DataManagment.CrystalData.HKLReflex reflex, MathNet.Numerics.LinearAlgebra.Vector<double> aStress)
         {
-            double systemYield = this.GetYieldStrenght(reflex);
+            double systemYield = this.GetMainYieldStrenght(reflex);
 
             double shearForce = Math.Pow(aStress[0] - aStress[1], 2);
             shearForce += Math.Pow(aStress[1] - aStress[2], 2);
@@ -82,7 +104,7 @@ namespace CalScec.Analysis.Stress.Plasticity
         /// <returns>false: systemYield > shearForce, true slip system is active</returns>
         public bool CheckForTresca(DataManagment.CrystalData.HKLReflex reflex, MathNet.Numerics.LinearAlgebra.Vector<double> aStress)
         {
-            double systemYield = this.GetYieldStrenght(reflex);
+            double systemYield = this.GetMainYieldStrenght(reflex);
 
             double maxPrincipleStress = 0;
             double minPrincipleStress = Double.MaxValue;

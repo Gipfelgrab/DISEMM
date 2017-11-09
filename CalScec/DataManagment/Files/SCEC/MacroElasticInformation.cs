@@ -29,6 +29,11 @@ namespace CalScec.DataManagment.Files.SCEC
     {
         public double Stress;
         public double PsiAngle;
+        public double MainSlipDirectionAngle;
+        public double SecondarySlipDirectionAngle;
+        public bool _elasticRegime;
+
+        public double _macroskopicStrain;
 
         public PeakFunctionInformation DPeak;
 
@@ -36,6 +41,10 @@ namespace CalScec.DataManagment.Files.SCEC
         {
             this.Stress = PSA.Stress;
             this.PsiAngle = PSA.PsiAngle;
+            this.MainSlipDirectionAngle = PSA.MainSlipDirectionAngle;
+            this.SecondarySlipDirectionAngle = PSA.SecondarySlipDirectionAngle;
+            this._elasticRegime = PSA.ElasticRegime;
+            this._macroskopicStrain = PSA.MacroskopicStrain;
 
             DPeak = new PeakFunctionInformation(PSA.DPeak);
         }

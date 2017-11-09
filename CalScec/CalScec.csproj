@@ -113,6 +113,7 @@
     <Compile Include="Analysis\Stress\Microsopic\REKAssociationCalculationWindow.xaml.cs">
       <DependentUpon>REKAssociationCalculationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Analysis\Stress\Plasticity\PlasticityTensor.cs" />
     <Compile Include="Analysis\Stress\Plasticity\ReflexYield.cs" />
     <Compile Include="Analysis\Stress\Plasticity\YieldSurface.cs" />
     <Compile Include="Analysis\Stress\Plasticity\YieldSurfaceWindow.xaml.cs">
@@ -146,6 +147,7 @@
       <DependentUpon>DiffractionDataWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\Calculation.cs" />
+    <Compile Include="Tools\FourthRankTensor.cs" />
     <Compile Include="Tools\IdManagment.cs" />
     <Compile Include="Tools\TextureFitInformation.cs" />
     <Page Include="Analysis\Fitting\PeakFittingWindow.xaml">
@@ -250,6 +252,9 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Res\ReflectionConditions\SlipSystems.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Res\ReflectionConditions\SpaceGroupsHKL.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -302,16 +307,21 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\OrientationBiblothek\Bib\DiffractionOrientation\DiffractionOrientation\DiffractionOrientation.csproj">
+    <Resource Include="Res\Toolbar\CreateNewFile.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\Toolbar\playGraphic.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DiffractionOrientation\DiffractionOrientation\DiffractionOrientation.csproj">
       <Project>{3463c8d3-887d-4b7e-a4af-aa3bab8c1b32}</Project>
       <Name>DiffractionOrientation</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Res\Toolbar\CreateNewFile.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Res\Toolbar\playGraphic.png" />
+    <None Include="Res\ReflectionConditions\SlipSystems.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

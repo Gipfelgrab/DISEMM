@@ -18,11 +18,11 @@
                 <RowDefinition Height="0.4*"/>
                 <RowDefinition Height="0.6*"/>
             </Grid.RowDefinitions>
-            <ListView Name="ReflexList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5">
+            <ListView Name="ReflexList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5" SelectionChanged="ReflexList_SelectionChanged">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Width="100" Header="Reflex" DisplayMemberBinding="{Binding Path=Name}"/>
-                        <GridViewColumn Width="100" Header="Yield strength" DisplayMemberBinding="{Binding Path=Name}"/>
+                        <GridViewColumn Width="100" Header="Reflex" DisplayMemberBinding="{Binding Path=Reflex.HKLString}"/>
+                        <GridViewColumn Width="100" Header="Yield strength" DisplayMemberBinding="{Binding Path=YieldStrength}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
@@ -40,7 +40,7 @@
                 <RowDefinition Height="0.65*"/>
                 <RowDefinition Height="0.35*"/>
             </Grid.RowDefinitions>
-            <oxy:PlotView Name="MainDiffPlot" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
+            <oxy:PlotView Name="MainYieldPlot" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
             <GroupBox Grid.Row="1" Header="Parameters">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -49,16 +49,31 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <GroupBox Grid.Column="0" Header="Settings">
-                        <Grid>
+                        <Grid Margin="5,5,5,5">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="FitParameter"/>
+                            <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="PhaseSwitchBox" SelectionChanged="PhaseSwitchBox_SelectionChanged"/>
+                            <Button Grid.Row="2" MaxHeight="28" Margin="0,0,0,0" Name="ReflexGroup" Content="Group Reflexes" Click="ReflexGroup_Click"/>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Column="1" Header="Region managment">
+                    <GroupBox Grid.Column="1" Header="Region management">
+                        <Grid Margin="5,5,5,5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="ElasticLow" ToolTip="Lower elastic border"/>
+                            <TextBox Grid.Row="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="ElasticHigh" ToolTip="Upper elastic border"/>
+                            <TextBox Grid.Row="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="PlasticLow" ToolTip="Lower plastic border"/>
+                            <TextBox Grid.Row="3" HorizontalAlignment="Stretch" MaxHeight="30" Name="PlasticHigh" ToolTip="Upper plastic border"/>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Grid.Column="2" Header="Results">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
@@ -66,10 +81,7 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <TextBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="ElasticLow"/>
-                            <TextBox Grid.Row="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="ElasticHigh"/>
-                            <TextBox Grid.Row="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="PlasticLow"/>
-                            <TextBox Grid.Row="3" HorizontalAlignment="Stretch" MaxHeight="30" Name="PlasticHigh"/>
+                            <Button Grid.Row="3" MaxHeight="28" Margin="0,0,0,0" Name="FitYieldStrenght" Content="Fit yield strength" Click="FitYieldStrenght_Click"/>
                         </Grid>
                     </GroupBox>
                 </Grid>

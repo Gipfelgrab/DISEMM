@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalScec", "CalScec\CalScec.csproj", "{D3FB2F69-5B96-4DB3-9010-051B9DA267DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiffractionOrientation", "..\OrientationBiblothek\Bib\DiffractionOrientation\DiffractionOrientation\DiffractionOrientation.csproj", "{3463C8D3-887D-4B7E-A4AF-AA3BAB8C1B32}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiffractionOrientation", "..\DiffractionOrientation\DiffractionOrientation\DiffractionOrientation.csproj", "{3463C8D3-887D-4B7E-A4AF-AA3BAB8C1B32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

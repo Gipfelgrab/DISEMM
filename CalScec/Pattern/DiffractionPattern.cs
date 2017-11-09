@@ -223,6 +223,44 @@ namespace CalScec.Pattern
             return Ret;
         }
 
+        public double SlipDirectionAngle(double measured2Theta, DataManagment.CrystalData.HKLReflex slipPlane, DataManagment.CrystalData.HKLReflex slipDirection)
+        {
+            //First the scattering vector QI is calculated 
+            //second QI is rotated from the slip plane into the slipdirection
+            //third the Angle between S3 and the rotated QI is returned
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> QI = this.GetQI(measured2Theta);
+
+            DiffractionOrientation.OrientationMatrix RotationMatrix = new OrientationMatrix();
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> SlipPlaneIndices = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3, 0);
+            MathNet.Numerics.LinearAlgebra.Vector<double> SlipDirectionIndices = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3, 0);
+
+            SlipPlaneIndices[0] = slipPlane.H;
+            SlipPlaneIndices[0] = slipPlane.K;
+            SlipPlaneIndices[0] = slipPlane.L;
+
+            SlipDirectionIndices[0] = slipDirection.H;
+            SlipDirectionIndices[0] = slipDirection.K;
+            SlipDirectionIndices[0] = slipDirection.L;
+
+            List<MathNet.Numerics.LinearAlgebra.Vector<double>> RotIndices = new List<MathNet.Numerics.LinearAlgebra.Vector<double>>();
+            RotIndices.Add(SlipPlaneIndices);
+            RotIndices.Add(SlipDirectionIndices);
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> SampleSlipDirection = RotationMatrix.OM * QI;
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> S3 = this.GetRotatedS3();
+
+            double ScalarProduct = SampleSlipDirection * S3;
+            double TotalLength = SampleSlipDirection.Norm(2);
+            TotalLength *= S3.Norm(2);
+
+            double Ret = Math.Acos(ScalarProduct / TotalLength);
+            Ret /= (Math.PI / 180.0);
+            return Ret;
+        }
+
         private double _stress;
         public double Stress
         {

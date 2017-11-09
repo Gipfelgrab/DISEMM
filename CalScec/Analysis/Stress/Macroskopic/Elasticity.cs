@@ -172,6 +172,14 @@ namespace CalScec.Analysis.Stress.Macroskopic
     public struct PeakStressAssociation
     {
         public double Stress;
+        public string stress
+        {
+            get
+            {
+                return this.Stress.ToString("F3");
+            }
+        }
+
         public double PsiAngle;
         public double psiAngle
         {
@@ -180,13 +188,54 @@ namespace CalScec.Analysis.Stress.Macroskopic
                 return this.PsiAngle;
             }
         }
-        public string stress
+
+        private double _mainSlipDirectionAngle;
+        public double MainSlipDirectionAngle
         {
             get
             {
-                return this.Stress.ToString("F3");
+                return this._mainSlipDirectionAngle;
+            }
+            set
+            {
+                this._mainSlipDirectionAngle = value;
             }
         }
+        private double _secondarySlipDirectionAngle;
+        public double SecondarySlipDirectionAngle
+        {
+            get
+            {
+                return this._secondarySlipDirectionAngle;
+            }
+            set
+            {
+                this._secondarySlipDirectionAngle = value;
+            }
+        }
+
+        private bool _elasticRegime;
+        public bool ElasticRegime
+        {
+            get
+            {
+                return this._elasticRegime;
+            }
+            set
+            {
+                this._elasticRegime = value;
+            }
+        }
+
+        public double _macroskopicStrain;
+        public double MacroskopicStrain
+        {
+            get
+            {
+                return _macroskopicStrain;
+            }
+        }
+
 
         public Analysis.Peaks.DiffractionPeak DPeak;
         public Analysis.Peaks.DiffractionPeak DifPeak
@@ -214,13 +263,53 @@ namespace CalScec.Analysis.Stress.Macroskopic
             this.Stress = stress;
             this.PsiAngle = psiAngle;
 
+            this._mainSlipDirectionAngle = -1;
+            this._secondarySlipDirectionAngle = -1;
+
             this.DPeak = DP;
+
+            this._elasticRegime = true;
+            this._macroskopicStrain = -1;
+        }
+
+        public PeakStressAssociation(double stress, double psiAngle, double macroStrain, Analysis.Peaks.DiffractionPeak DP)
+        {
+            this.Stress = stress;
+            this.PsiAngle = psiAngle;
+
+            this._mainSlipDirectionAngle = -1;
+            this._secondarySlipDirectionAngle = -1;
+
+            this.DPeak = DP;
+
+            this._elasticRegime = true;
+            this._macroskopicStrain = macroStrain;
+        }
+
+        public PeakStressAssociation(double stress, double psiAngle, double macroStrain, bool elatsticRegime, Analysis.Peaks.DiffractionPeak DP)
+        {
+            this.Stress = stress;
+            this.PsiAngle = psiAngle;
+
+            this._mainSlipDirectionAngle = -1;
+            this._secondarySlipDirectionAngle = -1;
+
+            this.DPeak = DP;
+
+            this._elasticRegime = elatsticRegime;
+            this._macroskopicStrain = macroStrain;
         }
 
         public PeakStressAssociation(DataManagment.Files.SCEC.PeakStressInformation PSI)
         {
             this.Stress = PSI.Stress;
             this.PsiAngle = PSI.PsiAngle;
+
+            this._mainSlipDirectionAngle = PSI.MainSlipDirectionAngle;
+            this._secondarySlipDirectionAngle = PSI.SecondarySlipDirectionAngle;
+
+            this._elasticRegime = PSI._elasticRegime;
+            this._macroskopicStrain = PSI._macroskopicStrain;
 
             this.DPeak = new Peaks.DiffractionPeak(PSI.DPeak);
         }

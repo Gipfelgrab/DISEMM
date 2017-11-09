@@ -101,6 +101,9 @@ namespace CalScec.Analysis.Stress.Microsopic
         public Texture.OrientationDistributionFunction ODF;
 
         public List<REK> DiffractionConstants = new List<REK>();
+
+        #region Diffraction Elastic Constants
+
         /// <summary>
         /// Calculates the diffraction elastic constants from the single crystaline ones
         /// </summary>
@@ -576,6 +579,8 @@ namespace CalScec.Analysis.Stress.Microsopic
             return Ret;
         }
 
+        #endregion
+
         public bool IsIsotropic = false;
         public bool FitConverged = false;
 
@@ -782,7 +787,7 @@ namespace CalScec.Analysis.Stress.Microsopic
         }
         #endregion
 
-        #region Kappa
+        #region BulkModulus
 
         #region Cubic
 
@@ -860,9 +865,117 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         #endregion
 
+        #region Hexagonal
+
+        public double BulkModulusHexagonalCompliance
+        {
+            get
+            {
+                double Ret = 2.0 * this.S11;
+                Ret += S33;
+                Ret += 2 * S12;
+                Ret += 4 * S13;
+
+                Ret = 1 / Ret;
+
+                return Ret;
+            }
+        }
+
+        public double BulkModulusHexagonalStiffness
+        {
+            get
+            {
+                double Ret = 1.0 / 9.0;
+
+                double Sum = 2 * this.C11;
+                Sum += this.C33;
+
+                Sum += 2 * (C12 + (2 * this.C13));
+
+                Ret *= Sum;
+
+                return Ret;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region ShearModulus
+
+        #region Constants
+
+        #region Cubic
+
+        public double ConstantsShearModulusCubicStiffness
+        {
+            get
+            {
+                double Ret = 3.0 * (this.C11 - this.C12 + (3.0 * this.C44));
+                Ret *= 1.0 / 15.0;
+
+                return Ret;
+            }
+        }
+
+        public double ConstantsShearModulusCubicCompliance
+        {
+            get
+            {
+                double Ret = 3.0 * (this.S11 - this.S12 + (3.0 * this.S44));
+                Ret *= 4.0;
+
+                Ret = 1.0 / (15.0 * Ret);
+
+                return Ret;
+            }
+        }
+
+        #endregion
+
+        #region Hexagonal
+
+        public double ConstantsShearModulusHexagonalStiffness
+        {
+            get
+            {
+                double Ret = (2.0 * this.C11);
+                Ret += this.C33;
+                Ret -= this.C12;
+                Ret -= 2.0 * this.C13;
+                Ret += 2.0 * this.C44;
+                Ret += this.C66;
+
+                Ret *= 1.0 / 15.0;
+
+                return Ret;
+            }
+        }
+
+        public double ConstantsShearModulusHexagonalCompliance
+        {
+            get
+            {
+                double Ret = (2.0 * this.S11);
+                Ret += this.S33;
+                Ret -= this.S12;
+                Ret -= 2.0 * this.S13;
+                Ret += 2.0 * this.S44;
+                Ret += this.S66;
+
+                Ret *= 4.0;
+
+                Ret = 1.0 / (15.0 * Ret);
+
+                return Ret;
+            }
+        }
+
+        #endregion
+
+        #endregion
 
         #region Kroener
 

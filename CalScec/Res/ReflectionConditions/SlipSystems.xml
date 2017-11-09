@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SlipSystemTable>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>110</SlipPlain>
+    <SlipDirection>-111</SlipDirection>
+    <PlainCount>6</PlainCount>
+    <DirectionCount>2</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>211</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>12</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>321</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>24</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <SlipPlain>111</SlipPlain>
+    <SlipDirection>1-10</SlipDirection>
+    <PlainCount>4</PlainCount>
+    <DirectionCount>3</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>001</SlipPlain>
+    <SlipDirection>110</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>3</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>100</SlipPlain>
+    <SlipDirection>-210</SlipDirection>
+    <PlainCount>3</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>101</SlipPlain>
+    <SlipDirection>-210</SlipDirection>
+    <PlainCount>6</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>102</SlipPlain>
+    <SlipDirection>-210</SlipDirection>
+    <PlainCount>6</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>112</SlipPlain>
+    <SlipDirection>1-10</SlipDirection>
+    <PlainCount>6</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>100</SlipPlain>
+    <SlipDirection>-213</SlipDirection>
+    <PlainCount>3</PlainCount>
+    <DirectionCount>2</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>101</SlipPlain>
+    <SlipDirection>-213</SlipDirection>
+    <PlainCount>6</PlainCount>
+    <DirectionCount>2</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>111</SlipPlain>
+    <SlipDirection>-213</SlipDirection>
+    <PlainCount>6</PlainCount>
+    <DirectionCount>2</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>112</SlipPlain>
+    <SlipDirection>-213</SlipDirection>
+    <PlainCount>6</PlainCount>
+    <DirectionCount>2</DirectionCount>
+  </SlipSystem>
+</SlipSystemTable>

@@ -1965,6 +1965,16 @@ namespace CalScec.DataManagment.CrystalData
             }
         }
 
+        public double NormFaktor
+        {
+            get
+            {
+                double N = Math.Pow(this._h, 2) + Math.Pow(this._k, 2) + Math.Pow(this._l, 2);
+
+                return 1.0 / Math.Sqrt(N);
+            }
+        }
+
         public string HKLString
         {
             get

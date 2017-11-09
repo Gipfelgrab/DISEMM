@@ -410,6 +410,80 @@ namespace CalScec.Analysis
 
         #endregion
 
+        #region Anisotropy
+
+        #region Cubic
+
+        public double GetLogEukAnisitropyCubic(int phase)
+        {
+            double VRShear = this.VoigtTensorData[phase].ConstantsShearModulusCubicStiffness / this.ReussTensorData[phase].ConstantsShearModulusCubicCompliance;
+            double VRBulk = this.VoigtTensorData[phase].KappaCubicStiffness / this.ReussTensorData[phase].KappaCubicCompliance;
+
+            VRShear = Math.Log(VRShear);
+            VRBulk = Math.Log(VRBulk);
+
+            double Ret = Math.Sqrt((5.0 * Math.Pow(VRShear, 2)) + Math.Pow(VRBulk, 2));
+
+            return Ret;
+        }
+
+        public double GetUniversalAnisotropy(int phase)
+        {
+            double VRShear = this.VoigtTensorData[phase].ConstantsShearModulusCubicStiffness / this.ReussTensorData[phase].ConstantsShearModulusCubicCompliance;
+            double VRBulk = this.VoigtTensorData[phase].KappaCubicStiffness / this.ReussTensorData[phase].KappaCubicCompliance;
+
+            double Ret = VRBulk + (5.0 * VRShear) - 6;
+
+            return Ret;
+        }
+
+        public double GetChungBuessemAnistropy(int phase)
+        {
+            double VRShearNeg = this.VoigtTensorData[phase].ConstantsShearModulusCubicStiffness - this.ReussTensorData[phase].ConstantsShearModulusCubicCompliance;
+            double VRShearPos = this.VoigtTensorData[phase].ConstantsShearModulusCubicStiffness + this.ReussTensorData[phase].ConstantsShearModulusCubicCompliance;
+
+            return VRShearNeg / VRShearPos;
+        }
+
+        #endregion
+
+        #region Hexagonal
+
+        public double GetLogEukAnisitropyHexagonal(int phase)
+        {
+            double VRShear = this.VoigtTensorData[phase].ConstantsShearModulusHexagonalStiffness / this.ReussTensorData[phase].ConstantsShearModulusHexagonalCompliance;
+            double VRBulk = this.VoigtTensorData[phase].BulkModulusHexagonalStiffness / this.ReussTensorData[phase].BulkModulusHexagonalCompliance;
+
+            VRShear = Math.Log(VRShear);
+            VRBulk = Math.Log(VRBulk);
+
+            double Ret = Math.Sqrt((5.0 * Math.Pow(VRShear, 2)) + Math.Pow(VRBulk, 2));
+
+            return Ret;
+        }
+
+        public double GetUniversalAnisotropyHexagonal(int phase)
+        {
+            double VRShear = this.VoigtTensorData[phase].ConstantsShearModulusHexagonalStiffness / this.ReussTensorData[phase].ConstantsShearModulusHexagonalCompliance;
+            double VRBulk = this.VoigtTensorData[phase].BulkModulusHexagonalStiffness / this.ReussTensorData[phase].BulkModulusHexagonalCompliance;
+
+            double Ret = VRBulk + (5.0 * VRShear) - 6;
+
+            return Ret;
+        }
+
+        public double GetChungBuessemAnistropyHexagonal(int phase)
+        {
+            double VRShearNeg = this.VoigtTensorData[phase].ConstantsShearModulusHexagonalStiffness - this.ReussTensorData[phase].ConstantsShearModulusHexagonalCompliance;
+            double VRShearPos = this.VoigtTensorData[phase].ConstantsShearModulusHexagonalStiffness + this.ReussTensorData[phase].ConstantsShearModulusHexagonalCompliance;
+
+            return VRShearNeg / VRShearPos;
+        }
+
+        #endregion
+
+        #endregion
+
         public Sample()
         {
             this._name = "Default";
