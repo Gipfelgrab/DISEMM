@@ -357,7 +357,8 @@ namespace CalScec.Analysis.Stress.Microsopic
                                 {
                                     double appStress = this.ActSample.DiffractionPatterns[n].Stress;
                                     double psyAngle = this.ActSample.DiffractionPatterns[n].PsiAngle(SelectedPeak.Angle);
-                                    Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(appStress, psyAngle, SelectedPeak);
+                                    double phiAngle = this.ActSample.DiffractionPatterns[n].PhiAngle(SelectedPeak.Angle);
+                                    Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(appStress, psyAngle, SelectedPeak, phiAngle);
 
                                     NewREKData = new REK(this.ActSample.CrystalData[this.PhaseSwitchBox.SelectedIndex], SelectedPeak.AssociatedHKLReflex);
                                     NewREKData.ElasticStressData.Add(NewAssociation);
@@ -368,7 +369,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 }
                 catch
                 {
-                    Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(0, 0, SelectedPeak);
+                    Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(0, 0, SelectedPeak, 0);
 
                     NewREKData = new REK(this.ActSample.CrystalData[this.PhaseSwitchBox.SelectedIndex], SelectedPeak.AssociatedHKLReflex);
                     NewREKData.ElasticStressData.Add(NewAssociation);
@@ -423,7 +424,8 @@ namespace CalScec.Analysis.Stress.Microsopic
                                     {
                                         double appStress = this.ActSample.DiffractionPatterns[n].Stress;
                                         double psyAngle = this.ActSample.DiffractionPatterns[n].PsiAngle(SelectedPeak.Angle);
-                                        Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(appStress, psyAngle, SelectedPeak);
+                                        double phiAngle = this.ActSample.DiffractionPatterns[n].PhiAngle(SelectedPeak.Angle);
+                                        Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(appStress, psyAngle, SelectedPeak, phiAngle);
 
                                         UsedDataSet.ElasticStressData.Add(NewAssociation);
                                     }
@@ -433,7 +435,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                     }
                     catch
                     {
-                        Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(0, 0, SelectedPeak);
+                        Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(0, 0, SelectedPeak, 0);
 
                         UsedDataSet.ElasticStressData.Add(NewAssociation);
                     }
@@ -663,7 +665,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                                 {
                                     if(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedHKLReflex.HKLString == this.ActSample.CrystalData[n].HKLList[i].HKLString)
                                     {
-                                        Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(this.ActSample.DiffractionPatterns[j].Stress, this.ActSample.DiffractionPatterns[j].PsiAngle(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].Angle), this.ActSample.DiffractionPatterns[j].FoundPeaks[k]);
+                                        Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(this.ActSample.DiffractionPatterns[j].Stress, this.ActSample.DiffractionPatterns[j].PsiAngle(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].Angle), this.ActSample.DiffractionPatterns[j].FoundPeaks[k], this.ActSample.DiffractionPatterns[j].PhiAngle(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].Angle));
 
                                         ActualREK.ElasticStressData.Add(NewAssociation);
                                     }

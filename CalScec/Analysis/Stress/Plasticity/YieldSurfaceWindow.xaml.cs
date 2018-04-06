@@ -98,8 +98,8 @@ namespace CalScec.Analysis.Stress.Plasticity
 
             this.YieldPlotModel.Series.Clear();
 
-            Pattern.Counts UsedCountsElastic = RY.MacroStrainOverMicroStrainData(true);
-            Pattern.Counts UsedCountsPlastic = RY.MacroStrainOverMicroStrainData(false);
+            Pattern.Counts UsedCountsElastic = RY.MicroStrainOverMacroStrainData(true);
+            Pattern.Counts UsedCountsPlastic = RY.MicroStrainOverMacroStrainData(false);
 
             OxyPlot.Series.LineSeries TmpElastic = new OxyPlot.Series.LineSeries();
             TmpElastic.Title = "Elastic regime";
@@ -251,7 +251,7 @@ namespace CalScec.Analysis.Stress.Plasticity
                             {
                                 if(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].AssociatedHKLReflex.HKLString == this.ActSample.YieldSurfaceData[j].ReflexYieldData[k].SlipPlane.HKLString)
                                 {
-                                    Stress.Macroskopic.PeakStressAssociation PSATmp = new Macroskopic.PeakStressAssociation(this.ActSample.DiffractionPatterns[n].Stress, this.ActSample.DiffractionPatterns[n].PsiAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle), this.ActSample.DiffractionPatterns[n].MacroStrain, true, this.ActSample.DiffractionPatterns[n].FoundPeaks[i]);
+                                    Stress.Macroskopic.PeakStressAssociation PSATmp = new Macroskopic.PeakStressAssociation(this.ActSample.DiffractionPatterns[n].Stress, this.ActSample.DiffractionPatterns[n].PsiAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle), this.ActSample.DiffractionPatterns[n].PhiAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle), this.ActSample.DiffractionPatterns[n].MacroStrain, true, this.ActSample.DiffractionPatterns[n].FoundPeaks[i]);
                                     PSATmp.MainSlipDirectionAngle = this.ActSample.DiffractionPatterns[n].SlipDirectionAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle, this.ActSample.YieldSurfaceData[j].ReflexYieldData[k].SlipPlane, this.ActSample.YieldSurfaceData[j].ReflexYieldData[k].MainSlipDirection);
                                     PSATmp.SecondarySlipDirectionAngle = this.ActSample.DiffractionPatterns[n].SlipDirectionAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle, this.ActSample.YieldSurfaceData[j].ReflexYieldData[k].SlipPlane, this.ActSample.YieldSurfaceData[j].ReflexYieldData[k].SecondarySlipDirection);
                                     this.ActSample.YieldSurfaceData[j].ReflexYieldData[k].PeakData.Add(PSATmp);
@@ -265,7 +265,7 @@ namespace CalScec.Analysis.Stress.Plasticity
                             {
                                 ReflexYield RYieldTmp = new ReflexYield(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].AssociatedHKLReflex, this.ActSample.CrystalData[j]);
 
-                                Stress.Macroskopic.PeakStressAssociation PSATmp = new Macroskopic.PeakStressAssociation(this.ActSample.DiffractionPatterns[n].Stress, this.ActSample.DiffractionPatterns[n].PsiAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle), this.ActSample.DiffractionPatterns[n].MacroStrain, true, this.ActSample.DiffractionPatterns[n].FoundPeaks[i]);
+                                Stress.Macroskopic.PeakStressAssociation PSATmp = new Macroskopic.PeakStressAssociation(this.ActSample.DiffractionPatterns[n].Stress, this.ActSample.DiffractionPatterns[n].PsiAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle), this.ActSample.DiffractionPatterns[n].PhiAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle), this.ActSample.DiffractionPatterns[n].MacroStrain, true, this.ActSample.DiffractionPatterns[n].FoundPeaks[i]);
                                 PSATmp.MainSlipDirectionAngle = this.ActSample.DiffractionPatterns[n].SlipDirectionAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle, RYieldTmp.SlipPlane, RYieldTmp.MainSlipDirection);
                                 PSATmp.SecondarySlipDirectionAngle = this.ActSample.DiffractionPatterns[n].SlipDirectionAngle(this.ActSample.DiffractionPatterns[n].FoundPeaks[i].Angle, RYieldTmp.SlipPlane, RYieldTmp.SecondarySlipDirection);
                                 RYieldTmp.PeakData.Add(PSATmp);

@@ -279,7 +279,7 @@ namespace CalScec.DataManagment.Files.SCEC
                             {
                                 if (this.MacroElasticData[n][i].DPeak.PeakId == Ret.DiffractionPatterns[j].FoundPeaks[k].PeakId)
                                 {
-                                    ElTmp.Add(new Analysis.Stress.Macroskopic.PeakStressAssociation(this.MacroElasticData[n][i].Stress, this.MacroElasticData[n][i].PsiAngle, Ret.DiffractionPatterns[j].FoundPeaks[k]));
+                                    ElTmp.Add(new Analysis.Stress.Macroskopic.PeakStressAssociation(this.MacroElasticData[n][i].Stress, this.MacroElasticData[n][i].PsiAngle, Ret.DiffractionPatterns[j].FoundPeaks[k], this.MacroElasticData[n][i].PsiAngle));
                                     PeakNewlyAssociated = true;
                                     break;
                                 }

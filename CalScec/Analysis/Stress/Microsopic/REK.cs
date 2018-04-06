@@ -410,7 +410,7 @@ namespace CalScec.Analysis.Stress.Microsopic
 
             for(int n = 0; n < this.ElasticStressData.Count; n++)
             {
-                Macroskopic.PeakStressAssociation Tmp = new Macroskopic.PeakStressAssociation(this.ElasticStressData[n].Stress, this.ElasticStressData[n].PsiAngle, this.ElasticStressData[n].DifPeak.Clone() as Analysis.Peaks.DiffractionPeak);
+                Macroskopic.PeakStressAssociation Tmp = new Macroskopic.PeakStressAssociation(this.ElasticStressData[n].Stress, this.ElasticStressData[n].PsiAngle, this.ElasticStressData[n].DifPeak.Clone() as Analysis.Peaks.DiffractionPeak, this.ElasticStressData[n].PhiAngle);
 
                 Ret.ElasticStressData.Add(Tmp);
             }

@@ -263,6 +263,20 @@ namespace CalScec.Analysis.Fitting
             return Ret / (ET.DiffractionConstants.Count - 8);
         }
 
+        public static double Chi2StrainVoigtCubic(Stress.Microsopic.ElasticityTensors ET)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ET.UsedPSA.Count; n++)
+            {
+                double CS1 = ET.UsedPSA[n]._Strain;
+                CS1 -= ET.GetStrainCubic(ET.UsedPSA[n], ET);
+                CS1 /= ET.UsedPSA[n]._StrainError;
+                Ret += Math.Pow(CS1, 2);
+            }
+
+            return Ret / (ET.UsedPSA.Count - 2);
+        }
+
         #endregion
 
         #region Reuss
@@ -314,6 +328,21 @@ namespace CalScec.Analysis.Fitting
 
             return Ret / (ET.DiffractionConstants.Count - 2);
         }
+
+        public static double Chi2StrainReussCubic(Stress.Microsopic.ElasticityTensors ET)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ET.UsedPSA.Count; n++)
+            {
+                double CS1 = ET.UsedPSA[n]._Strain;
+                CS1 -= ET.GetStrainCubic(ET.UsedPSA[n]);
+                CS1 /= ET.UsedPSA[n]._StrainError;
+                Ret += Math.Pow(CS1, 2);
+            }
+
+            return Ret / (ET.UsedPSA.Count - 2);
+        }
+
         #endregion
 
         #region Hill
@@ -472,6 +501,53 @@ namespace CalScec.Analysis.Fitting
             }
 
             return Ret / (ET.DiffractionConstants.Count - 2);
+        }
+
+        #endregion
+
+        #region Texture
+
+        public static double Chi2TextureVoigtCubic(Texture.OrientationDistributionFunction ODF)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ODF.UsedPSA.Count; n++)
+            {
+                double CS1 = ODF.UsedPSA[n]._Strain;
+                CS1 -= ODF.GetStrainVoigtCubic(ODF.UsedPSA[n]);
+                CS1 /= ODF.UsedPSA[n]._StrainError;
+                Ret += Math.Pow(CS1, 2);
+            }
+
+            return Ret / (ODF.UsedPSA.Count - 2);
+        }
+
+        public static double Chi2TextureReussCubic(Texture.OrientationDistributionFunction ODF)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ODF.UsedPSA.Count; n++)
+            {
+                double CS1 = ODF.UsedPSA[n]._Strain;
+                CS1 -= ODF.GetStrainReussCubic(ODF.UsedPSA[n]);
+                CS1 /= ODF.UsedPSA[n]._StrainError;
+
+                Ret += Math.Pow(CS1, 2);
+            }
+
+            return Ret / (ODF.UsedPSA.Count - 2);
+        }
+
+        public static double Chi2TextureHillCubic(Texture.OrientationDistributionFunction ODF)
+        {
+            double Ret = 0;
+            for (int n = 0; n < ODF.UsedPSA.Count; n++)
+            {
+                double CS1 = ODF.UsedPSA[n]._Strain;
+                CS1 -= ODF.GetStrainHillCubic(ODF.UsedPSA[n]);
+                CS1 /= ODF.UsedPSA[n]._StrainError;
+                Ret += Math.Pow(CS1, 2);
+            }
+
+            return Ret / (ODF.UsedPSA.Count - 2);
         }
 
         #endregion

@@ -2007,6 +2007,14 @@ namespace CalScec.DataManagment.CrystalData
             }
         }
 
+        public HKLReflex(double distance)
+        {
+            this._h = 0;
+            this._k = 0;
+            this._l = 0;
+            this._distance = distance;
+        }
+
         public HKLReflex(int[] hKL, double distance)
         {
             this._h = hKL[0];

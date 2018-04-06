@@ -126,6 +126,11 @@ namespace CalScec.Pattern
 
             return Ret;
         }
+        /// <summary>
+        /// Der Vektor der Messrichtung
+        /// </summary>
+        /// <param name="Measured2Theta"> Gemessener Winkel der Netzebenschar</param>
+        /// <returns></returns>
         private MathNet.Numerics.LinearAlgebra.Vector<double> GetQI(double Measured2Theta)
         {
             MathNet.Numerics.LinearAlgebra.Vector<double> Ret = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3, 0);

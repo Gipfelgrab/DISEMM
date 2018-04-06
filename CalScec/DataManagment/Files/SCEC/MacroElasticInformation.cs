@@ -29,6 +29,7 @@ namespace CalScec.DataManagment.Files.SCEC
     {
         public double Stress;
         public double PsiAngle;
+        public double PhiAngle;
         public double MainSlipDirectionAngle;
         public double SecondarySlipDirectionAngle;
         public bool _elasticRegime;
@@ -41,6 +42,7 @@ namespace CalScec.DataManagment.Files.SCEC
         {
             this.Stress = PSA.Stress;
             this.PsiAngle = PSA.PsiAngle;
+            this.PhiAngle = PSA.PhiAngle;
             this.MainSlipDirectionAngle = PSA.MainSlipDirectionAngle;
             this.SecondarySlipDirectionAngle = PSA.SecondarySlipDirectionAngle;
             this._elasticRegime = PSA.ElasticRegime;

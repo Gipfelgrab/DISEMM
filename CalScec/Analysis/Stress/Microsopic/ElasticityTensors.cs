@@ -6344,6 +6344,8 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         #region Fitting
 
+        #region DEK
+
         public void FitVoigt(bool classicCalculation)
         {
             switch (this.Symmetry)
@@ -6669,6 +6671,131 @@ namespace CalScec.Analysis.Stress.Microsopic
             this.CalculateStiffnesses();
             SetFittingErrorsHill(classicCalculation);
         }
+
+        #endregion
+
+        #region Strain
+
+        public void FitVoigtStrain(bool classicCalculation)
+        {
+            switch (this.Symmetry)
+            {
+                case "cubic":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorStrainVoigtCubic(this, classicCalculation);
+                    break;
+                case "hexagonal":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorVoigtType1(this, classicCalculation);
+                    break;
+                case "tetragonal type 1":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorVoigtType2(this, classicCalculation);
+                    break;
+                case "tetragonal type 2":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorVoigtType2(this, classicCalculation);
+                    break;
+                case "trigonal type 1":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorVoigtType1(this, classicCalculation);
+                    break;
+                case "trigonal type 2":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorVoigtType1(this, classicCalculation);
+                    break;
+                case "rhombic":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorVoigtType3(this, classicCalculation);
+                    break;
+                case "monoclinic":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorVoigtType3(this, classicCalculation);
+                    break;
+                case "triclinic":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorVoigtType3(this, classicCalculation);
+                    break;
+                default:
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorVoigtType3(this, classicCalculation);
+                    break;
+            }
+
+            this.CalculateCompliances();
+        }
+
+        public void FitReussStrain(bool classicCalculation)
+        {
+            switch (this.Symmetry)
+            {
+                case "cubic":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorStrainReussCubic(this, classicCalculation);
+                    break;
+                case "hexagonal":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorReussHexagonal(this, classicCalculation);
+                    break;
+                case "tetragonal type 1":
+
+                    break;
+                case "tetragonal type 2":
+
+                    break;
+                case "trigonal type 1":
+
+                    break;
+                case "trigonal type 2":
+
+                    break;
+                case "rhombic":
+
+                    break;
+                case "monoclinic":
+
+                    break;
+                case "triclinic":
+
+                    break;
+                default:
+
+                    break;
+            }
+
+            this.CalculateStiffnesses();
+            SetFittingErrorsReuss(classicCalculation);
+        }
+
+        public void FitHillStrain(bool classicCalculation)
+        {
+            switch (this.Symmetry)
+            {
+                case "cubic":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorHillCubic(this, classicCalculation);
+                    break;
+                case "hexagonal":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorHillHexagonal(this, classicCalculation);
+                    break;
+                case "tetragonal type 1":
+
+                    break;
+                case "tetragonal type 2":
+
+                    break;
+                case "trigonal type 1":
+
+                    break;
+                case "trigonal type 2":
+
+                    break;
+                case "rhombic":
+
+                    break;
+                case "monoclinic":
+
+                    break;
+                case "triclinic":
+
+                    break;
+                default:
+
+                    break;
+            }
+
+            this.CalculateStiffnesses();
+            SetFittingErrorsHill(classicCalculation);
+        }
+
+        #endregion
 
         #region Error calculation
 
@@ -10705,31 +10832,41 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double S1ReussHexagonal(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = Math.Pow(hKL.H, 2) + (hKL.H * hKL.K) + Math.Pow(hKL.K, 2);
-            Ret *= 6 * Math.Pow(hKL.L, 2);
+            #region HKL Reduction
+
+            DataManagment.CrystalData.CODData CData = this.GetPhaseInformation;
+
+            double H = hKL.H / CData.A;
+            double K = hKL.K / CData.B;
+            double L = hKL.L / CData.C;
+
+            #endregion
+
+            double Ret = Math.Pow(H, 2) + (H * K) + Math.Pow(K, 2);
+            Ret *= 6 * Math.Pow(L, 2);
             Ret *= this.S11 + this.S33 - this.S44;
 
-            double Sum = Math.Pow(hKL.H, 2) + (hKL.H * hKL.K) + Math.Pow(hKL.K, 2);
-            Sum *= ( 4 * Math.Pow(hKL.H, 2)) + (4 * (hKL.H * hKL.K)) + ( 4 * Math.Pow(hKL.K, 2)) + (3 * Math.Pow(hKL.L, 2));
+            double Sum = Math.Pow(H, 2) + (H * K) + Math.Pow(K, 2);
+            Sum *= ( 4 * Math.Pow(H, 2)) + (4 * (H * K)) + ( 4 * Math.Pow(K, 2)) + (3 * Math.Pow(L, 2));
 
             Ret += 2 * this.S12 * Sum;
 
-            Sum = 8 * Math.Pow(hKL.H, 4);
-            Sum += 16 * Math.Pow(hKL.H, 3) * hKL.K;
-            Sum += 24 * Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
-            Sum += 16 * hKL.H * Math.Pow(hKL.K, 3);
-            Sum += 8 * Math.Pow(hKL.K, 4);
-            Sum += 6 * Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
-            Sum += 6 * hKL.H * hKL.K * Math.Pow(hKL.L, 2);
-            Sum += 6 * Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
-            Sum += 9 * Math.Pow(hKL.L, 4);
+            Sum = 8 * Math.Pow(H, 4);
+            Sum += 16 * Math.Pow(H, 3) * K;
+            Sum += 24 * Math.Pow(H, 2) * Math.Pow(K, 2);
+            Sum += 16 * H * Math.Pow(K, 3);
+            Sum += 8 * Math.Pow(K, 4);
+            Sum += 6 * Math.Pow(H, 2) * Math.Pow(L, 2);
+            Sum += 6 * H * K * Math.Pow(L, 2);
+            Sum += 6 * Math.Pow(K, 2) * Math.Pow(L, 2);
+            Sum += 9 * Math.Pow(L, 4);
 
             Ret += Sum * this.S13;
 
-            double N = 4 * Math.Pow(hKL.H, 2);
-            N += 4 * Math.Pow(hKL.K, 2);
-            N += 4 * Math.Pow(hKL.L, 2);
-            N += 4 * hKL.H * hKL.K;
+            double N = 4 * Math.Pow(H, 2);
+            N += 4 * Math.Pow(K, 2);
+            N += 3 * Math.Pow(L, 2);
+            N += 4 * H * K;
 
             Ret /= Math.Pow(N, 2);
 
@@ -10738,20 +10875,30 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double HS2ReussHexagonal(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = Math.Pow(Math.Pow(hKL.H, 2) + (hKL.H * hKL.K) + Math.Pow(hKL.K, 2), 2);
-            Ret *= 16 * this.S11;
-            Ret += 9 * Math.Pow(hKL.L, 4) * this.S33;
+            #region HKL Reduction
 
-            double Sum = Math.Pow(hKL.H, 2) + (hKL.H * hKL.K) + Math.Pow(hKL.K, 2);
-            Sum *= 12 * Math.Pow(hKL.L, 2);
+            DataManagment.CrystalData.CODData CData = this.GetPhaseInformation;
+
+            double H = hKL.H / CData.A;
+            double K = hKL.K / CData.B;
+            double L = hKL.L / CData.C;
+
+            #endregion
+
+            double Ret = Math.Pow(Math.Pow(H, 2) + (H * K) + Math.Pow(K, 2), 2);
+            Ret *= 16 * this.S11;
+            Ret += 9 * Math.Pow(L, 4) * this.S33;
+
+            double Sum = Math.Pow(H, 2) + (H * K) + Math.Pow(K, 2);
+            Sum *= 12 * Math.Pow(L, 2);
             Sum *= ((2 * this.S13) + this.S44);
 
             Ret += Sum;
 
-            double N = 4 * Math.Pow(hKL.H, 2);
-            N += 4 * Math.Pow(hKL.K, 2);
-            N += 4 * Math.Pow(hKL.L, 2);
-            N += 4 * hKL.H * hKL.K;
+            double N = 4 * Math.Pow(H, 2);
+            N += 4 * Math.Pow(K, 2);
+            N += 3 * Math.Pow(L, 2);
+            N += 4 * H * K;
 
             Ret /= Math.Pow(N, 2);
 
@@ -10984,13 +11131,23 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double FirstDerivativeS11S1ReussHexagonal(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = Math.Pow(hKL.H, 2) + (hKL.H * hKL.K) + Math.Pow(hKL.K, 2);
-            Ret *= 6 * Math.Pow(hKL.L, 2);
+            #region HKL Reduction
 
-            double N = 4 * Math.Pow(hKL.H, 2);
-            N += 4 * Math.Pow(hKL.K, 2);
-            N += 4 * Math.Pow(hKL.L, 2);
-            N += 4 * hKL.H * hKL.K;
+            DataManagment.CrystalData.CODData CData = this.GetPhaseInformation;
+
+            double H = hKL.H / CData.A;
+            double K = hKL.K / CData.B;
+            double L = hKL.L / CData.C;
+
+            #endregion
+
+            double Ret = Math.Pow(H, 2) + (H * K) + Math.Pow(K, 2);
+            Ret *= 6 * Math.Pow(L, 2);
+
+            double N = 4 * Math.Pow(H, 2);
+            N += 4 * Math.Pow(K, 2);
+            N += 3 * Math.Pow(L, 2);
+            N += 4 * H * K;
 
             Ret /= Math.Pow(N, 2);
 
@@ -10999,13 +11156,23 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double FirstDerivativeS33S1ReussHexagonal(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = Math.Pow(hKL.H, 2) + (hKL.H * hKL.K) + Math.Pow(hKL.K, 2);
-            Ret *= 6 * Math.Pow(hKL.L, 2);
+            #region HKL Reduction
 
-            double N = 4 * Math.Pow(hKL.H, 2);
-            N += 4 * Math.Pow(hKL.K, 2);
-            N += 4 * Math.Pow(hKL.L, 2);
-            N += 4 * hKL.H * hKL.K;
+            DataManagment.CrystalData.CODData CData = this.GetPhaseInformation;
+
+            double H = hKL.H / CData.A;
+            double K = hKL.K / CData.B;
+            double L = hKL.L / CData.C;
+
+            #endregion
+
+            double Ret = Math.Pow(H, 2) + (H * K) + Math.Pow(K, 2);
+            Ret *= 6 * Math.Pow(L, 2);
+
+            double N = 4 * Math.Pow(H, 2);
+            N += 4 * Math.Pow(K, 2);
+            N += 3 * Math.Pow(L, 2);
+            N += 4 * H * K;
 
             Ret /= Math.Pow(N, 2);
 
@@ -11014,13 +11181,23 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double FirstDerivativeS44S1ReussHexagonal(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = Math.Pow(hKL.H, 2) + (hKL.H * hKL.K) + Math.Pow(hKL.K, 2);
-            Ret *= -6 * Math.Pow(hKL.L, 2);
+            #region HKL Reduction
 
-            double N = 4 * Math.Pow(hKL.H, 2);
-            N += 4 * Math.Pow(hKL.K, 2);
-            N += 4 * Math.Pow(hKL.L, 2);
-            N += 4 * hKL.H * hKL.K;
+            DataManagment.CrystalData.CODData CData = this.GetPhaseInformation;
+
+            double H = hKL.H / CData.A;
+            double K = hKL.K / CData.B;
+            double L = hKL.L / CData.C;
+
+            #endregion
+
+            double Ret = Math.Pow(H, 2) + (H * K) + Math.Pow(K, 2);
+            Ret *= -6 * Math.Pow(L, 2);
+
+            double N = 4 * Math.Pow(H, 2);
+            N += 4 * Math.Pow(K, 2);
+            N += 3 * Math.Pow(L, 2);
+            N += 4 * H * K;
 
             Ret /= Math.Pow(N, 2);
 
@@ -11029,14 +11206,24 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double FirstDerivativeS12S1ReussHexagonal(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = Math.Pow(hKL.H, 2) + (hKL.H * hKL.K) + Math.Pow(hKL.K, 2);
-            Ret *= (4 * Math.Pow(hKL.H, 2)) + (4 * (hKL.H * hKL.K)) + (4 * Math.Pow(hKL.K, 2)) + (3 * Math.Pow(hKL.L, 2));
+            #region HKL Reduction
+
+            DataManagment.CrystalData.CODData CData = this.GetPhaseInformation;
+
+            double H = hKL.H / CData.A;
+            double K = hKL.K / CData.B;
+            double L = hKL.L / CData.C;
+
+            #endregion
+
+            double Ret = Math.Pow(H, 2) + (H * K) + Math.Pow(K, 2);
+            Ret *= (4 * Math.Pow(H, 2)) + (4 * (H * K)) + (4 * Math.Pow(K, 2)) + (3 * Math.Pow(L, 2));
             Ret *= 2;
 
-            double N = 4 * Math.Pow(hKL.H, 2);
-            N += 4 * Math.Pow(hKL.K, 2);
-            N += 4 * Math.Pow(hKL.L, 2);
-            N += 4 * hKL.H * hKL.K;
+            double N = 4 * Math.Pow(H, 2);
+            N += 4 * Math.Pow(K, 2);
+            N += 3 * Math.Pow(L, 2);
+            N += 4 * H * K;
 
             Ret /= Math.Pow(N, 2);
 
@@ -11045,20 +11232,30 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double FirstDerivativeS13S1ReussHexagonal(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = 8 * Math.Pow(hKL.H, 4);
-            Ret += 16 * Math.Pow(hKL.H, 3) * hKL.K;
-            Ret += 24 * Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
-            Ret += 16 * hKL.H * Math.Pow(hKL.K, 3);
-            Ret += 8 * Math.Pow(hKL.K, 4);
-            Ret += 6 * Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
-            Ret += 6 * hKL.H * hKL.K * Math.Pow(hKL.L, 2);
-            Ret += 6 * Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
-            Ret += 9 * Math.Pow(hKL.L, 4);
+            #region HKL Reduction
 
-            double N = 4 * Math.Pow(hKL.H, 2);
-            N += 4 * Math.Pow(hKL.K, 2);
-            N += 4 * Math.Pow(hKL.L, 2);
-            N += 4 * hKL.H * hKL.K;
+            DataManagment.CrystalData.CODData CData = this.GetPhaseInformation;
+
+            double H = hKL.H / CData.A;
+            double K = hKL.K / CData.B;
+            double L = hKL.L / CData.C;
+
+            #endregion
+
+            double Ret = 8 * Math.Pow(H, 4);
+            Ret += 16 * Math.Pow(H, 3) * K;
+            Ret += 24 * Math.Pow(H, 2) * Math.Pow(K, 2);
+            Ret += 16 * H * Math.Pow(K, 3);
+            Ret += 8 * Math.Pow(K, 4);
+            Ret += 6 * Math.Pow(H, 2) * Math.Pow(L, 2);
+            Ret += 6 * H * K * Math.Pow(L, 2);
+            Ret += 6 * Math.Pow(K, 2) * Math.Pow(L, 2);
+            Ret += 9 * Math.Pow(L, 4);
+
+            double N = 4 * Math.Pow(H, 2);
+            N += 4 * Math.Pow(K, 2);
+            N += 3 * Math.Pow(L, 2);
+            N += 4 * H * K;
 
             Ret /= Math.Pow(N, 2);
 
@@ -11067,13 +11264,23 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double FirstDerivativeS11HS2ReussHexagonal(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = Math.Pow(Math.Pow(hKL.H, 2) + (hKL.H * hKL.K) + Math.Pow(hKL.K, 2), 2);
+            #region HKL Reduction
+
+            DataManagment.CrystalData.CODData CData = this.GetPhaseInformation;
+
+            double H = hKL.H / CData.A;
+            double K = hKL.K / CData.B;
+            double L = hKL.L / CData.C;
+
+            #endregion
+
+            double Ret = Math.Pow(Math.Pow(H, 2) + (H * K) + Math.Pow(K, 2), 2);
             Ret *= 16;
 
-            double N = 4 * Math.Pow(hKL.H, 2);
-            N += 4 * Math.Pow(hKL.K, 2);
-            N += 4 * Math.Pow(hKL.L, 2);
-            N += 4 * hKL.H * hKL.K;
+            double N = 4 * Math.Pow(H, 2);
+            N += 4 * Math.Pow(K, 2);
+            N += 3 * Math.Pow(L, 2);
+            N += 4 * H * K;
 
             Ret /= Math.Pow(N, 2);
 
@@ -11084,12 +11291,22 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double FirstDerivativeS33HS2ReussHexagonal(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = 9 * Math.Pow(hKL.L, 4);
+            #region HKL Reduction
 
-            double N = 4 * Math.Pow(hKL.H, 2);
-            N += 4 * Math.Pow(hKL.K, 2);
-            N += 4 * Math.Pow(hKL.L, 2);
-            N += 4 * hKL.H * hKL.K;
+            DataManagment.CrystalData.CODData CData = this.GetPhaseInformation;
+
+            double H = hKL.H / CData.A;
+            double K = hKL.K / CData.B;
+            double L = hKL.L / CData.C;
+
+            #endregion
+
+            double Ret = 9 * Math.Pow(L, 4);
+
+            double N = 4 * Math.Pow(H, 2);
+            N += 4 * Math.Pow(K, 2);
+            N += 3 * Math.Pow(L, 2);
+            N += 4 * H * K;
 
             Ret /= Math.Pow(N, 2);
 
@@ -11107,13 +11324,23 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double FirstDerivativeS13HS2ReussHexagonal(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = Math.Pow(hKL.H, 2) + (hKL.H * hKL.K) + Math.Pow(hKL.K, 2);
-            Ret *= 24.0 * Math.Pow(hKL.L, 2);
+            #region HKL Reduction
 
-            double N = 4 * Math.Pow(hKL.H, 2);
-            N += 4 * Math.Pow(hKL.K, 2);
-            N += 4 * Math.Pow(hKL.L, 2);
-            N += 4 * hKL.H * hKL.K;
+            DataManagment.CrystalData.CODData CData = this.GetPhaseInformation;
+
+            double H = hKL.H / CData.A;
+            double K = hKL.K / CData.B;
+            double L = hKL.L / CData.C;
+
+            #endregion
+
+            double Ret = Math.Pow(H, 2) + (H * K) + Math.Pow(K, 2);
+            Ret *= 24.0 * Math.Pow(L, 2);
+
+            double N = 4 * Math.Pow(H, 2);
+            N += 4 * Math.Pow(K, 2);
+            N += 3 * Math.Pow(L, 2);
+            N += 4 * H * K;
 
             Ret /= Math.Pow(N, 2);
 
@@ -11124,13 +11351,23 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double FirstDerivativeS44HS2ReussHexagonal(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = Math.Pow(hKL.H, 2) + (hKL.H * hKL.K) + Math.Pow(hKL.K, 2);
-            Ret *= 12 * Math.Pow(hKL.L, 2);
+            #region HKL Reduction
 
-            double N = 4 * Math.Pow(hKL.H, 2);
-            N += 4 * Math.Pow(hKL.K, 2);
-            N += 4 * Math.Pow(hKL.L, 2);
-            N += 4 * hKL.H * hKL.K;
+            DataManagment.CrystalData.CODData CData = this.GetPhaseInformation;
+
+            double H = hKL.H / CData.A;
+            double K = hKL.K / CData.B;
+            double L = hKL.L / CData.C;
+
+            #endregion
+
+            double Ret = Math.Pow(H, 2) + (H * K) + Math.Pow(K, 2);
+            Ret *= 12 * Math.Pow(L, 2);
+
+            double N = 4 * Math.Pow(H, 2);
+            N += 4 * Math.Pow(K, 2);
+            N += 3 * Math.Pow(L, 2);
+            N += 4 * H * K;
 
             Ret /= Math.Pow(N, 2);
 
@@ -13980,54 +14217,60 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double FirstDerivativeS11S1GeometricHillCubic(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = this.FirstDerivativeS11S1ReussCubic(hKL) * this.S1VoigtCubic();
+            double Ret = this.FirstDerivativeS11S1ReussCubic(hKL) * this.S1VoigtCubicCompliance();
             Ret += this.S1ReussCubic(hKL) * this.FirstDerivativeS11S1VoigtCubic();
-            Ret /= Math.Sqrt(this.S1ReussCubic(hKL) * this.S1VoigtCubic());
+            Ret /= Math.Sqrt(this.S1ReussCubic(hKL) * this.S1VoigtCubicCompliance());
+            Ret *= 0.5;
 
             return Ret;
         }
 
         public double FirstDerivativeS12S1GeometricHillCubic(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = this.FirstDerivativeS12S1ReussCubic(hKL) * this.S1VoigtCubic();
+            double Ret = this.FirstDerivativeS12S1ReussCubic(hKL) * this.S1VoigtCubicCompliance();
             Ret += this.S1ReussCubic(hKL) * this.FirstDerivativeS12S1VoigtCubic();
-            Ret /= Math.Sqrt(this.S1ReussCubic(hKL) * this.S1VoigtCubic());
+            Ret /= Math.Sqrt(this.S1ReussCubic(hKL) * this.S1VoigtCubicCompliance());
+            Ret *= 0.5;
 
             return Ret;
         }
 
         public double FirstDerivativeS44S1GeometricHillCubic(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = this.FirstDerivativeS44S1ReussCubic(hKL) * this.S1VoigtCubic();
+            double Ret = this.FirstDerivativeS44S1ReussCubic(hKL) * this.S1VoigtCubicCompliance();
             Ret += this.S1ReussCubic(hKL) * this.FirstDerivativeS44S1VoigtCubic();
-            Ret /= Math.Sqrt(this.S1ReussCubic(hKL) * this.S1VoigtCubic());
+            Ret /= Math.Sqrt(this.S1ReussCubic(hKL) * this.S1VoigtCubicCompliance());
+            Ret *= 0.5;
 
             return Ret;
         }
 
         public double FirstDerivativeS11HS2GeometricHillCubic(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = this.FirstDerivativeS11HS2ReussCubic(hKL) * this.HS2VoigtCubic();
+            double Ret = this.FirstDerivativeS11HS2ReussCubic(hKL) * this.HS2VoigtCubicCompliance();
             Ret += this.HS2ReussCubic(hKL) * this.FirstDerivativeS11HS2VoigtCubic();
-            Ret /= Math.Sqrt(this.HS2ReussCubic(hKL) * this.HS2VoigtCubic());
+            Ret /= Math.Sqrt(this.HS2ReussCubic(hKL) * this.HS2VoigtCubicCompliance());
+            Ret *= 0.5;
 
             return Ret;
         }
 
         public double FirstDerivativeS12HS2GeometricHillCubic(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = this.FirstDerivativeS12HS2ReussCubic(hKL) * this.HS2VoigtCubic();
+            double Ret = this.FirstDerivativeS12HS2ReussCubic(hKL) * this.HS2VoigtCubicCompliance();
             Ret += this.HS2ReussCubic(hKL) * this.FirstDerivativeS12HS2VoigtCubic();
-            Ret /= Math.Sqrt(this.HS2ReussCubic(hKL) * this.HS2VoigtCubic());
+            Ret /= Math.Sqrt(this.HS2ReussCubic(hKL) * this.HS2VoigtCubicCompliance());
+            Ret *= 0.5;
 
             return Ret;
         }
 
         public double FirstDerivativeS44HS2GeometricHillCubic(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = this.FirstDerivativeS44HS2ReussCubic(hKL) * this.HS2VoigtCubic();
+            double Ret = this.FirstDerivativeS44HS2ReussCubic(hKL) * this.HS2VoigtCubicCompliance();
             Ret += this.HS2ReussCubic(hKL) * this.FirstDerivativeS44HS2VoigtCubic();
-            Ret /= Math.Sqrt(this.HS2ReussCubic(hKL) * this.HS2VoigtCubic());
+            Ret /= Math.Sqrt(this.HS2ReussCubic(hKL) * this.HS2VoigtCubicCompliance());
+            Ret *= 0.5;
 
             return Ret;
         }
@@ -14372,6 +14615,586 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         #endregion
 
+        #region Strain calculations
+
+        #region Data Setting
+
+        public List<CalScec.Analysis.Stress.Macroskopic.PeakStressAssociation> UsedPSA = new List<Stress.Macroskopic.PeakStressAssociation>();
+
+        public void SetPeakStressAssociation(Sample actSample)
+        {
+            for (int i = 0; i < this.GetPhaseInformation.HKLList.Count; i++)
+            {
+                for (int j = 0; j < actSample.DiffractionPatterns.Count; j++)
+                {
+                    for (int k = 0; k < actSample.DiffractionPatterns[j].FoundPeaks.Count; k++)
+                    {
+                        if (actSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedCrystalData.SymmetryGroupID == this.GetPhaseInformation.SymmetryGroupID)
+                        {
+                            if (actSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedHKLReflex.HKLString == this.GetPhaseInformation.HKLList[i].HKLString)
+                            {
+                                Stress.Macroskopic.PeakStressAssociation NewAssociation = new Stress.Macroskopic.PeakStressAssociation(actSample.DiffractionPatterns[j].Stress, actSample.DiffractionPatterns[j].PsiAngle(actSample.DiffractionPatterns[j].FoundPeaks[k].Angle), actSample.DiffractionPatterns[j].FoundPeaks[k], actSample.DiffractionPatterns[j].PhiAngle(actSample.DiffractionPatterns[j].FoundPeaks[k].Angle));
+
+                                this.UsedPSA.Add(NewAssociation);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public void SetStrainData()
+        {
+            List<List<Stress.Macroskopic.PeakStressAssociation>> SortedDataPre = new List<List<Stress.Macroskopic.PeakStressAssociation>>();
+
+            List<double> UsedPsiAngles = new List<double>();
+            int AllDataUsed = 0;
+
+            while (AllDataUsed < this.UsedPSA.Count)
+            {
+                List<Stress.Macroskopic.PeakStressAssociation> ActAngle = new List<Stress.Macroskopic.PeakStressAssociation>();
+                int StartingNumber = 0;
+                double ActPsiAngle = 0;
+
+                for (int n = 0; n < this.UsedPSA.Count; n++)
+                {
+                    bool Contained = false;
+                    for (int i = 0; i < UsedPsiAngles.Count; i++)
+                    {
+                        if (Math.Abs(this.UsedPSA[n].PsiAngle - UsedPsiAngles[i]) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
+                        {
+                            Contained = true;
+                            break;
+                        }
+                    }
+
+                    if (!Contained)
+                    {
+                        StartingNumber = n + 1;
+                        ActPsiAngle = this.UsedPSA[n].PsiAngle;
+                        ActAngle.Add(this.UsedPSA[n]);
+                        AllDataUsed++;
+                        break;
+                    }
+                }
+
+                for (int n = StartingNumber; n < this.UsedPSA.Count; n++)
+                {
+                    if (Math.Abs(ActPsiAngle - this.UsedPSA[n].PsiAngle) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
+                    {
+                        ActAngle.Add(this.UsedPSA[n]);
+                        AllDataUsed++;
+                    }
+                }
+
+                UsedPsiAngles.Add(ActPsiAngle);
+                SortedDataPre.Add(ActAngle);
+            }
+
+            List<List<Stress.Macroskopic.PeakStressAssociation>> SortedData = new List<List<Stress.Macroskopic.PeakStressAssociation>>();
+
+            for (int n = 0; n < SortedDataPre.Count; n++)
+            {
+                List<Stress.Macroskopic.PeakStressAssociation> HKLSortTmp = new List<Stress.Macroskopic.PeakStressAssociation>();
+                DataManagment.CrystalData.HKLReflex ActReflex = new DataManagment.CrystalData.HKLReflex(-1);
+                for (int i = 0; i < SortedDataPre[n].Count; i++)
+                {
+                    if (ActReflex.Distance != -1)
+                    {
+                        if (ActReflex.HKLString == SortedDataPre[n][i].DPeak.AssociatedHKLReflex.HKLString)
+                        {
+                            HKLSortTmp.Add(SortedDataPre[n][i]);
+                        }
+                        else
+                        {
+                            List<Stress.Macroskopic.PeakStressAssociation> HKLSort = new List<Stress.Macroskopic.PeakStressAssociation>();
+                            for (int j = 0; j < HKLSortTmp.Count; j++)
+                            {
+                                Stress.Macroskopic.PeakStressAssociation Tmp = new Stress.Macroskopic.PeakStressAssociation(HKLSortTmp[j]);
+                                HKLSort.Add(Tmp);
+                            }
+                            SortedData.Add(HKLSort);
+                            HKLSortTmp.Clear();
+
+                            HKLSortTmp.Add(SortedDataPre[n][i]);
+                            ActReflex = SortedDataPre[n][i].DPeak.AssociatedHKLReflex;
+                        }
+                    }
+                    else
+                    {
+                        HKLSortTmp.Add(SortedDataPre[n][i]);
+                        ActReflex = SortedDataPre[n][i].DPeak.AssociatedHKLReflex;
+                    }
+                }
+
+                List<Stress.Macroskopic.PeakStressAssociation> HKLSort1 = new List<Stress.Macroskopic.PeakStressAssociation>();
+                for (int j = 0; j < HKLSortTmp.Count; j++)
+                {
+                    Stress.Macroskopic.PeakStressAssociation Tmp = new Stress.Macroskopic.PeakStressAssociation(HKLSortTmp[j]);
+                    HKLSort1.Add(Tmp);
+                }
+                SortedData.Add(HKLSort1);
+            }
+
+            for (int n = 0; n < SortedData.Count; n++)
+            {
+                if (SortedData[n].Count > 1)
+                {
+                    double SmallestStress = SortedData[n][0].Stress;
+                    double SmallestDistance = SortedData[n][0].DPeak.LatticeDistance;
+
+                    for (int i = 1; i < SortedData[n].Count; i++)
+                    {
+                        if (SmallestStress > SortedData[n][i].Stress)
+                        {
+                            SmallestStress = SortedData[n][i].Stress;
+                            SmallestDistance = SortedData[n][i].DPeak.LatticeDistance;
+                        }
+                    }
+
+                    for (int i = 0; i < SortedData[n].Count; i++)
+                    {
+                        if (SmallestStress != SortedData[n][i].Stress)
+                        {
+                            double StrainValue = (SortedData[n][i].DPeak.LatticeDistance - SmallestDistance);
+                            StrainValue /= SmallestDistance;
+                            double StressValue = (SortedData[n][i].Stress - SmallestStress);
+
+                            SortedData[n][i].Strain = StrainValue;
+                            SortedData[n][i].Stress = StressValue;
+                            double StrainValueError = (SortedData[n][i].DPeak.LatticeDistanceError);
+                            StrainValueError /= SmallestDistance;
+                            StrainValueError *= StrainValue;
+
+                            if (StrainValueError == 0)
+                            {
+                                StrainValueError = 1;
+                            }
+
+                            SortedData[n][i]._StrainError = StrainValueError;
+                        }
+                        else
+                        {
+                            double StrainValue = 0;
+                            double StressValue = 0;
+
+                            SortedData[n][i].Strain = StrainValue;
+                            SortedData[n][i]._StrainError = 1;
+                            SortedData[n][i].Stress = StressValue;
+                        }
+                    }
+                }
+            }
+
+            this.UsedPSA.Clear();
+
+            for (int n = 0; n < SortedData.Count; n++)
+            {
+                for (int i = 0; i < SortedData[n].Count; i++)
+                {
+                    this.UsedPSA.Add(SortedData[n][i]);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Cubic
+
+        public double GetOrientationConstantCubic()
+        {
+            double ret = this.S11 - this.S12 - (0.5 * this.S44);
+
+            return ret;
+        }
+
+        public double GetOrientationConstantCubic(double s11, double s12, double s44)
+        {
+            double ret = s11 - s12 - (0.5 * s44);
+
+            return ret;
+        }
+
+        public double GetStrainCubic(Stress.Macroskopic.PeakStressAssociation usedAssociation)
+        {
+            double A0 = GetOrientationConstantCubic();
+            double Gamma = this.CubicGamma(usedAssociation.DPeak.AssociatedHKLReflex);
+
+            double ret = this.S11 - this.S12 - (3.0 * A0 * Gamma);
+            ret *= Math.Pow(Math.Cos((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+
+            ret += this.S12 + (A0 * Gamma);
+
+            return ret * usedAssociation.Stress;
+        }
+
+        public double GetStrainCubic(Stress.Macroskopic.PeakStressAssociation usedAssociation, ElasticityTensors ET)
+        {
+            double A0 = GetOrientationConstantCubic(ET.S11, ET.S12, ET.S44);
+            double Gamma = this.CubicGamma(usedAssociation.DPeak.AssociatedHKLReflex);
+
+            double ret = ET.S11 - ET.S12 - (3.0 * A0 * Gamma);
+            ret *= Math.Pow(Math.Cos((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+
+            ret += ET.S12 + (A0 * Gamma);
+
+            return ret * usedAssociation.Stress;
+        }
+
+        #region Voigt
+
+        public double GetS11VoigtCubic(ElasticityTensors ET)
+        {
+            double ret = ET.C11 + ET.C12;
+            ret /= Math.Pow(ET.C11, 2) + (ET.C11 * ET.C12) - (2.0 * Math.Pow(ET.C12, 2));
+
+            return ret;
+        }
+
+        public double GetS12VoigtCubic(ElasticityTensors ET)
+        {
+            double ret = -1.0 * ET.C12;
+            ret /= Math.Pow(ET.C11, 2) + (ET.C11 * ET.C12) - (2.0 * Math.Pow(ET.C12, 2));
+
+            return ret;
+        }
+
+        public double GetS44VoigtCubic(ElasticityTensors ET)
+        {
+            return 1.0 / ET.C44;
+        }
+
+        public double GetStrainVoigtCubicFD(Stress.Macroskopic.PeakStressAssociation usedAssociation, ElasticityTensors ET, int parameter)
+        {
+            switch (parameter)
+            {
+                case 0:
+                    return GetStrainCubicVoigtFDC11(usedAssociation, ET);
+                case 1:
+                    return GetStrainCubicVoigtFDC12(usedAssociation, ET);
+                case 2:
+                    return GetStrainCubicVoigtFDC44(usedAssociation, ET);
+                default:
+                    return 0.0;
+            }
+        }
+
+        #region First Derivatives
+
+        #region Compliance parameters
+
+        public double GetFDN(ElasticityTensors ET)
+        {
+            double ret = Math.Pow(ET.C11, 2);
+            ret += (ET.C11 + ET.C12);
+            ret -= 2.0 * Math.Pow(ET.C12, 2);
+
+            return Math.Pow(ret, 2);
+        }
+
+        public double GetS11VoigtCubicFDC11(ElasticityTensors ET)
+        {
+            double ret = -1.0 * Math.Pow(ET.C11, 2);
+            ret -= 2 * ET.C11 * ET.C12;
+            ret -= 3.0 * Math.Pow(ET.C12, 2);
+
+            return ret / this.GetFDN(ET);
+        }
+
+        public double GetS11VoigtCubicFDC12(ElasticityTensors ET)
+        {
+            double ret = -1.0 * Math.Pow(ET.C11, 2);
+            ret -= 2 * ET.C11 * ET.C12;
+            ret -= 3.0 * Math.Pow(ET.C12, 2);
+
+            return ret / this.GetFDN(ET);
+        }
+
+        public double GetS11VoigtCubicFDC44(ElasticityTensors ET)
+        {
+            return 0.0;
+        }
+
+        public double GetS12VoigtCubicFDC11(ElasticityTensors ET)
+        {
+            double ret = (2.0 * ET.C11) + ET.C12;
+            ret *= ET.C12;
+
+            return ret / this.GetFDN(ET);
+        }
+
+        public double GetS12VoigtCubicFDC12(ElasticityTensors ET)
+        {
+            double ret = -1.0 * Math.Pow(ET.C11, 2);
+            ret -= 2.0 * Math.Pow(ET.C12, 2);
+
+            return ret / this.GetFDN(ET);
+        }
+
+        public double GetS12VoigtCubicFDC44(ElasticityTensors ET)
+        {
+            return 0.0;
+        }
+
+        public double GetS44VoigtCubicFDC11(ElasticityTensors ET)
+        {
+            return 0.0;
+        }
+
+        public double GetS44VoigtCubicFDC12(ElasticityTensors ET)
+        {
+            return 0.0;
+        }
+
+        public double GetS44VoigtCubicFDC44(ElasticityTensors ET)
+        {
+            double ret = Math.Pow(ET.C44, 2);
+
+            return -1.0 / ret;
+        }
+
+        #endregion
+
+        public double GetStrainCubicVoigtFDC11(Stress.Macroskopic.PeakStressAssociation usedAssociation, ElasticityTensors ET)
+        {
+            double S11FD = this.GetS11VoigtCubicFDC11(ET);
+            double S12FD = this.GetS12VoigtCubicFDC11(ET);
+            double S44FD = this.GetS44VoigtCubicFDC11(ET);
+
+            double A0 = GetOrientationConstantCubic(S11FD, S12FD, S44FD);
+            double Gamma = this.CubicGamma(usedAssociation.DPeak.AssociatedHKLReflex);
+
+            double ret = S11FD - S12FD - (3.0 * A0 * Gamma);
+            ret *= Math.Pow(Math.Cos((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+
+            ret += S12FD + (A0 * Gamma);
+
+            return ret * usedAssociation.Stress;
+        }
+
+        public double GetStrainCubicVoigtFDC12(Stress.Macroskopic.PeakStressAssociation usedAssociation, ElasticityTensors ET)
+        {
+            double S11FD = this.GetS11VoigtCubicFDC12(ET);
+            double S12FD = this.GetS12VoigtCubicFDC12(ET);
+            double S44FD = this.GetS44VoigtCubicFDC12(ET);
+
+            double A0 = GetOrientationConstantCubic(S11FD, S12FD, S44FD);
+            double Gamma = this.CubicGamma(usedAssociation.DPeak.AssociatedHKLReflex);
+
+            double ret = S11FD - S12FD - (3.0 * A0 * Gamma);
+            ret *= Math.Pow(Math.Cos((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+
+            ret += S12FD + (A0 * Gamma);
+
+            return ret * usedAssociation.Stress;
+        }
+
+        public double GetStrainCubicVoigtFDC44(Stress.Macroskopic.PeakStressAssociation usedAssociation, ElasticityTensors ET)
+        {
+            double S11FD = this.GetS11VoigtCubicFDC44(ET);
+            double S12FD = this.GetS12VoigtCubicFDC44(ET);
+            double S44FD = this.GetS44VoigtCubicFDC44(ET);
+
+            double A0 = GetOrientationConstantCubic(S11FD, S12FD, S44FD);
+            double Gamma = this.CubicGamma(usedAssociation.DPeak.AssociatedHKLReflex);
+
+            double ret = S11FD - S12FD - (3.0 * A0 * Gamma);
+            ret *= Math.Pow(Math.Cos((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+
+            ret += S12FD + (A0 * Gamma);
+
+            return ret * usedAssociation.Stress;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Reuss
+
+        public double GetStrainReussCubicFD(Stress.Macroskopic.PeakStressAssociation usedAssociation, int parameter)
+        {
+            switch(parameter)
+            {
+                case 0:
+                    return GetStrainCubicReussFDS11(usedAssociation);
+                case 1:
+                    return GetStrainCubicReussFDS12(usedAssociation);
+                case 2:
+                    return GetStrainCubicReussFDS44(usedAssociation);
+                default:
+                    return 0.0;
+            }
+        }
+
+        #region First Derivatives Detailed
+        
+        public double GetStrainCubicReussFDS11(Stress.Macroskopic.PeakStressAssociation usedAssociation)
+        {
+            double Gamma = this.CubicGamma(usedAssociation.DPeak.AssociatedHKLReflex);
+
+            double ret = 1.0 - (3.0 * Gamma);
+            ret *= Math.Pow(Math.Cos((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+
+            ret += Gamma;
+
+            return ret * usedAssociation.Stress;
+        }
+
+        public double GetStrainCubicReussFDS12(Stress.Macroskopic.PeakStressAssociation usedAssociation)
+        {
+            double Gamma = this.CubicGamma(usedAssociation.DPeak.AssociatedHKLReflex);
+
+            double ret = -1.0 + (3.0 * Gamma);
+            ret *= Math.Pow(Math.Cos((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+
+            ret += 1.0 - Gamma;
+
+            return ret * usedAssociation.Stress;
+        }
+
+        public double GetStrainCubicReussFDS44(Stress.Macroskopic.PeakStressAssociation usedAssociation)
+        {
+            double Gamma = this.CubicGamma(usedAssociation.DPeak.AssociatedHKLReflex);
+
+            double ret = 3.0 * 0.5 * Gamma;
+            ret *= Math.Pow(Math.Cos((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+
+            ret -= 0.5 * Gamma;
+
+            return ret * usedAssociation.Stress;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Hill
+
+        #endregion
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vector
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] S11
+        ///[1] S12
+        ///[2] S44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorStrainVoigtCubic(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            //[2][2] C44
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+
+            //[0] C11
+            //[1] C12
+            //[1] C44
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            for (int n = 0; n < this.UsedPSA.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 0) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+
+                HessianMatrix[1, 1] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 1) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                HessianMatrix[0, 1] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 1) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                HessianMatrix[1, 0] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 1) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+
+                HessianMatrix[2, 2] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 2)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                HessianMatrix[0, 2] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                HessianMatrix[2, 0] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                HessianMatrix[1, 2] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                HessianMatrix[2, 1] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 0);
+                SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 1);
+                SolutionVector[2] += (this.UsedPSA[n]._Strain - this.GetStrainCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], this, 2);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 3; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vector
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] S11
+        ///[1] S12
+        ///[2] S44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorStrainReussCubic(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            //[2][2] C44
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+
+            //[0] C11
+            //[1] C12
+            //[1] C44
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            for (int n = 0; n < this.UsedPSA.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 0) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+
+                HessianMatrix[1, 1] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 1) * this.GetStrainReussCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                HessianMatrix[0, 1] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 1) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                HessianMatrix[1, 0] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 1) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+
+                HessianMatrix[2, 2] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 2)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                HessianMatrix[0, 2] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                HessianMatrix[2, 0] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                HessianMatrix[1, 2] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                HessianMatrix[2, 1] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0);
+                SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussCubicFD(this.UsedPSA[n], 1);
+                SolutionVector[2] += (this.UsedPSA[n]._Strain - this.GetStrainCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussCubicFD(this.UsedPSA[n], 2);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 3; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        #endregion
+
+        #endregion
+
         #region Cloning
 
         public object Clone()
@@ -14396,6 +15219,11 @@ namespace CalScec.Analysis.Stress.Microsopic
             for (int n = 0; n < this.DiffractionConstants.Count; n++)
             {
                 Ret.DiffractionConstants.Add(this.DiffractionConstants[n].Clone() as REK);
+            }
+
+            for (int n = 0; n < this.UsedPSA.Count; n++)
+            {
+                Ret.UsedPSA.Add(new Macroskopic.PeakStressAssociation(this.UsedPSA[n]));
             }
 
             return Ret;

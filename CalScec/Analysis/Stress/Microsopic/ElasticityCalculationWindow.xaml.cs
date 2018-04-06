@@ -31,6 +31,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             this.ActSample = usedSample;
 
             this.PrepareREKS();
+            PrepareStrainFit();
             this.LoadData();
         }
 
@@ -83,6 +84,19 @@ namespace CalScec.Analysis.Stress.Microsopic
             }
         }
 
+        private void PrepareStrainFit()
+        {
+            for (int n = 0; n < this.ActSample.CrystalData.Count; n++)
+            {
+                this.ActSample.VoigtTensorData[n].SetPeakStressAssociation(this.ActSample);
+                this.ActSample.VoigtTensorData[n].SetStrainData();
+                this.ActSample.ReussTensorData[n].SetPeakStressAssociation(this.ActSample);
+                this.ActSample.ReussTensorData[n].SetStrainData();
+                this.ActSample.HillTensorData[n].SetPeakStressAssociation(this.ActSample);
+                this.ActSample.HillTensorData[n].SetStrainData();
+            }
+        }
+
         private void LoadData()
         {
             TextEventsActive = false;
@@ -123,9 +137,12 @@ namespace CalScec.Analysis.Stress.Microsopic
             REKItem1.Content = "Classic";
             ComboBoxItem REKItem2 = new ComboBoxItem();
             REKItem2.Content = "Macroskopic";
+            ComboBoxItem REKItem3 = new ComboBoxItem();
+            REKItem3.Content = "Strain";
 
             this.REKSwitchBox.Items.Add(REKItem1);
             this.REKSwitchBox.Items.Add(REKItem2);
+            this.REKSwitchBox.Items.Add(REKItem3);
 
             this.REKSwitchBox.SelectedIndex = 0;
 
@@ -604,6 +621,10 @@ namespace CalScec.Analysis.Stress.Microsopic
                         {
                             this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(true);
                         }
+                        else if(REKSwitchBox.SelectedIndex == 2)
+                        {
+                            this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigtStrain(true);
+                        }
                         else
                         {
                             this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(false);
@@ -613,6 +634,10 @@ namespace CalScec.Analysis.Stress.Microsopic
                         if (REKSwitchBox.SelectedIndex == 0)
                         {
                             this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(true);
+                        }
+                        else if (REKSwitchBox.SelectedIndex == 2)
+                        {
+                            this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReussStrain(true);
                         }
                         else
                         {
@@ -1195,30 +1220,51 @@ namespace CalScec.Analysis.Stress.Microsopic
                 case 0:
                     this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
                     this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+
+                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetPeakStressAssociation(this.ActSample);
+                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetStrainData();
                     break;
                 case 1:
                     this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
                     this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+
+                    this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetPeakStressAssociation(this.ActSample);
+                    this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetStrainData();
                     break;
                 case 2:
                     this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
                     this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+
+                    this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetPeakStressAssociation(this.ActSample);
+                    this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetStrainData();
                     break;
                 case 3:
                     this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
                     this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+
+                    this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetPeakStressAssociation(this.ActSample);
+                    this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetStrainData();
                     break;
                 case 4:
                     this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
                     this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+
+                    this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetPeakStressAssociation(this.ActSample);
+                    this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetStrainData();
                     break;
                 case 5:
                     this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
                     this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+
+                    this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetPeakStressAssociation(this.ActSample);
+                    this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetStrainData();
                     break;
                 default:
                     this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].Clone() as ElasticityTensors;
                     this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor.ODF = null;
+
+                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetPeakStressAssociation(this.ActSample);
+                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetStrainData();
                     break;
             }
 

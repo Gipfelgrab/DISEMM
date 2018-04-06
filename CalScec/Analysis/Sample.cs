@@ -233,7 +233,7 @@ namespace CalScec.Analysis
             {
                 for(int i = 0; i < this.DiffractionPatterns[n].FoundPeaks.Count; i++)
                 {
-                    ret.Add(new Stress.Macroskopic.PeakStressAssociation(this.DiffractionPatterns[n].Stress, this.DiffractionPatterns[n].PsiAngle(this.DiffractionPatterns[n].FoundPeaks[i].Angle), this.DiffractionPatterns[n].FoundPeaks[i]));
+                    ret.Add(new Stress.Macroskopic.PeakStressAssociation(this.DiffractionPatterns[n].Stress, this.DiffractionPatterns[n].PsiAngle(this.DiffractionPatterns[n].FoundPeaks[i].Angle), this.DiffractionPatterns[n].FoundPeaks[i], this.DiffractionPatterns[n].PsiAngle(this.DiffractionPatterns[n].FoundPeaks[i].Angle)));
                 }
             }
 
