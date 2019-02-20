@@ -68,7 +68,8 @@
                     <TextBox Name="PatternPhiSampleAngle" Grid.Row="3" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternPhiSampleAngle_TextChanged"/>
                     <TextBox Name="PatternAppliedForce" Grid.Row="4" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternAppliedForce_TextChanged"/>
                     <TextBox Name="PatternAppliedStress" Grid.Row="5" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternAppliedStress_TextChanged"/>
-                    <TextBox Name="PatternMacroStrain" Grid.Row="5" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternMacroStrain_TextChanged"/>
+                    <TextBox Name="PatternMacroStrain" Grid.Row="6" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternMacroStrain_TextChanged"/>
+                    <Button Name="Autofill" Grid.Row="7" Grid.Column="1" Content="Auto fill" Click="Autofill_Click" Margin="5,5,5,5"/>
                 </Grid>
             </GroupBox>
         </Grid>
@@ -77,7 +78,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0" Header="Experimental overview">
+            <GroupBox Grid.Row="0" Header="Composition info">
                 <Viewport3D Name="ExperimentalViewPort">
                     <Viewport3D.Camera>
                         <OrthographicCamera x:Name="ExperimentalCamera" FarPlaneDistance="10" NearPlaneDistance="1" LookDirection="0,0,-1" UpDirection="0,1,0" Position="0,0,2"/>

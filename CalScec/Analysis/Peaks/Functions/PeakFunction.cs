@@ -123,11 +123,11 @@ namespace CalScec.Analysis.Peaks.Functions
             set
             {
                 double NewValue = value;
-                if(NewValue < 0.1)
+                if (NewValue < 0.001)
                 {
-                    NewValue = 0.1;
+                    NewValue = 0.001;
                 }
-                else if(NewValue > 3.0)
+                else if (NewValue > 3.0)
                 {
                     NewValue = 3.0;
                 }
@@ -432,9 +432,9 @@ namespace CalScec.Analysis.Peaks.Functions
             set
             {
                 double NewValue = value;
-                if(NewValue < 100.0)
+                if(NewValue < 1.0)
                 {
-                    NewValue = 100;
+                    NewValue = 1;
                 }
                 switch (this.functionType)
                 {

@@ -15,6 +15,7 @@ namespace CalScec.Analysis.Texture
         /// [3] value
         /// </summary>
         public List<double[]> TDData = new List<double[]>();
+        private bool _symmetryReducedCalculation = CalScec.Properties.Settings.Default.ODFSymmetricCalculation;
 
         public double this[double varPhi1, double phi, double varPhi2]
         {
@@ -22,9 +23,22 @@ namespace CalScec.Analysis.Texture
             {
                 for(int n = 0; n < this.TDData.Count; n++)
                 {
-                    if(this.TDData[n][0] == varPhi1 && this.TDData[n][1] == phi && this.TDData[n][2] == varPhi2)
+                    if (this._symmetryReducedCalculation)
                     {
-                        return this.TDData[n][3];
+                        double symPhi = phi % 95;
+                        double symVarPhi2 = varPhi2 % 60;
+
+                        if (this.TDData[n][0] == varPhi1 && this.TDData[n][1] == symPhi && this.TDData[n][2] == symVarPhi2)
+                        {
+                            return this.TDData[n][3];
+                        }
+                    }
+                    else
+                    {
+                        if (this.TDData[n][0] == varPhi1 && this.TDData[n][1] == phi && this.TDData[n][2] == varPhi2)
+                        {
+                            return this.TDData[n][3];
+                        }
                     }
                 }
 
@@ -349,6 +363,21 @@ namespace CalScec.Analysis.Texture
             }
         }
 
+        public void SetMRDValues(List<Stress.Macroskopic.PeakStressAssociation> PSA)
+        {
+            for(int n = 0; n < PSA.Count; n++)
+            {
+                List<double[]> IntegrationAngles = GetEulerAnglesParallelToMeasurmentVektor(PSA[n].DPeak.AssociatedHKLReflex, PSA[n].phiAngle, PSA[n].psiAngle);
+                PSA[n].MRDValue = 0;
+
+                for (int i = 0; i < IntegrationAngles.Count; i++)
+                {
+                    double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
+                    PSA[n].MRDValue += ODFValue;
+                }
+            }
+        }
+
         public OrientationDistributionFunction(string filePath)
         {
             TDData = new List<double[]>();
@@ -561,9 +590,18 @@ namespace CalScec.Analysis.Texture
         /// <returns></returns>
         public double GetStrainReussCubic(Stress.Macroskopic.PeakStressAssociation usedAssociation)
         {
-            double F33 = this.GetStressFactor33ReussCubic(usedAssociation);
+            MathNet.Numerics.LinearAlgebra.Matrix<double> StressFactors = this.GetStressFactorMatrixReuss(usedAssociation);
+            //Totaler TestUmbau
+            //double F33 = this.GetStressFactor33ReussCubic(usedAssociation);
+            ////ACHTUNG/////////////////
+            ////COs^2 psi wird getestet
+            //return F33 * usedAssociation.Stress * Math.Pow(Math.Cos(usedAssociation.PsiAngle), 2);
 
-            return F33 * usedAssociation.Stress;
+            double ret = StressFactors[0, 0] * Math.Pow(Math.Sin((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+            ret -= StressFactors[0, 2] * Math.Sin(2 * (usedAssociation.PhiAngle * Math.PI) / 180.0);
+            ret = StressFactors[2, 2] * Math.Pow(Math.Cos((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+
+            return ret * usedAssociation.Stress;
         }
 
         /// <summary>
@@ -574,8 +612,9 @@ namespace CalScec.Analysis.Texture
         public double GetStrainHillCubic(Stress.Macroskopic.PeakStressAssociation usedAssociation)
         {
             double F33 = this.GetStressFactor33HillCubic(usedAssociation);
-
-            return F33 * usedAssociation.Stress;
+            //ACHTUNG/////////////////
+            //COs^2 psi wird getestet
+            return F33 * usedAssociation.Stress * Math.Pow(Math.Cos(usedAssociation.PsiAngle), 2);
         }
 
         /// <summary>
@@ -586,8 +625,9 @@ namespace CalScec.Analysis.Texture
         public double GetStrainVoigtHexagonal(Stress.Macroskopic.PeakStressAssociation usedAssociation)
         {
             double F33 = this.GetStressFactor33VoigtHexagonal(usedAssociation);
-
-            return F33 * usedAssociation.Stress;
+            //ACHTUNG/////////////////
+            //COs^2 psi wird getestet
+            return F33 * usedAssociation.Stress * Math.Pow(Math.Cos(usedAssociation.PsiAngle), 2);
         }
 
         /// <summary>
@@ -598,8 +638,9 @@ namespace CalScec.Analysis.Texture
         public double GetStrainReussHexagonal(Stress.Macroskopic.PeakStressAssociation usedAssociation)
         {
             double F33 = this.GetStressFactor33ReussHexagonal(usedAssociation);
-
-            return F33 * usedAssociation.Stress;
+            //ACHTUNG/////////////////
+            //COs^2 psi wird getestet
+            return F33 * usedAssociation.Stress * Math.Pow(Math.Cos(usedAssociation.PsiAngle), 2);
         }
 
         /// <summary>
@@ -610,8 +651,9 @@ namespace CalScec.Analysis.Texture
         public double GetStrainHillHexagonal(Stress.Macroskopic.PeakStressAssociation usedAssociation)
         {
             double F33 = this.GetStressFactor33HillHexagonal(usedAssociation);
-
-            return F33 * usedAssociation.Stress;
+            //ACHTUNG/////////////////
+            //COs^2 psi wird getestet
+            return F33 * usedAssociation.Stress * Math.Pow(Math.Cos(usedAssociation.PsiAngle), 2);
         }
 
         ///// <summary>
@@ -663,8 +705,17 @@ namespace CalScec.Analysis.Texture
         public double GetStrainVoigtCubicFD(Stress.Macroskopic.PeakStressAssociation usedAssociation, int parameter)
         {
             double F33 = this.GetStressFactor33VoigtCubicFD(usedAssociation, parameter);
-
+            //ACHTUNG/////////////////
+            //COs^2 psi wird getestet
             return F33 * usedAssociation.Stress;
+
+            //MathNet.Numerics.LinearAlgebra.Matrix<double> StressFactors = this.GetStressFactorMatrixVoigtCubicFD(usedAssociation, parameter);
+
+            //double ret = StressFactors[0, 0] * Math.Pow(Math.Sin((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+            //ret -= StressFactors[0, 2] * Math.Sin(2 * (usedAssociation.PhiAngle * Math.PI) / 180.0);
+            //ret = StressFactors[2, 2] * Math.Pow(Math.Cos((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+
+            //return ret * usedAssociation.Stress;
         }
 
         /// <summary>
@@ -675,9 +726,19 @@ namespace CalScec.Analysis.Texture
         /// <returns></returns>
         public double GetStrainReussCubicFD(Stress.Macroskopic.PeakStressAssociation usedAssociation, int parameter)
         {
-            double F33 = this.GetStressFactor33ReussCubicFD(usedAssociation, parameter);
+            //Totaler TestUmbau
+            //double F33 = this.GetStressFactor33ReussCubicFD(usedAssociation, parameter);
+            ////ACHTUNG/////////////////
+            ////COs^2 psi wird getestet
+            //return F33 * usedAssociation.Stress * Math.Pow(Math.Cos(usedAssociation.PsiAngle), 2);
 
-            return F33 * usedAssociation.Stress;
+            MathNet.Numerics.LinearAlgebra.Matrix<double> StressFactors = this.GetStressFactorMatrixReussCubicFD(usedAssociation, parameter);
+
+            double ret = StressFactors[0, 0] * Math.Pow(Math.Sin((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+            ret -= StressFactors[0, 2] * Math.Sin(2 * (usedAssociation.PhiAngle * Math.PI) / 180.0);
+            ret = StressFactors[2, 2] * Math.Pow(Math.Cos((usedAssociation.PsiAngle * Math.PI) / 180.0), 2);
+
+            return ret * usedAssociation.Stress;
         }
 
         /// <summary>
@@ -689,7 +750,8 @@ namespace CalScec.Analysis.Texture
         public double GetStrainHillCubicFD(Stress.Macroskopic.PeakStressAssociation usedAssociation, int parameter)
         {
             double F33 = this.GetStressFactor33HillCubicFD(usedAssociation, parameter);
-
+            //ACHTUNG/////////////////
+            //COs^2 psi wird getestet
             return F33 * usedAssociation.Stress;
         }
 
@@ -706,8 +768,9 @@ namespace CalScec.Analysis.Texture
         public double GetStrainVoigtHexagonalFD(Stress.Macroskopic.PeakStressAssociation usedAssociation, int parameter)
         {
             double F33 = this.GetStressFactor33VoigtHexagonalFD(usedAssociation, parameter);
-
-            return F33 * usedAssociation.Stress;
+            //ACHTUNG/////////////////
+            //COs^2 psi wird getestet
+            return F33 * usedAssociation.Stress * Math.Pow(Math.Cos(usedAssociation.PsiAngle), 2);
         }
 
         /// <summary>
@@ -719,8 +782,9 @@ namespace CalScec.Analysis.Texture
         public double GetStrainReussHexagonalFD(Stress.Macroskopic.PeakStressAssociation usedAssociation, int parameter)
         {
             double F33 = this.GetStressFactor33ReussHexagonalFD(usedAssociation, parameter);
-
-            return F33 * usedAssociation.Stress;
+            //ACHTUNG/////////////////
+            //COs^2 psi wird getestet
+            return F33 * usedAssociation.Stress * Math.Pow(Math.Cos(usedAssociation.PsiAngle), 2);
         }
 
         /// <summary>
@@ -732,8 +796,9 @@ namespace CalScec.Analysis.Texture
         public double GetStrainHillHexagonalFD(Stress.Macroskopic.PeakStressAssociation usedAssociation, int parameter)
         {
             double F33 = this.GetStressFactor33HillHexagonalFD(usedAssociation, parameter);
-
-            return F33 * usedAssociation.Stress;
+            //ACHTUNG/////////////////
+            //COs^2 psi wird getestet
+            return F33 * usedAssociation.Stress * Math.Pow(Math.Cos(usedAssociation.PsiAngle), 2);
         }
 
         #endregion
@@ -1261,16 +1326,16 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -1301,11 +1366,11 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -1332,11 +1397,11 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -1363,11 +1428,11 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -1394,11 +1459,11 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -1425,11 +1490,11 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -1456,13 +1521,13 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubic(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 if (!double.IsNaN(orientedStiffnessTensor.S11) && !double.IsNaN(orientedStiffnessTensor.S12) && !double.IsNaN(orientedStiffnessTensor.S44))
                 {
                     double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                    ret += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                    ret += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                     normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                 }
@@ -1476,6 +1541,75 @@ namespace CalScec.Analysis.Texture
             {
                 return ret / normFactor;
             }
+        }
+
+        private double stressFactor11IntegrantVoigt(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
+        {
+            double ret = 0.0;
+            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
+
+            ret += orientedStiffnessTensor.S11 * measurmentDirection[0] * measurmentDirection[0] * oDFValue;
+            ret += orientedStiffnessTensor.S21 * measurmentDirection[1] * measurmentDirection[1] * oDFValue;
+            ret += orientedStiffnessTensor.S31 * measurmentDirection[2] * measurmentDirection[2] * oDFValue;
+
+            return ret;
+        }
+
+        private double stressFactor12IntegrantVoigt(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
+        {
+            double ret = 0.0;
+            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
+
+            ret += orientedStiffnessTensor.S66 * measurmentDirection[0] * measurmentDirection[1] * oDFValue;
+            ret += orientedStiffnessTensor.S66 * measurmentDirection[1] * measurmentDirection[0] * oDFValue;
+
+            return ret;
+        }
+
+        private double stressFactor13IntegrantVoigt(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
+        {
+            double ret = 0.0;
+            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
+
+            ret += orientedStiffnessTensor.S55 * measurmentDirection[0] * measurmentDirection[2] * oDFValue;
+            ret += orientedStiffnessTensor.S55 * measurmentDirection[2] * measurmentDirection[0] * oDFValue;
+
+            return ret;
+        }
+
+        private double stressFactor22IntegrantVoigt(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
+        {
+            double ret = 0.0;
+            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
+
+            ret += orientedStiffnessTensor.S12 * measurmentDirection[0] * measurmentDirection[1] * oDFValue;
+            ret += orientedStiffnessTensor.S22 * measurmentDirection[1] * measurmentDirection[1] * oDFValue;
+            ret += orientedStiffnessTensor.S23 * measurmentDirection[1] * measurmentDirection[2] * oDFValue;
+
+            return ret;
+        }
+
+        private double stressFactor23IntegrantVoigt(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
+        {
+            double ret = 0.0;
+            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
+
+            ret += orientedStiffnessTensor.S44 * measurmentDirection[1] * measurmentDirection[2] * oDFValue;
+            ret += orientedStiffnessTensor.S44 * measurmentDirection[2] * measurmentDirection[1] * oDFValue;
+
+            return ret;
+        }
+
+        private double stressFactor33IntegrantVoigt(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
+        {
+            double ret = 0.0;
+            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
+
+            ret += orientedStiffnessTensor.S13 * measurmentDirection[0] * measurmentDirection[0] * oDFValue;
+            ret += orientedStiffnessTensor.S23 * measurmentDirection[1] * measurmentDirection[1] * oDFValue;
+            ret += orientedStiffnessTensor.S33 * measurmentDirection[2] * measurmentDirection[2] * oDFValue;
+
+            return ret;
         }
 
         #endregion
@@ -1498,12 +1632,12 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret[0, 0] += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
+                ret[0, 1] += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
+                ret[0, 2] += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
+                ret[1, 1] += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
+                ret[1, 2] += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
+                ret[2, 2] += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1538,7 +1672,7 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1562,7 +1696,7 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1586,7 +1720,7 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1610,7 +1744,7 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1634,7 +1768,7 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1658,7 +1792,7 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin((IntegrationAngles[n][1] * Math.PI) / 180.0);
+                ret += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin((IntegrationAngles[n][1] * Math.PI) / 180.0);
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -1674,6 +1808,73 @@ namespace CalScec.Analysis.Texture
             {
                 return ret / normFactor;
             }
+        }
+
+        private double stressFactor11IntegrantReuss(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
+        {
+            double ret = 0.0;
+            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
+
+            ret += orientedStiffnessTensor.S11 * oDFValue;
+            ret += orientedStiffnessTensor.S21 * oDFValue;
+            ret += orientedStiffnessTensor.S31 * oDFValue;
+
+            return ret;
+        }
+
+        private double stressFactor12IntegrantReuss(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
+        {
+            double ret = 0.0;
+            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
+
+            ret += orientedStiffnessTensor.S66 * oDFValue;
+            ret += orientedStiffnessTensor.S66 * oDFValue;
+
+            return ret;
+        }
+
+        private double stressFactor13IntegrantReuss(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
+        {
+            double ret = 0.0;
+            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
+
+            ret += orientedStiffnessTensor.S55 * oDFValue;
+            ret += orientedStiffnessTensor.S55 * oDFValue;
+
+            return ret;
+        }
+
+        private double stressFactor22IntegrantReuss(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
+        {
+            double ret = 0.0;
+
+            ret += orientedStiffnessTensor.S12 * oDFValue;
+            ret += orientedStiffnessTensor.S22 * oDFValue;
+            ret += orientedStiffnessTensor.S23 * oDFValue;
+
+            return ret;
+        }
+
+        private double stressFactor23IntegrantReuss(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
+        {
+            double ret = 0.0;
+
+            ret += orientedStiffnessTensor.S44 * oDFValue;
+            ret += orientedStiffnessTensor.S44 * oDFValue;
+
+            return ret;
+        }
+
+        private double stressFactor33IntegrantReuss(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
+        {
+            double ret = 0.0;
+            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
+
+            ret += orientedStiffnessTensor.S13 * oDFValue;
+            ret += orientedStiffnessTensor.S23 * oDFValue;
+            ret += orientedStiffnessTensor.S33 * oDFValue;
+
+            return ret;
         }
 
         #endregion
@@ -1706,12 +1907,12 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
+                ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
+                ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
+                ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
+                ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
+                ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1749,7 +1950,7 @@ namespace CalScec.Analysis.Texture
                 orientedTensor.S12 = (orientedCTensor.S12 + orientedSTensor.S11) / 2.0;
                 orientedTensor.S44 = (orientedCTensor.S44 + orientedSTensor.S11) / 2.0;
 
-                ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1783,7 +1984,7 @@ namespace CalScec.Analysis.Texture
                 orientedTensor.S12 = (orientedCTensor.S12 + orientedSTensor.S11) / 2.0;
                 orientedTensor.S44 = (orientedCTensor.S44 + orientedSTensor.S11) / 2.0;
 
-                ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1817,7 +2018,7 @@ namespace CalScec.Analysis.Texture
                 orientedTensor.S12 = (orientedCTensor.S12 + orientedSTensor.S11) / 2.0;
                 orientedTensor.S44 = (orientedCTensor.S44 + orientedSTensor.S11) / 2.0;
 
-                ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1851,7 +2052,7 @@ namespace CalScec.Analysis.Texture
                 orientedTensor.S12 = (orientedCTensor.S12 + orientedSTensor.S11) / 2.0;
                 orientedTensor.S44 = (orientedCTensor.S44 + orientedSTensor.S11) / 2.0;
 
-                ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1885,7 +2086,7 @@ namespace CalScec.Analysis.Texture
                 orientedTensor.S12 = (orientedCTensor.S12 + orientedSTensor.S11) / 2.0;
                 orientedTensor.S44 = (orientedCTensor.S44 + orientedSTensor.S11) / 2.0;
 
-                ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1919,7 +2120,7 @@ namespace CalScec.Analysis.Texture
                 orientedTensor.S12 = (orientedCTensor.S12 + orientedSTensor.S11) / 2.0;
                 orientedTensor.S44 = (orientedCTensor.S44 + orientedSTensor.S11) / 2.0;
 
-                ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -1928,75 +2129,6 @@ namespace CalScec.Analysis.Texture
         }
 
         #endregion
-
-        private double stressFactor11Integrant(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
-        {
-            double ret = 0.0;
-            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
-
-            ret += orientedStiffnessTensor.S11 * measurmentDirection[0] * measurmentDirection[0] * oDFValue;
-            ret += orientedStiffnessTensor.S21 * measurmentDirection[1] * measurmentDirection[1] * oDFValue;
-            ret += orientedStiffnessTensor.S31 * measurmentDirection[2] * measurmentDirection[2] * oDFValue;
-
-            return ret;
-        }
-
-        private double stressFactor12Integrant(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
-        {
-            double ret = 0.0;
-            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
-
-            ret += orientedStiffnessTensor.S66 * measurmentDirection[0] * measurmentDirection[1] * oDFValue;
-            ret += orientedStiffnessTensor.S66 * measurmentDirection[1] * measurmentDirection[0] * oDFValue;
-
-            return ret;
-        }
-
-        private double stressFactor13Integrant(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
-        {
-            double ret = 0.0;
-            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
-
-            ret += orientedStiffnessTensor.S55 * measurmentDirection[0] * measurmentDirection[2] * oDFValue;
-            ret += orientedStiffnessTensor.S55 * measurmentDirection[2] * measurmentDirection[0] * oDFValue;
-
-            return ret;
-        }
-
-        private double stressFactor22Integrant(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
-        {
-            double ret = 0.0;
-            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
-
-            ret += orientedStiffnessTensor.S12 * measurmentDirection[0] * measurmentDirection[1] * oDFValue;
-            ret += orientedStiffnessTensor.S22 * measurmentDirection[1] * measurmentDirection[1] * oDFValue;
-            ret += orientedStiffnessTensor.S23 * measurmentDirection[1] * measurmentDirection[2] * oDFValue;
-
-            return ret;
-        }
-
-        private double stressFactor23Integrant(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
-        {
-            double ret = 0.0;
-            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
-
-            ret += orientedStiffnessTensor.S44 * measurmentDirection[1] * measurmentDirection[2] * oDFValue;
-            ret += orientedStiffnessTensor.S44 * measurmentDirection[2] * measurmentDirection[1] * oDFValue;
-
-            return ret;
-        }
-
-        private double stressFactor33Integrant(Stress.Macroskopic.PeakStressAssociation usedAssociation, Stress.Microsopic.ElasticityTensors orientedStiffnessTensor, double oDFValue)
-        {
-            double ret = 0.0;
-            MathNet.Numerics.LinearAlgebra.Vector<double> measurmentDirection = usedAssociation.MeasurementDirektionVektor;
-
-            ret += orientedStiffnessTensor.S13 * measurmentDirection[0] * measurmentDirection[0] * oDFValue;
-            ret += orientedStiffnessTensor.S23 * measurmentDirection[1] * measurmentDirection[1] * oDFValue;
-            ret += orientedStiffnessTensor.S33 * measurmentDirection[2] * measurmentDirection[2] * oDFValue;
-
-            return ret;
-        }
 
         #region First Derivatives
         
@@ -2021,16 +2153,16 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2052,16 +2184,16 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2083,16 +2215,16 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2127,11 +2259,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0)));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0)));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2149,11 +2281,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2171,11 +2303,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2206,11 +2338,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2228,11 +2360,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2250,11 +2382,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2285,11 +2417,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2307,11 +2439,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2329,11 +2461,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2364,11 +2496,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2386,11 +2518,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2408,11 +2540,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2443,11 +2575,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2465,11 +2597,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2487,11 +2619,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2522,12 +2654,12 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
                         if (!double.IsNaN(orientedStiffnessTensor.S11) && !double.IsNaN(orientedStiffnessTensor.S12) && !double.IsNaN(orientedStiffnessTensor.S44))
                         {
-                            ret += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                            ret += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                             normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         }
@@ -2546,12 +2678,12 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
                         if (!double.IsNaN(orientedStiffnessTensor.S11) && !double.IsNaN(orientedStiffnessTensor.S12) && !double.IsNaN(orientedStiffnessTensor.S44))
                         {
-                            ret += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                            ret += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                             normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         }
@@ -2570,12 +2702,12 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubicFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorCubicFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
                         if (!double.IsNaN(orientedStiffnessTensor.S11) && !double.IsNaN(orientedStiffnessTensor.S12) && !double.IsNaN(orientedStiffnessTensor.S44))
                         {
-                            ret += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                            ret += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                             normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         }
@@ -2621,12 +2753,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2652,12 +2784,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2683,12 +2815,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -2727,7 +2859,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -2748,7 +2880,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -2769,7 +2901,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -2803,7 +2935,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -2824,7 +2956,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -2845,7 +2977,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -2879,7 +3011,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -2900,7 +3032,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -2921,7 +3053,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -2955,7 +3087,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -2976,7 +3108,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -2997,7 +3129,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3031,7 +3163,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3052,7 +3184,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3073,7 +3205,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3107,7 +3239,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
                     //normFactor *= 8.0 * Math.Pow(Math.PI, 2);
@@ -3128,7 +3260,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
                     //normFactor *= 8.0 * Math.Pow(Math.PI, 2);
@@ -3151,7 +3283,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
                     //normFactor *= 8.0 * Math.Pow(Math.PI, 2);
@@ -3199,12 +3331,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3232,12 +3364,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3265,12 +3397,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3311,7 +3443,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3335,7 +3467,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3359,7 +3491,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3396,7 +3528,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3420,7 +3552,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3444,7 +3576,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3481,7 +3613,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3505,7 +3637,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3529,7 +3661,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3566,7 +3698,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3590,7 +3722,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3614,7 +3746,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3651,7 +3783,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3675,7 +3807,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3699,7 +3831,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3736,7 +3868,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3760,7 +3892,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3784,7 +3916,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -3823,16 +3955,16 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorCubic(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -3863,11 +3995,11 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -3894,11 +4026,11 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -3925,11 +4057,11 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -3956,11 +4088,11 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -3987,11 +4119,11 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                ret += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -4018,13 +4150,13 @@ namespace CalScec.Analysis.Texture
                 //EigeneEntwicklung
                 //Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]);
                 //Korrektur
-                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonal(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                 if (!double.IsNaN(orientedStiffnessTensor.S11) && !double.IsNaN(orientedStiffnessTensor.S12) && !double.IsNaN(orientedStiffnessTensor.S44))
                 {
                     double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                    ret += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                    ret += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                     normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                 }
@@ -4060,12 +4192,12 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret[0, 0] += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
+                ret[0, 1] += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
+                ret[0, 2] += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
+                ret[1, 1] += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
+                ret[1, 2] += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
+                ret[2, 2] += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4100,7 +4232,7 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4124,7 +4256,7 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4148,7 +4280,7 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4172,7 +4304,7 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4196,7 +4328,7 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4220,7 +4352,7 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin((IntegrationAngles[n][1] * Math.PI) / 180.0);
+                ret += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin((IntegrationAngles[n][1] * Math.PI) / 180.0);
 
                 normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
             }
@@ -4268,12 +4400,12 @@ namespace CalScec.Analysis.Texture
 
                 double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue);
-                ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
+                ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
+                ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
+                ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
+                ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
+                ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4311,7 +4443,7 @@ namespace CalScec.Analysis.Texture
                 orientedTensor.S12 = (orientedCTensor.S12 + orientedSTensor.S11) / 2.0;
                 orientedTensor.S44 = (orientedCTensor.S44 + orientedSTensor.S11) / 2.0;
 
-                ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4345,7 +4477,7 @@ namespace CalScec.Analysis.Texture
                 orientedTensor.S12 = (orientedCTensor.S12 + orientedSTensor.S11) / 2.0;
                 orientedTensor.S44 = (orientedCTensor.S44 + orientedSTensor.S11) / 2.0;
 
-                ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4379,7 +4511,7 @@ namespace CalScec.Analysis.Texture
                 orientedTensor.S12 = (orientedCTensor.S12 + orientedSTensor.S11) / 2.0;
                 orientedTensor.S44 = (orientedCTensor.S44 + orientedSTensor.S11) / 2.0;
 
-                ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4413,7 +4545,7 @@ namespace CalScec.Analysis.Texture
                 orientedTensor.S12 = (orientedCTensor.S12 + orientedSTensor.S11) / 2.0;
                 orientedTensor.S44 = (orientedCTensor.S44 + orientedSTensor.S11) / 2.0;
 
-                ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4447,7 +4579,7 @@ namespace CalScec.Analysis.Texture
                 orientedTensor.S12 = (orientedCTensor.S12 + orientedSTensor.S11) / 2.0;
                 orientedTensor.S44 = (orientedCTensor.S44 + orientedSTensor.S11) / 2.0;
 
-                ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4481,7 +4613,7 @@ namespace CalScec.Analysis.Texture
                 orientedTensor.S12 = (orientedCTensor.S12 + orientedSTensor.S11) / 2.0;
                 orientedTensor.S44 = (orientedCTensor.S44 + orientedSTensor.S11) / 2.0;
 
-                ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue);
+                ret += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue);
 
                 normFactor += ODFValue;
             }
@@ -4514,16 +4646,16 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4545,16 +4677,16 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4576,16 +4708,16 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4607,16 +4739,16 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4638,16 +4770,16 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4682,11 +4814,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0)));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0)));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4704,11 +4836,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4726,11 +4858,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4748,11 +4880,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4770,11 +4902,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4805,11 +4937,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4827,11 +4959,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4849,11 +4981,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4871,11 +5003,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4893,11 +5025,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4928,11 +5060,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4950,11 +5082,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4972,11 +5104,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -4994,11 +5126,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5016,11 +5148,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5051,11 +5183,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5073,11 +5205,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5095,11 +5227,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5117,11 +5249,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5139,11 +5271,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5174,11 +5306,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5196,11 +5328,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5218,11 +5350,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5240,11 +5372,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5262,11 +5394,11 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5297,12 +5429,12 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS11(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
                         if (!double.IsNaN(orientedStiffnessTensor.S11) && !double.IsNaN(orientedStiffnessTensor.S12) && !double.IsNaN(orientedStiffnessTensor.S44))
                         {
-                            ret += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                            ret += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                             normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         }
@@ -5321,12 +5453,12 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS12(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
                         if (!double.IsNaN(orientedStiffnessTensor.S11) && !double.IsNaN(orientedStiffnessTensor.S12) && !double.IsNaN(orientedStiffnessTensor.S44))
                         {
-                            ret += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                            ret += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                             normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         }
@@ -5345,12 +5477,12 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS44(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
                         if (!double.IsNaN(orientedStiffnessTensor.S11) && !double.IsNaN(orientedStiffnessTensor.S12) && !double.IsNaN(orientedStiffnessTensor.S44))
                         {
-                            ret += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                            ret += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                             normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         }
@@ -5369,12 +5501,12 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS13(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
                         if (!double.IsNaN(orientedStiffnessTensor.S11) && !double.IsNaN(orientedStiffnessTensor.S12) && !double.IsNaN(orientedStiffnessTensor.S44))
                         {
-                            ret += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                            ret += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                             normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         }
@@ -5393,12 +5525,12 @@ namespace CalScec.Analysis.Texture
 
                     for (int n = 0; n < IntegrationAngles.Count; n++)
                     {
-                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedStiffnessTensorHexagonalFDC33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
+                        Stress.Microsopic.ElasticityTensors orientedStiffnessTensor = this.OrientedComplianceTensorHexagonalFDS33(n * 5, usedAssociation.DPeak.AssociatedHKLReflex);
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
                         if (!double.IsNaN(orientedStiffnessTensor.S11) && !double.IsNaN(orientedStiffnessTensor.S12) && !double.IsNaN(orientedStiffnessTensor.S44))
                         {
-                            ret += stressFactor33Integrant(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                            ret += stressFactor33IntegrantVoigt(usedAssociation, orientedStiffnessTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                             normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         }
@@ -5444,12 +5576,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5475,12 +5607,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5506,12 +5638,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5537,12 +5669,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5568,12 +5700,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
 
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
@@ -5612,7 +5744,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5633,7 +5765,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5654,7 +5786,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5675,7 +5807,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5696,7 +5828,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5730,7 +5862,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5751,7 +5883,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5772,7 +5904,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5793,7 +5925,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5814,7 +5946,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5848,7 +5980,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5869,7 +6001,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5890,7 +6022,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5911,7 +6043,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5932,7 +6064,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5966,7 +6098,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -5987,7 +6119,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6008,7 +6140,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6029,7 +6161,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6050,7 +6182,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6084,7 +6216,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6105,7 +6237,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6126,7 +6258,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6147,7 +6279,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6168,7 +6300,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6202,7 +6334,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
                     //normFactor *= 8.0 * Math.Pow(Math.PI, 2);
@@ -6223,7 +6355,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
                     //normFactor *= 8.0 * Math.Pow(Math.PI, 2);
@@ -6246,7 +6378,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
                     //normFactor *= 8.0 * Math.Pow(Math.PI, 2);
@@ -6268,7 +6400,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
                     //normFactor *= 8.0 * Math.Pow(Math.PI, 2);
@@ -6290,7 +6422,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantReuss(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
                     //normFactor *= 8.0 * Math.Pow(Math.PI, 2);
@@ -6338,12 +6470,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6371,12 +6503,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6404,12 +6536,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6437,12 +6569,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6470,12 +6602,12 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret[0, 0] += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 1] += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[0, 2] += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 1] += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[1, 2] += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
-                        ret[2, 2] += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 0] += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 1] += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[0, 2] += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 1] += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[1, 2] += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret[2, 2] += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6516,7 +6648,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6540,7 +6672,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6564,7 +6696,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6588,7 +6720,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6612,7 +6744,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor11Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor11IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6649,7 +6781,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6673,7 +6805,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6697,7 +6829,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6721,7 +6853,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6745,7 +6877,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor12Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor12IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6782,7 +6914,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6806,7 +6938,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6830,7 +6962,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6854,7 +6986,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6878,7 +7010,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor13Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor13IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6915,7 +7047,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6939,7 +7071,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6963,7 +7095,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -6987,7 +7119,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -7011,7 +7143,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor22Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor22IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -7048,7 +7180,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -7072,7 +7204,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -7096,7 +7228,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -7120,7 +7252,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -7144,7 +7276,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor23Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor23IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -7181,7 +7313,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -7205,7 +7337,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -7229,7 +7361,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -7253,7 +7385,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -7277,7 +7409,7 @@ namespace CalScec.Analysis.Texture
 
                         double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
 
-                        ret += stressFactor33Integrant(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
+                        ret += stressFactor33IntegrantVoigt(usedAssociation, orientedTensor, ODFValue) * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                         normFactor += ODFValue * Math.Sin(IntegrationAngles[n][1] * (Math.PI / 180.0));
                     }
 
@@ -11044,34 +11176,34 @@ namespace CalScec.Analysis.Texture
             switch (this.BaseTensor.Symmetry)
             {
                 case "cubic":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureVoigtCubic(this);
+                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureVoigtCubic(this);
                     break;
                 case "hexagonal":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureVoigtType1(this, classicCalculation);
+                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureVoigtType1(this, classicCalculation);
                     break;
                 case "tetragonal type 1":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureVoigtType2(this, classicCalculation);
+                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureVoigtType2(this, classicCalculation);
                     break;
                 case "tetragonal type 2":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureVoigtType2(this, classicCalculation);
+                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureVoigtType2(this, classicCalculation);
                     break;
                 case "trigonal type 1":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureVoigtType1(this, classicCalculation);
+                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureVoigtType1(this, classicCalculation);
                     break;
                 case "trigonal type 2":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureVoigtType1(this, classicCalculation);
+                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureVoigtType1(this, classicCalculation);
                     break;
                 case "rhombic":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureVoigtType3(this, classicCalculation);
+                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureVoigtType3(this, classicCalculation);
                     break;
                 case "monoclinic":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureVoigtType3(this, classicCalculation);
+                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureVoigtType3(this, classicCalculation);
                     break;
                 case "triclinic":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureVoigtType3(this, classicCalculation);
+                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureVoigtType3(this, classicCalculation);
                     break;
                 default:
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureVoigtType3(this, classicCalculation);
+                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureVoigtType3(this, classicCalculation);
                     break;
             }
 
@@ -11083,10 +11215,10 @@ namespace CalScec.Analysis.Texture
             switch (this.BaseTensor.Symmetry)
             {
                 case "cubic":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureReussCubic(this);
+                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureReussCubic(this);
                     break;
                 case "hexagonal":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureReussHexagonal(this, classicCalculation);
+                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureReussHexagonal(this, classicCalculation);
                     break;
                 case "tetragonal type 1":
 
@@ -11123,10 +11255,10 @@ namespace CalScec.Analysis.Texture
             switch (this.BaseTensor.Symmetry)
             {
                 case "cubic":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureHillCubic(this);
+                    //this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureHillCubic(this);
                     break;
                 case "hexagonal":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureHillHexagonal(this, classicCalculation);
+                    //this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureHillHexagonal(this, classicCalculation);
                     break;
                 case "tetragonal type 1":
 
@@ -11165,7 +11297,7 @@ namespace CalScec.Analysis.Texture
                 switch (this.BaseTensor.Symmetry)
                 {
                     case "cubic":
-                        this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureKroenerCubicStiffness(this, classicCalculation);
+                        //this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureKroenerCubicStiffness(this, classicCalculation);
                         break;
                     case "hexagonal":
                         break;
@@ -11203,7 +11335,7 @@ namespace CalScec.Analysis.Texture
                 switch (this.BaseTensor.Symmetry)
                 {
                     case "cubic":
-                        this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureKroenerCubicCompliance(this, classicCalculation);
+                        //this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureKroenerCubicCompliance(this, classicCalculation);
                         break;
                     case "hexagonal":
                         break;
@@ -11245,7 +11377,7 @@ namespace CalScec.Analysis.Texture
                 switch (this.BaseTensor.Symmetry)
                 {
                     case "cubic":
-                        this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureDeWittCubicStiffness(this, classicCalculation);
+                        //this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitNElasticityTensorTextureDeWittCubicStiffness(this, classicCalculation);
                         break;
                     case "hexagonal":
                         break;
@@ -11283,7 +11415,7 @@ namespace CalScec.Analysis.Texture
                 switch (this.BaseTensor.Symmetry)
                 {
                     case "cubic":
-                        this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureDeWittCubicCompliance(this, classicCalculation);
+                        //this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureDeWittCubicCompliance(this, classicCalculation);
                         break;
                     case "hexagonal":
                         break;
@@ -11323,10 +11455,10 @@ namespace CalScec.Analysis.Texture
             switch (this.BaseTensor.Symmetry)
             {
                 case "cubic":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureGeometricHillCubic(this, classicCalculation);
+                    //this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureGeometricHillCubic(this, classicCalculation);
                     break;
                 case "hexagonal":
-                    this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureGeometricHillHexagonal(this, classicCalculation);
+                    //this.BaseTensor.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorTextureGeometricHillHexagonal(this, classicCalculation);
                     break;
                 case "tetragonal type 1":
 
@@ -11380,32 +11512,42 @@ namespace CalScec.Analysis.Texture
             //[1] C12
             //[1] C44
             MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+            int remains = this.UsedPSA.Count % 10;
 
-            for (int n = 0; n < this.UsedPSA.Count; n++)
+            Parallel.For(0, 10, i =>
             {
-                #region Matrix Build
+                int step = (this.UsedPSA.Count - remains) / 10;
 
-                HessianMatrix[0, 0] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                int lowerBoarder = i * step;
+                int upperBoarder = (i + 1) * step;
+
+
+                for (int n = lowerBoarder; n < upperBoarder; n++)
+                {
+                    #region Matrix Build
+
+                    HessianMatrix[0, 0] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
         
-                HessianMatrix[1, 1] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                HessianMatrix[0, 1] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                HessianMatrix[1, 0] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[1, 1] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[0, 1] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[1, 0] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
 
-                HessianMatrix[2, 2] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                HessianMatrix[0, 2] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                HessianMatrix[2, 0] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                HessianMatrix[1, 2] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                HessianMatrix[2, 1] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                #endregion
+                    HessianMatrix[2, 2] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[0, 2] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[2, 0] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[1, 2] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[2, 1] += (this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    #endregion
 
-                #region Vector build
+                    #region Vector build
 
-                SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0);
-                SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1);
-                SolutionVector[2] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2);
+                    SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 0);
+                    SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 1);
+                    SolutionVector[2] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtCubicFD(this.UsedPSA[n], 2);
 
-                #endregion
-            }
+                        #endregion
+                }
+            });
 
             for (int n = 0; n < 3; n++)
             {
@@ -11440,31 +11582,41 @@ namespace CalScec.Analysis.Texture
             //[1] C44
             MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
 
-            for (int n = 0; n < this.UsedPSA.Count; n++)
+            int remains = this.UsedPSA.Count % 10;
+
+            Parallel.For(0, 10, i =>
             {
-                #region Matrix Build
+                int step = (this.UsedPSA.Count - remains) / 10;
 
-                HessianMatrix[0, 0] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 0) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                int lowerBoarder = i * step;
+                int upperBoarder = (i + 1) * step;
 
-                HessianMatrix[1, 1] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 1) * this.GetStrainReussCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                HessianMatrix[0, 1] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 1) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                HessianMatrix[1, 0] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 1) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                for (int n = lowerBoarder; n < upperBoarder; n++)
+                {
+                    #region Matrix Build
 
-                HessianMatrix[2, 2] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 2)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                HessianMatrix[0, 2] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                HessianMatrix[2, 0] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                HessianMatrix[1, 2] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                HessianMatrix[2, 1] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
-                #endregion
+                    HessianMatrix[0, 0] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 0) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
 
-                #region Vector build
+                    HessianMatrix[1, 1] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 1) * this.GetStrainReussCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[0, 1] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 1) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[1, 0] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 1) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
 
-                SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainReussCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0);
-                SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainReussCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussCubicFD(this.UsedPSA[n], 1);
-                SolutionVector[2] += (this.UsedPSA[n]._Strain - this.GetStrainReussCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussCubicFD(this.UsedPSA[n], 2);
+                    HessianMatrix[2, 2] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 2)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[0, 2] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[2, 0] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[1, 2] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    HessianMatrix[2, 1] += (this.GetStrainReussCubicFD(this.UsedPSA[n], 2) * this.GetStrainReussCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
+                    #endregion
 
-                #endregion
-            }
+                    #region Vector build
+
+                    SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainReussCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussCubicFD(this.UsedPSA[n], 0);
+                    SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainReussCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussCubicFD(this.UsedPSA[n], 1);
+                    SolutionVector[2] += (this.UsedPSA[n]._Strain - this.GetStrainReussCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussCubicFD(this.UsedPSA[n], 2);
+
+                    #endregion
+                }
+            });
 
             for (int n = 0; n < 3; n++)
             {
@@ -11499,9 +11651,18 @@ namespace CalScec.Analysis.Texture
             //[1] C44
             MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
 
-            for (int n = 0; n < this.UsedPSA.Count; n++)
+            int remains = this.UsedPSA.Count % 10;
+
+            Parallel.For(0, 10, i =>
             {
-                #region Matrix Build
+                int step = (this.UsedPSA.Count - remains) / 10;
+
+                int lowerBoarder = i * step;
+                int upperBoarder = (i + 1) * step;
+
+                for (int n = lowerBoarder; n < upperBoarder; n++)
+                {
+                    #region Matrix Build
 
                 HessianMatrix[0, 0] += (this.GetStrainHillCubicFD(this.UsedPSA[n], 0) * this.GetStrainHillCubicFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
 
@@ -11516,14 +11677,15 @@ namespace CalScec.Analysis.Texture
                 HessianMatrix[2, 1] += (this.GetStrainHillCubicFD(this.UsedPSA[n], 2) * this.GetStrainHillCubicFD(this.UsedPSA[n], 1)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
                 #endregion
 
-                #region Vector build
+                    #region Vector build
 
-                SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainHillCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillCubicFD(this.UsedPSA[n], 0);
-                SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainHillCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillCubicFD(this.UsedPSA[n], 1);
-                SolutionVector[2] += (this.UsedPSA[n]._Strain - this.GetStrainHillCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillCubicFD(this.UsedPSA[n], 2);
+                    SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainHillCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillCubicFD(this.UsedPSA[n], 0);
+                    SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainHillCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillCubicFD(this.UsedPSA[n], 1);
+                    SolutionVector[2] += (this.UsedPSA[n]._Strain - this.GetStrainHillCubic(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillCubicFD(this.UsedPSA[n], 2);
 
-                #endregion
-            }
+                        #endregion
+                }
+            });
 
             for (int n = 0; n < 3; n++)
             {
@@ -11555,18 +11717,27 @@ namespace CalScec.Analysis.Texture
             //[2][2] C44
             //[3][3] C13
             //[4][4] C33
-            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(5, 5, 0.0);
 
             //[0] C11
             //[1] C12
             //[2] C44
             //[3] C13
             //[4] C33
-            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(5);
 
-            for (int n = 0; n < this.UsedPSA.Count; n++)
+            int remains = this.UsedPSA.Count % 10;
+
+            Parallel.For(0, 10, i =>
             {
-                #region Matrix Build
+                int step = (this.UsedPSA.Count - remains) / 10;
+
+                int lowerBoarder = i * step;
+                int upperBoarder = (i + 1) * step;
+
+                for (int n = lowerBoarder; n < upperBoarder; n++)  
+                {
+                    #region Matrix Build
 
                 HessianMatrix[0, 0] += (this.GetStrainVoigtHexagonalFD(this.UsedPSA[n], 0) * this.GetStrainVoigtHexagonalFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
 
@@ -11600,23 +11771,24 @@ namespace CalScec.Analysis.Texture
 
                 #endregion
 
-                #region Vector build
+                    #region Vector build
 
-                SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtHexagonalFD(this.UsedPSA[n], 0);
-                SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtHexagonalFD(this.UsedPSA[n], 1);
-                SolutionVector[2] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtHexagonalFD(this.UsedPSA[n], 2);
-                SolutionVector[3] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtHexagonalFD(this.UsedPSA[n], 3);
-                SolutionVector[4] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtHexagonalFD(this.UsedPSA[n], 4);
+                    SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtHexagonalFD(this.UsedPSA[n], 0);
+                    SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtHexagonalFD(this.UsedPSA[n], 1);
+                    SolutionVector[2] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtHexagonalFD(this.UsedPSA[n], 2);
+                    SolutionVector[3] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtHexagonalFD(this.UsedPSA[n], 3);
+                    SolutionVector[4] += (this.UsedPSA[n]._Strain - this.GetStrainVoigtHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainVoigtHexagonalFD(this.UsedPSA[n], 4);
 
-                #endregion
-            }
+                    #endregion
+                }
+            });
 
             for (int n = 0; n < 5; n++)
             {
                 HessianMatrix[n, n] *= (1 + Lambda);
             }
 
-            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(5);
 
             HessianMatrix.Solve(SolutionVector, ParamDelta);
 
@@ -11641,18 +11813,27 @@ namespace CalScec.Analysis.Texture
             //[2][2] C44
             //[3][3] C13
             //[4][4] C33
-            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(5, 5, 0.0);
 
             //[0] C11
             //[1] C12
             //[1] C44
             //[3] C13
             //[4] C33
-            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(5);
 
-            for (int n = 0; n < this.UsedPSA.Count; n++)
+            int remains = this.UsedPSA.Count % 10;
+
+            Parallel.For(0, 10, i =>
             {
-                #region Matrix Build
+                int step = (this.UsedPSA.Count - remains) / 10;
+
+                int lowerBoarder = i * step;
+                int upperBoarder = (i + 1) * step;
+
+                for (int n = lowerBoarder; n < upperBoarder; n++)
+                {
+                    #region Matrix Build
 
                 HessianMatrix[0, 0] += (this.GetStrainReussHexagonalFD(this.UsedPSA[n], 0) * this.GetStrainReussHexagonalFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
 
@@ -11686,7 +11867,7 @@ namespace CalScec.Analysis.Texture
 
                 #endregion
 
-                #region Vector build
+                    #region Vector build
 
                 SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainReussHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussHexagonalFD(this.UsedPSA[n], 0);
                 SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainReussHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussHexagonalFD(this.UsedPSA[n], 1);
@@ -11694,15 +11875,16 @@ namespace CalScec.Analysis.Texture
                 SolutionVector[3] += (this.UsedPSA[n]._Strain - this.GetStrainReussHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussHexagonalFD(this.UsedPSA[n], 3);
                 SolutionVector[4] += (this.UsedPSA[n]._Strain - this.GetStrainReussHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainReussHexagonalFD(this.UsedPSA[n], 4);
 
-                #endregion
-            }
+                        #endregion
+                }
+            });
 
             for (int n = 0; n < 5; n++)
             {
                 HessianMatrix[n, n] *= (1 + Lambda);
             }
 
-            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(5);
 
             HessianMatrix.Solve(SolutionVector, ParamDelta);
 
@@ -11727,18 +11909,27 @@ namespace CalScec.Analysis.Texture
             //[2][2] C44
             ///[3] C13
             ///[4] C33
-            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(5, 5, 0.0);
 
             //[0] C11
             //[1] C12
             //[2] C44
             //[3] C13
             //[4] C33
-            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(5);
 
-            for (int n = 0; n < this.UsedPSA.Count; n++)
+            int remains = this.UsedPSA.Count % 10;
+
+            Parallel.For(0, 10, i =>
             {
-                #region Matrix Build
+                int step = (this.UsedPSA.Count - remains) / 10;
+
+                int lowerBoarder = i * step;
+                int upperBoarder = (i + 1) * step;
+
+                for (int n = lowerBoarder; n < upperBoarder; n++)
+                {
+                    #region Matrix Build
 
                 HessianMatrix[0, 0] += (this.GetStrainHillHexagonalFD(this.UsedPSA[n], 0) * this.GetStrainHillHexagonalFD(this.UsedPSA[n], 0)) / Math.Pow(this.UsedPSA[n]._StrainError, 2);
 
@@ -11772,23 +11963,24 @@ namespace CalScec.Analysis.Texture
 
                 #endregion
 
-                #region Vector build
+                    #region Vector build
 
-                SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainHillHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillHexagonalFD(this.UsedPSA[n], 0);
-                SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainHillHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillHexagonalFD(this.UsedPSA[n], 1);
-                SolutionVector[2] += (this.UsedPSA[n]._Strain - this.GetStrainHillHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillHexagonalFD(this.UsedPSA[n], 2);
-                SolutionVector[3] += (this.UsedPSA[n]._Strain - this.GetStrainHillHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillHexagonalFD(this.UsedPSA[n], 3);
-                SolutionVector[4] += (this.UsedPSA[n]._Strain - this.GetStrainHillHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillHexagonalFD(this.UsedPSA[n], 4);
+                    SolutionVector[0] += (this.UsedPSA[n]._Strain - this.GetStrainHillHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillHexagonalFD(this.UsedPSA[n], 0);
+                    SolutionVector[1] += (this.UsedPSA[n]._Strain - this.GetStrainHillHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillHexagonalFD(this.UsedPSA[n], 1);
+                    SolutionVector[2] += (this.UsedPSA[n]._Strain - this.GetStrainHillHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillHexagonalFD(this.UsedPSA[n], 2);
+                    SolutionVector[3] += (this.UsedPSA[n]._Strain - this.GetStrainHillHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillHexagonalFD(this.UsedPSA[n], 3);
+                    SolutionVector[4] += (this.UsedPSA[n]._Strain - this.GetStrainHillHexagonal(this.UsedPSA[n]) / Math.Pow(this.UsedPSA[n]._StrainError, 2)) * this.GetStrainHillHexagonalFD(this.UsedPSA[n], 4);
 
-                #endregion
-            }
+                        #endregion
+                }
+            });
 
             for (int n = 0; n < 5; n++)
             {
                 HessianMatrix[n, n] *= (1 + Lambda);
             }
 
-            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(5);
 
             HessianMatrix.Solve(SolutionVector, ParamDelta);
 
@@ -11801,18 +11993,67 @@ namespace CalScec.Analysis.Texture
 
         #region Fitting using Multi Threading
 
+        public int _fittingTrial = 0;
+        public int FittingTrial
+        {
+            get
+            {
+                return this._fittingTrial;
+            }
+            set
+            {
+                this._fittingTrial = value;
+                this.OnFitUpdated();
+
+            }
+        }
+        public Tools.TextureFitInformation FitDisplayInfo;
+        public DateTime FitActiveSince = new DateTime();
+
         public event System.ComponentModel.PropertyChangedEventHandler FitFinished;
         public event System.ComponentModel.PropertyChangedEventHandler FitStarted;
+        public event System.ComponentModel.PropertyChangedEventHandler FitUpdated;
 
         protected void OnFitStarted()
         {
             this._fitConverged = false;
             this.fitActive = true;
+            this.FittingTrial = 0;
 
             System.ComponentModel.PropertyChangedEventHandler handler = FitStarted;
             if (handler != null)
             {
                 handler(this, new System.ComponentModel.PropertyChangedEventArgs("FitStarted"));
+            }
+        }
+
+        protected void OnFitUpdated()
+        {
+            if (this.FitDisplayInfo != null)
+            {
+                this.FitDisplayInfo.LMATrial = this._fittingTrial;
+            }
+
+            switch (this.fittingModel)
+            {
+                case "Voigt":
+                    this.BaseTensor.CalculateStiffnesses();
+                    break;
+                case "Reuss":
+                    this.BaseTensor.CalculateStiffnesses();
+                    break;
+                case "Hill":
+                    this.BaseTensor.CalculateStiffnesses();
+                    break;
+                default:
+                    break;
+
+            }
+
+            System.ComponentModel.PropertyChangedEventHandler handler = FitUpdated;
+            if (handler != null)
+            {
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs("FitUpdated"));
             }
         }
 

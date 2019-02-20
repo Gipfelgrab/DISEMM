@@ -607,7 +607,7 @@ namespace CalScec.Analysis.Fitting
             this.ResidualPlotModel.Series.Clear();
 
             Peaks.Functions.PeakRegionFunction PRF = e.Argument as Peaks.Functions.PeakRegionFunction;
-
+            
             OxyPlot.Series.LineSeries PointSeries = new OxyPlot.Series.LineSeries();
             OxyPlot.Series.LineSeries ResidualSeries = new OxyPlot.Series.LineSeries();
             OxyPlot.Series.LineSeries FunctionSeries = new OxyPlot.Series.LineSeries();

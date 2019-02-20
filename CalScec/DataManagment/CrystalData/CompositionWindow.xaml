@@ -1,0 +1,46 @@
+﻿<Window x:Class="CalScec.DataManagment.CrystalData.CompositionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CalScec.DataManagment.CrystalData"
+        mc:Ignorable="d"
+        Title="CompositionWindow" Height="300" Width="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="5*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.4*"/>
+            <ColumnDefinition Width="0.6*"/>
+        </Grid.ColumnDefinitions>
+        <Label Grid.Column="0" Grid.Row="0" Content="Phase type" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+        <Label Grid.Column="0" Grid.Row="1" Content="Inclusion type" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+        <Label Grid.Column="0" Grid.Row="2" Content="PhaseFraction" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+        <Label Grid.Column="0" Grid.Row="3" Content="Phase parameter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Name="PhaseParameter1Label"/>
+        <Label Grid.Column="0" Grid.Row="4" Content="Phase parameter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Name="PhaseParameter2Label"/>
+        <Label Grid.Column="0" Grid.Row="5" Content="Phase parameter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Name="PhaseParameter3Label"/>
+        <ComboBox Grid.Row="0" Grid.Column="1" Margin="5,2,5,2" Name="PhaseTypeSelection" MaxWidth="350" MaxHeight="30" SelectionChanged="PhaseTypeSelection_SelectionChanged">
+            <ComboBoxItem Content="Matrix"/>
+            <ComboBoxItem Content="Inclusion"/>
+        </ComboBox>
+        <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,2,5,2" Name="InclusionTypeSelection" MaxWidth="350" MaxHeight="30" SelectionChanged="InclusionTypeSelection_SelectionChanged"/>
+        <TextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="1" Name="PhaseFraction" Margin="5,2,5,2" MaxHeight="28" MaxWidth="250" TextChanged="PhaseFraction_TextChanged"/>
+        <TextBox Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="1" Name="PhaseParameter1Text" Margin="5,2,5,2" MaxHeight="28" MaxWidth="250" TextChanged="PhaseParameter1Text_TextChanged"/>
+        <TextBox Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="1" Name="PhaseParameter2Text" Margin="5,2,5,2" MaxHeight="28" MaxWidth="250" TextChanged="PhaseParameter2Text_TextChanged"/>
+        <TextBox Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="1" Name="PhaseParameter3Text" Margin="5,2,5,2" MaxHeight="28" MaxWidth="250" TextChanged="PhaseParameter3Text_TextChanged"/>
+        <ListView Name="CrystalDataList" Grid.Row="6" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" SelectionChanged="CrystalDataList_SelectionChanged">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="300" Header="Name" DisplayMemberBinding="{Binding Path=Name}"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Window>

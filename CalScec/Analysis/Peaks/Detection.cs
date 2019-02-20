@@ -307,5 +307,63 @@ namespace CalScec.Analysis.Peaks
             DP.FoundPeaks = DPeakList;
             DP.SetPeakAssociations();
         }
+
+        public static void PrevPatternDetection(Pattern.DiffractionPattern DP, Pattern.DiffractionPattern PrevDP)
+        {
+            List<DiffractionPeak> DPeakList = new List<DiffractionPeak>();
+
+            for (int n = 0; n < PrevDP.FoundPeaks.Count; n++)
+            {
+                double FWHMD = PrevDP.FoundPeaks[n].PFunction.FWHM;
+                int dChannel = 0;
+                double dHeight = 0.0;
+
+                double StartDegree = PrevDP.FoundPeaks[n].PFunction.Angle - (2.0 * FWHMD);
+                if (StartDegree < CalScec.Properties.Settings.Default.PatternLowerLimit)
+                {
+                    StartDegree = CalScec.Properties.Settings.Default.PatternLowerLimit;
+                }
+
+                double StopDegree = PrevDP.FoundPeaks[n].PFunction.Angle + (2.0 * FWHMD);
+                if (StopDegree > CalScec.Properties.Settings.Default.PatternUpperLimit)
+                {
+                    StopDegree = CalScec.Properties.Settings.Default.PatternUpperLimit;
+                }
+
+                Pattern.Counts FittingCounts = new Pattern.Counts();
+
+                for (int j = 0; j < DP.PatternCounts.Count; j++)
+                {
+                    if (StartDegree < DP.PatternCounts[j][0])
+                    {
+                        if (StopDegree > DP.PatternCounts[j][0])
+                        {
+                            FittingCounts.Add(DP.PatternCounts[j]);
+
+                            if (dHeight < DP.PatternCounts[j][1])
+                            {
+                                dHeight = DP.PatternCounts[j][1];
+                                dChannel = j;
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                double dBackground = FittingCounts[0][1];
+
+                DiffractionPeak DPeak = new DiffractionPeak(PrevDP.FoundPeaks[n].DetectedChannel, PrevDP.FoundPeaks[n].PFunction.Angle, PrevDP.FoundPeaks[n].PFunction.Intensity, dBackground, FittingCounts);
+
+                DPeak.AddHKLAssociation(PrevDP.FoundPeaks[n].AssociatedHKLReflex, PrevDP.FoundPeaks[n].AssociatedCrystalData);
+
+                DPeakList.Add(DPeak);
+            }
+
+            DP.FoundPeaks = DPeakList;
+            DP.SetPeakAssociations();
+        }
     }
 }

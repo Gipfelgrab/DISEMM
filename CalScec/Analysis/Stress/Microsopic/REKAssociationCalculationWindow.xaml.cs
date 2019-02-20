@@ -22,6 +22,8 @@ namespace CalScec.Analysis.Stress.Microsopic
         public Sample ActSample;
         bool TextEventsActive = true;
 
+        public bool textureAktivated = false;
+
         public OxyPlot.PlotModel MainPlotModel = new OxyPlot.PlotModel();
         OxyPlot.Axes.LinearAxis MainXAxisLin = new OxyPlot.Axes.LinearAxis();
         OxyPlot.Axes.LinearAxis MainYAxisLin = new OxyPlot.Axes.LinearAxis();
@@ -359,6 +361,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                                     double psyAngle = this.ActSample.DiffractionPatterns[n].PsiAngle(SelectedPeak.Angle);
                                     double phiAngle = this.ActSample.DiffractionPatterns[n].PhiAngle(SelectedPeak.Angle);
                                     Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(appStress, psyAngle, SelectedPeak, phiAngle);
+                                    NewAssociation._macroskopicStrain = this.ActSample.DiffractionPatterns[n].MacroStrain;
 
                                     NewREKData = new REK(this.ActSample.CrystalData[this.PhaseSwitchBox.SelectedIndex], SelectedPeak.AssociatedHKLReflex);
                                     NewREKData.ElasticStressData.Add(NewAssociation);
@@ -390,8 +393,14 @@ namespace CalScec.Analysis.Stress.Microsopic
                             }
                         }
                     }
-
-                    this.ActSample.DiffractionConstants[this.PhaseSwitchBox.SelectedIndex].Add(NewREKData);
+                    if (this.textureAktivated)
+                    {
+                        this.ActSample.DiffractionConstantsTexture[this.PhaseSwitchBox.SelectedIndex].Add(NewREKData);
+                    }
+                    else
+                    {
+                        this.ActSample.DiffractionConstants[this.PhaseSwitchBox.SelectedIndex].Add(NewREKData);
+                    }
                 }
 
                 this.REKCalculationList.Items.Refresh();
@@ -426,6 +435,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                                         double psyAngle = this.ActSample.DiffractionPatterns[n].PsiAngle(SelectedPeak.Angle);
                                         double phiAngle = this.ActSample.DiffractionPatterns[n].PhiAngle(SelectedPeak.Angle);
                                         Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(appStress, psyAngle, SelectedPeak, phiAngle);
+                                        NewAssociation._macroskopicStrain = this.ActSample.DiffractionPatterns[n].MacroStrain;
 
                                         UsedDataSet.ElasticStressData.Add(NewAssociation);
                                     }
@@ -472,6 +482,11 @@ namespace CalScec.Analysis.Stress.Microsopic
             OxyPlot.Series.LineSeries ResTmp = new OxyPlot.Series.LineSeries();
 
             Pattern.Counts UsedCounts = REKData.GetClassicREKFittingData();
+
+            if(Convert.ToBoolean(this.StressPartitioningBox.IsChecked))
+            {
+                UsedCounts = REKData.GetClassicPhaseREKFittingData();
+            }
 
             if (UsedCounts.Count > 0)
             {
@@ -666,7 +681,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                                     if(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedHKLReflex.HKLString == this.ActSample.CrystalData[n].HKLList[i].HKLString)
                                     {
                                         Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(this.ActSample.DiffractionPatterns[j].Stress, this.ActSample.DiffractionPatterns[j].PsiAngle(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].Angle), this.ActSample.DiffractionPatterns[j].FoundPeaks[k], this.ActSample.DiffractionPatterns[j].PhiAngle(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].Angle));
-
+                                        NewAssociation._macroskopicStrain = this.ActSample.DiffractionPatterns[j].MacroStrain;
                                         ActualREK.ElasticStressData.Add(NewAssociation);
                                     }
                                 }
@@ -687,8 +702,14 @@ namespace CalScec.Analysis.Stress.Microsopic
                                 }
                             }
                         }
-
-                        this.ActSample.DiffractionConstants[n].Add(ActualREK);
+                        if(this.textureAktivated)
+                        {
+                            this.ActSample.DiffractionConstantsTexture[n].Add(ActualREK);
+                        }
+                        else
+                        {
+                            this.ActSample.DiffractionConstants[n].Add(ActualREK);
+                        }
                     }
                 }
                 
@@ -701,8 +722,14 @@ namespace CalScec.Analysis.Stress.Microsopic
             if (this.REKCalculationList.SelectedIndex != -1)
             {
                 REK SelectedItem = (REK)this.REKCalculationList.SelectedItem;
-
-                this.ActSample.DiffractionConstants[this.PhaseSwitchBox.SelectedIndex].Remove(SelectedItem);
+                if (this.textureAktivated)
+                {
+                    this.ActSample.DiffractionConstantsTexture[this.PhaseSwitchBox.SelectedIndex].Remove(SelectedItem);
+                }
+                else
+                {
+                    this.ActSample.DiffractionConstants[this.PhaseSwitchBox.SelectedIndex].Remove(SelectedItem);
+                }
 
                 this.REKCalculationList.Items.Refresh();
             }
@@ -712,7 +739,14 @@ namespace CalScec.Analysis.Stress.Microsopic
         {
             if (this.PhaseSwitchBox.SelectedIndex != -1)
             {
-                this.REKCalculationList.ItemsSource = this.ActSample.DiffractionConstants[this.PhaseSwitchBox.SelectedIndex];
+                if (this.textureAktivated)
+                {
+                    this.REKCalculationList.ItemsSource = this.ActSample.DiffractionConstantsTexture[this.PhaseSwitchBox.SelectedIndex];
+                }
+                else
+                {
+                    this.REKCalculationList.ItemsSource = this.ActSample.DiffractionConstants[this.PhaseSwitchBox.SelectedIndex];
+                }
             }
         }
 
@@ -721,11 +755,68 @@ namespace CalScec.Analysis.Stress.Microsopic
             if (this.REKCalculationList.SelectedIndex != -1)
             {
                 REK SelectedItem = (REK)this.REKCalculationList.SelectedItem;
-
-                SelectedItem.FitClassicREKFunction();
+                if (this.textureAktivated)
+                {
+                    if (Convert.ToBoolean(this.StressPartitioningBox.IsChecked))
+                    {
+                        this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetMRDValues(SelectedItem.ElasticStressData);
+                        SelectedItem.FitTexturedPhaseREKFunction();
+                    }
+                    else
+                    {
+                        this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetMRDValues(SelectedItem.ElasticStressData);
+                        SelectedItem.FitTexturedREKFunction();
+                    }
+                }
+                else
+                {
+                    if (Convert.ToBoolean(this.StressPartitioningBox.IsChecked))
+                    {
+                        SelectedItem.FitClassicPhaseREKFunction();
+                    }
+                    else
+                    {
+                        SelectedItem.FitClassicREKFunction();
+                    }
+                }
 
                 PlotREKDataClassic(SelectedItem);
                 this.REKCalculationList.Items.Refresh();
+            }
+        }
+
+        private void TextureBox_Checked(object sender, RoutedEventArgs e)
+        {
+            this.textureAktivated = true;
+            this.REKCalculationList.ItemsSource = this.ActSample.DiffractionConstantsTexture[this.PhaseSwitchBox.SelectedIndex];
+        }
+
+        private void TextureBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            this.textureAktivated = false;
+            this.REKCalculationList.ItemsSource = this.ActSample.DiffractionConstants[this.PhaseSwitchBox.SelectedIndex];
+        }
+
+        private void SetPhaseStress_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.REKCalculationList.SelectedIndex != -1)
+            {
+                REK selectedDEC = (REK)this.REKCalculationList.SelectedItem;
+
+                double stressTrans = 1.0;
+
+                for (int n = 0; n < this.ActSample.CrystalData.Count; n++)
+                {
+                    if(this.ActSample.CrystalData[n].SymmetryGroupID == selectedDEC.PhaseInformation.SymmetryGroupID)
+                    {
+                        stressTrans = this.ActSample.StressTransitionFactors[n][2, 2];
+                    }
+                }
+
+                for (int n = 0; n < selectedDEC.ElasticStressData.Count; n++)
+                {
+                    selectedDEC.ElasticStressData[n].PhaseFractionStress = stressTrans * selectedDEC.ElasticStressData[n].Stress;
+                }
             }
         }
     }

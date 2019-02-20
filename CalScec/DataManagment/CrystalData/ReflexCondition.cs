@@ -1489,7 +1489,7 @@ namespace CalScec.DataManagment.CrystalData
     }
 
     [Serializable]
-    public struct CODData
+    public class CODData
     {
         private int _id;
         public int Id
@@ -1518,6 +1518,78 @@ namespace CalScec.DataManagment.CrystalData
             set
             {
                 this._name = value;
+            }
+        }
+
+        private double _phaseFraction;
+        public double PhaseFraction
+        {
+            get
+            {
+                return this._phaseFraction;
+            }
+            set
+            {
+                this._phaseFraction = value;
+            }
+        }
+
+        public bool _matrix;
+        public bool Matrix
+        {
+            get
+            {
+                return this._matrix;
+            }
+            set
+            {
+                this._matrix = value;
+            }
+        }
+        private int _inclusionType;
+        public int InclusionType
+        {
+            get
+            {
+                return this._inclusionType;
+            }
+            set
+            {
+                this._inclusionType = value;
+            }
+        }
+        public double[] inclusionDimension;
+        public double InclusionA
+        {
+            get
+            {
+                return this.inclusionDimension[0];
+            }
+            set
+            {
+                this.inclusionDimension[0] = value;
+            }
+        }
+        public double InclusionB
+        {
+            get
+            {
+                return this.inclusionDimension[1];
+            }
+            set
+            {
+                this.inclusionDimension[1] = value;
+            }
+        }
+        public double InclusionC
+        {
+            get
+            {
+                return this.inclusionDimension[2];
+            }
+            set
+            {
+                this.inclusionDimension[2] = value;
             }
         }
 
@@ -1725,6 +1797,11 @@ namespace CalScec.DataManagment.CrystalData
 
         public List<HKLReflex> HKLList;
 
+        public CODData()
+        {
+
+        }
+
         public CODData(System.Data.DataRow Entry)
         {
             try
@@ -1756,6 +1833,10 @@ namespace CalScec.DataManagment.CrystalData
                 this._symmetryGroupId = -1;
                 HKLList = new List<HKLReflex>();
                 this._id = Tools.IdManagment.ActualCODId;
+                this._matrix = false;
+                double[] tmp = { 0.0, 0.0, 0.0 };
+                this.inclusionDimension = tmp;
+                this._inclusionType = 0;
             }
             catch
             {
@@ -1779,7 +1860,13 @@ namespace CalScec.DataManagment.CrystalData
                 this._symmetryGroupId = -1;
                 HKLList = new List<HKLReflex>();
                 this._id = -1;
+                this._matrix = false;
+                double[] tmp = { 0.0, 0.0, 0.0 };
+                this.inclusionDimension = tmp;
+                this._inclusionType = 0;
             }
+
+            this._phaseFraction = 0.0;
         }
 
         public CODData(string CIFFilePath)
@@ -1802,6 +1889,11 @@ namespace CalScec.DataManagment.CrystalData
             this._lastUpdate = DateTime.Today;
             this._text = "";
             this._symmetryGroupId = -1;
+            this._phaseFraction = 0.0;
+            this._matrix = false;
+            double[] tmp = { 0.0, 0.0, 0.0 };
+            this.inclusionDimension = tmp;
+            this._inclusionType = 0;
 
             string[] PatternFileLines = System.IO.File.ReadLines(CIFFilePath).ToArray();
 
@@ -1906,7 +1998,12 @@ namespace CalScec.DataManagment.CrystalData
             this._symmetryGroupId = symmetryID;
             this._id = Tools.IdManagment.ActualCODId;
 
+            this._phaseFraction = 0.0;
             HKLList = new List<HKLReflex>();
+            this._matrix = false;
+            double[] tmp = { 0.0, 0.0, 0.0 };
+            this.inclusionDimension = tmp;
+            this._inclusionType = 0;
         }
 
         public CODData(CODData ToClone)
@@ -1930,6 +2027,10 @@ namespace CalScec.DataManagment.CrystalData
             this._text = ToClone._text;
             this._symmetryGroupId = ToClone._symmetryGroupId;
             this._id = ToClone.Id;
+            this._phaseFraction = ToClone._phaseFraction;
+            this._matrix = ToClone.Matrix;
+            this.inclusionDimension = ToClone.inclusionDimension;
+            this._inclusionType = ToClone.InclusionType;
 
             HKLList = ToClone.HKLList;
         }
@@ -2029,6 +2130,20 @@ namespace CalScec.DataManagment.CrystalData
             this._k = k;
             this._l = l;
             this._distance = distance;
+        }
+
+        public MathNet.Numerics.LinearAlgebra.Vector<double> Direction
+        {
+            get
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ret = MathNet.Numerics.LinearAlgebra.CreateVector.Dense(3, 0.0);
+
+                ret[0] = this.H;
+                ret[1] = this.K;
+                ret[2] = this.L;
+
+                return ret;
+            }
         }
 
 

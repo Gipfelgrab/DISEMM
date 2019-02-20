@@ -251,6 +251,27 @@ namespace CalScec.Tools
             return ret;
         }
 
+        public double InnerTransormation(MathNet.Numerics.LinearAlgebra.Matrix<double> t1, MathNet.Numerics.LinearAlgebra.Matrix<double> t2)
+        {
+            double ret = 0.0;
+
+            for(int n = 0; n < 3; n++ )
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        for (int k = 0; k < 3; k++)
+                        {
+                            ret += t1[n, i] * this[n, i, j, k] * t2[j, k];
+                        }
+                    }
+                }
+            }
+
+            return ret;
+        }
+
         #region Operatoren
 
         public static FourthRankTensor operator *(FourthRankTensor a, FourthRankTensor b)
@@ -305,6 +326,7 @@ namespace CalScec.Tools
                 return null;
             }
         }
+        
 
         public static FourthRankTensor operator +(FourthRankTensor a, FourthRankTensor b)
         {

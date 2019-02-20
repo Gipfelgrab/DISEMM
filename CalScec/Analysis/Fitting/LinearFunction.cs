@@ -177,6 +177,58 @@ namespace CalScec.Analysis.Fitting
             return ParamDelta;
         }
 
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] Aclivity
+        ///[1] Constant
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorAclivityConstant(double Lambda, Pattern.Counts UsedCounts, List<double> weightings)
+        {
+            //[0][0] Aclivity
+            //[1][1] Constant
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < UsedCounts.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += weightings[n] * (this.FirstDerivativeAclivity(UsedCounts[n][0]) * this.FirstDerivativeAclivity(UsedCounts[n][0]) / Math.Pow(UsedCounts[n][2], 2));
+
+                HessianMatrix[1, 1] += weightings[n] * (this.FirstDerivativeConstant(UsedCounts[n][0]) * this.FirstDerivativeConstant(UsedCounts[n][0]) / Math.Pow(UsedCounts[n][2], 2));
+                HessianMatrix[0, 1] += weightings[n] * (this.FirstDerivativeConstant(UsedCounts[n][0]) * this.FirstDerivativeAclivity(UsedCounts[n][0]) / Math.Pow(UsedCounts[n][2], 2));
+                HessianMatrix[1, 0] += weightings[n] * (this.FirstDerivativeConstant(UsedCounts[n][0]) * this.FirstDerivativeAclivity(UsedCounts[n][0]) / Math.Pow(UsedCounts[n][2], 2));
+
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += weightings[n] * ((UsedCounts[n][1] - this.Y(UsedCounts[n][0])) / Math.Pow(UsedCounts[n][2], 2)) * this.FirstDerivativeAclivity(UsedCounts[n][0]);
+                SolutionVector[1] += weightings[n] * ((UsedCounts[n][1] - this.Y(UsedCounts[n][0])) / Math.Pow(UsedCounts[n][2], 2)) * this.FirstDerivativeConstant(UsedCounts[n][0]);
+
+                #endregion
+            }
+
+            this._hessianMatrix = HessianMatrix;
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
         #endregion
 
         #endregion

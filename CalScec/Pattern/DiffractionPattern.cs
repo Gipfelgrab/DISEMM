@@ -98,7 +98,7 @@ namespace CalScec.Pattern
 
             return Ret;
         }
-        private MathNet.Numerics.LinearAlgebra.Vector<double> GetRotatedS3()
+        public MathNet.Numerics.LinearAlgebra.Vector<double> GetRotatedS3()
         {
             //X-Achse wird erst um Omega in position gedreht. Es wird von einem Rechtshändigen Koordinatensystemausgegangen
             //Dabei ist ein positiver Drehwinkel im Uhrzeigersinn!!!!!
@@ -114,6 +114,7 @@ namespace CalScec.Pattern
             //Nun wird die Drehung um Chi vollzogen. Dabei wird um die neue X-Achse gedreht!!!
             //positiver Winkel heißt im Urzeigersinn und Negativer Winkel gegen Uhrzeigersinn
             //Die Chi-Kippung wird im Uhrzeigersinn vollzogen --> positiver winkel
+
             DiffractionOrientation.OrientationMatrix RotationMatrixChiAxis = new OrientationMatrix();
 
             double[] AngleAxisPairValues = { this._chiAngle * (Math.PI / 180.0), XAxis[0], XAxis[1], XAxis[2] };
@@ -131,7 +132,7 @@ namespace CalScec.Pattern
         /// </summary>
         /// <param name="Measured2Theta"> Gemessener Winkel der Netzebenschar</param>
         /// <returns></returns>
-        private MathNet.Numerics.LinearAlgebra.Vector<double> GetQI(double Measured2Theta)
+        public MathNet.Numerics.LinearAlgebra.Vector<double> GetQI(double Measured2Theta)
         {
             MathNet.Numerics.LinearAlgebra.Vector<double> Ret = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3, 0);
 
@@ -242,16 +243,18 @@ namespace CalScec.Pattern
             MathNet.Numerics.LinearAlgebra.Vector<double> SlipDirectionIndices = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3, 0);
 
             SlipPlaneIndices[0] = slipPlane.H;
-            SlipPlaneIndices[0] = slipPlane.K;
-            SlipPlaneIndices[0] = slipPlane.L;
+            SlipPlaneIndices[1] = slipPlane.K;
+            SlipPlaneIndices[2] = slipPlane.L;
 
             SlipDirectionIndices[0] = slipDirection.H;
-            SlipDirectionIndices[0] = slipDirection.K;
-            SlipDirectionIndices[0] = slipDirection.L;
+            SlipDirectionIndices[1] = slipDirection.K;
+            SlipDirectionIndices[2] = slipDirection.L;
 
             List<MathNet.Numerics.LinearAlgebra.Vector<double>> RotIndices = new List<MathNet.Numerics.LinearAlgebra.Vector<double>>();
             RotIndices.Add(SlipPlaneIndices);
             RotIndices.Add(SlipDirectionIndices);
+
+            RotationMatrix.MillerIndices = RotIndices;
 
             MathNet.Numerics.LinearAlgebra.Vector<double> SampleSlipDirection = RotationMatrix.OM * QI;
 
@@ -297,6 +300,8 @@ namespace CalScec.Pattern
         public List<Analysis.Peaks.DiffractionPeak> FoundPeaks = new List<Analysis.Peaks.DiffractionPeak>();
         public List<Analysis.Peaks.Functions.PeakRegionFunction> PeakRegions = new List<Analysis.Peaks.Functions.PeakRegionFunction>();
 
+        public List<double> PhaseStresses = new List<double>();
+
         #endregion
 
         public DiffractionPattern(string FilePath, int id)
@@ -319,11 +324,25 @@ namespace CalScec.Pattern
                     {
                         if(s != "")
                         {
-                            ActCount.Add(Convert.ToDouble(s));
+                            try
+                            {
+                                ActCount.Add(Convert.ToDouble(s));
+                            }
+                            catch
+                            {
+
+                            }
                         }
                     }
+                    if (ActCount.Count > 1)
+                    {
+                        if (ActCount.Count < 3)
+                        {
+                            ActCount.Add(Math.Sqrt(ActCount[1]));
+                        }
 
-                    this.PatternCounts.Add(ActCount.ToArray());
+                        this.PatternCounts.Add(ActCount.ToArray());
+                    }
                 }
             }
         }
@@ -411,6 +430,7 @@ namespace CalScec.Pattern
             for(int n = 0; n < this.PeakRegions.Count; n++)
             {
                 this.PeakRegions[n].AssociatedPatternName = this.Name;
+                this.PeakRegions[n].PolynomialBackgroundFunction.Constant = this.PeakRegions[n][0].FittingCounts[0][1];
             }
         }
 

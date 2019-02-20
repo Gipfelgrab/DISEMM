@@ -544,6 +544,7 @@ namespace CalScec
                 }
 
                 PlotHKLToPlot();
+
                 DiffractionPatternList.ItemsSource = this.InvestigatedSample.DiffractionPatterns;
 
                 for(int n = 0; n < this.InvestigatedSample.DiffractionPatterns.Count; n++)
@@ -552,6 +553,58 @@ namespace CalScec
                     {
                         this.PeakFitWindow.AddPresettedRegion(this.InvestigatedSample.DiffractionPatterns[n].PeakRegions[i]);
                     }
+                }
+
+                this.InvestigatedSample.SetYieldExperimentalData();
+
+                for (int n = 0; n < this.InvestigatedSample.CrystalData.Count; n++)
+                {
+                    this.InvestigatedSample.VoigtTensorData[n].SetAverageParameters(this.InvestigatedSample.VoigtTensorData[n].GetCalculatedDiffractionConstantsVoigt(this.InvestigatedSample.CrystalData[n]));
+                    this.InvestigatedSample.ReussTensorData[n].SetAverageParameters(this.InvestigatedSample.ReussTensorData[n].GetCalculatedDiffractionConstantsReuss(this.InvestigatedSample.CrystalData[n]));
+                    this.InvestigatedSample.HillTensorData[n].SetAverageParameters(this.InvestigatedSample.HillTensorData[n].GetCalculatedDiffractionConstantsHill(this.InvestigatedSample.CrystalData[n]));
+                    this.InvestigatedSample.KroenerTensorData[n].SetAverageParameters(this.InvestigatedSample.KroenerTensorData[n].GetCalculatedDiffractionConstantsKroenerStiffness(this.InvestigatedSample.CrystalData[n]));
+                    this.InvestigatedSample.DeWittTensorData[n].SetAverageParameters(this.InvestigatedSample.DeWittTensorData[n].GetCalculatedDiffractionConstantsDeWittStiffness(this.InvestigatedSample.CrystalData[n]));
+                    this.InvestigatedSample.GeometricHillTensorData[n].SetAverageParameters(this.InvestigatedSample.GeometricHillTensorData[n].GetCalculatedDiffractionConstantsGeometricHill(this.InvestigatedSample.CrystalData[n]));
+
+                    //this.ActSample.ReussTensorData[n].SetPeakStressAssociation(this.ActSample);
+                    this.InvestigatedSample.ReussTensorData[n].DiffractionConstants = InvestigatedSample.DiffractionConstants[n];
+                    this.InvestigatedSample.HillTensorData[n].DiffractionConstants = InvestigatedSample.DiffractionConstants[n];
+                    this.InvestigatedSample.KroenerTensorData[n].DiffractionConstants = InvestigatedSample.DiffractionConstants[n];
+                    this.InvestigatedSample.DeWittTensorData[n].DiffractionConstants = InvestigatedSample.DiffractionConstants[n];
+                    this.InvestigatedSample.GeometricHillTensorData[n].DiffractionConstants = InvestigatedSample.DiffractionConstants[n];
+                
+                    this.InvestigatedSample.VoigtTensorData[n].DiffractionConstantsTexture = InvestigatedSample.DiffractionConstantsTexture[n];
+                    this.InvestigatedSample.ReussTensorData[n].DiffractionConstantsTexture = InvestigatedSample.DiffractionConstantsTexture[n];
+                    this.InvestigatedSample.HillTensorData[n].DiffractionConstantsTexture = InvestigatedSample.DiffractionConstantsTexture[n];
+                    this.InvestigatedSample.KroenerTensorData[n].DiffractionConstantsTexture = InvestigatedSample.DiffractionConstantsTexture[n];
+                    this.InvestigatedSample.DeWittTensorData[n].DiffractionConstantsTexture = InvestigatedSample.DiffractionConstantsTexture[n];
+                    this.InvestigatedSample.GeometricHillTensorData[n].DiffractionConstantsTexture = InvestigatedSample.DiffractionConstantsTexture[n];
+
+                    //this.InvestigatedSample.VoigtTensorData[n].SetPeakStressAssociation(this.InvestigatedSample);
+                    this.InvestigatedSample.ReussTensorData[n].SetPeakStressAssociation(this.InvestigatedSample);
+                    this.InvestigatedSample.HillTensorData[n].SetPeakStressAssociation(this.InvestigatedSample);
+                    this.InvestigatedSample.KroenerTensorData[n].SetPeakStressAssociation(this.InvestigatedSample);
+                    this.InvestigatedSample.DeWittTensorData[n].SetPeakStressAssociation(this.InvestigatedSample);
+                    this.InvestigatedSample.GeometricHillTensorData[n].SetPeakStressAssociation(this.InvestigatedSample);
+
+                    //this.InvestigatedSample.ReussTensorData[n].SetStrainDataReflexYield();
+                    //this.InvestigatedSample.HillTensorData[n].SetStrainDataReflexYield();
+                    //this.InvestigatedSample.KroenerTensorData[n].SetStrainDataReflexYield();
+                    //this.InvestigatedSample.DeWittTensorData[n].SetStrainDataReflexYield();
+                    //this.InvestigatedSample.GeometricHillTensorData[n].SetStrainDataReflexYield();
+
+                    for(int i = 0; i < this.InvestigatedSample.PlasticTensor[n].YieldSurfaceData.ReflexYieldData.Count; i++)
+                    {
+                        if (this.InvestigatedSample.CrystalData[n].SymmetryGroupID == 194)
+                        {
+                            this.InvestigatedSample.PlasticTensor[n].YieldSurfaceData.ReflexYieldData[i].SetCrystalStressAndStrain(1);
+                        }
+                        else
+                        {
+                            this.InvestigatedSample.PlasticTensor[n].YieldSurfaceData.ReflexYieldData[i].SetCrystalStressAndStrain(0);
+                        }
+                    }
+
                 }
             }
         }
@@ -886,7 +939,7 @@ namespace CalScec
             worker.ReportProgress(Convert.ToInt32(Progress), State);
 
             string FileExt = System.IO.Path.GetExtension(PatternPath);
-            if(FileExt.ToLower() == ".dat" || FileExt.ToLower() == ".eth")
+            if(FileExt.ToLower() == ".dat" || FileExt.ToLower() == ".eth" || FileExt.ToLower() == ".chi")
             {
                 try
                 {
@@ -928,9 +981,42 @@ namespace CalScec
                     Analysis.Peaks.Detection.HyperDetection(NewDiffractionPattern);
                     Analysis.Peaks.Detection.AssociateFoundPeaksToHKL(NewDiffractionPattern, this.InvestigatedSample.CrystalData);
                 }
-                else
+                else if (CalScec.Properties.Settings.Default.UsedPeakDetectionId == 1)
                 {
                     Analysis.Peaks.Detection.CIFDetection(NewDiffractionPattern, this.InvestigatedSample.CrystalData);
+                }
+                else
+                {
+                    char[] SepChars = { '.', '-', '_' };
+                    string[] SplitedPatternName = NewDiffractionPattern.Name.Split(SepChars);
+
+                    int PrevPatterIndex = -1;
+
+                    for(int n = 0; n < this.InvestigatedSample.DiffractionPatterns.Count - 1; n++)
+                    {
+                        string[] SplitedPrevPatternName = this.InvestigatedSample.DiffractionPatterns[n].Name.Split(SepChars);
+
+                        if(SplitedPatternName[2] == SplitedPrevPatternName[2])
+                        {
+                            PrevPatterIndex = n;
+                        }
+                    }
+
+                    if(PrevPatterIndex != -1)
+                    {
+                        Analysis.Peaks.Detection.PrevPatternDetection(NewDiffractionPattern, this.InvestigatedSample.DiffractionPatterns[PrevPatterIndex]);
+                    }
+                    else
+                    {
+                        if(this.InvestigatedSample.DiffractionPatterns.Count - 1 != 0)
+                        {
+                            Analysis.Peaks.Detection.PrevPatternDetection(NewDiffractionPattern, this.InvestigatedSample.DiffractionPatterns[0]);
+                        }
+                        else
+                        {
+                            Analysis.Peaks.Detection.CIFDetection(NewDiffractionPattern, this.InvestigatedSample.CrystalData);
+                        }
+                    }
                 }
 
                 NewDiffractionPattern.SetRegions();
@@ -1026,7 +1112,7 @@ namespace CalScec
             foreach(string PP in PatternPaths )
             {
                 string FileExt = System.IO.Path.GetExtension(PP);
-                if (FileExt.ToLower() == ".dat" || FileExt.ToLower() == ".eth")
+                if (FileExt.ToLower() == ".dat" || FileExt.ToLower() == ".eth" || FileExt.ToLower() == ".chi")
                 {
                     try
                     {
@@ -1080,9 +1166,42 @@ namespace CalScec
                             Analysis.Peaks.Detection.HyperDetection(AddedPatterns[i]);
                             Analysis.Peaks.Detection.AssociateFoundPeaksToHKL(AddedPatterns[i], this.InvestigatedSample.CrystalData);
                         }
-                        else
+                        else if (CalScec.Properties.Settings.Default.UsedPeakDetectionId == 1)
                         {
                             Analysis.Peaks.Detection.CIFDetection(AddedPatterns[i], this.InvestigatedSample.CrystalData);
+                        }
+                        else
+                        {
+                            char[] SepChars = { '.', '-', '_' };
+                            string[] SplitedPatternName = AddedPatterns[i].Name.Split(SepChars);
+
+                            int PrevPatterIndex = -1;
+
+                            for (int n = 0; n < this.InvestigatedSample.DiffractionPatterns.Count - AddedPatterns.Count; n++)
+                            {
+                                string[] SplitedPrevPatternName = this.InvestigatedSample.DiffractionPatterns[n].Name.Split(SepChars);
+
+                                if (SplitedPatternName[2] == SplitedPrevPatternName[2])
+                                {
+                                    PrevPatterIndex = n;
+                                }
+                            }
+
+                            if (PrevPatterIndex != -1)
+                            {
+                                Analysis.Peaks.Detection.PrevPatternDetection(AddedPatterns[i], this.InvestigatedSample.DiffractionPatterns[PrevPatterIndex]);
+                            }
+                            else
+                            {
+                                if (this.InvestigatedSample.DiffractionPatterns.Count - AddedPatterns.Count != 0)
+                                {
+                                    Analysis.Peaks.Detection.PrevPatternDetection(AddedPatterns[i], this.InvestigatedSample.DiffractionPatterns[0]);
+                                }
+                                else
+                                {
+                                    Analysis.Peaks.Detection.CIFDetection(AddedPatterns[i], this.InvestigatedSample.CrystalData);
+                                }
+                            }
                         }
 
                         AddedPatterns[i].SetRegions();
@@ -1678,6 +1797,13 @@ namespace CalScec
             }
 
             PlotHKLToPlot();
+        }
+
+        private void EditPhaseCompositionData_Click(object sender, RoutedEventArgs e)
+        {
+            DataManagment.CrystalData.CompositionWindow cW = new DataManagment.CrystalData.CompositionWindow(this.InvestigatedSample);
+
+            cW.ShowDialog();
         }
 
         #endregion
@@ -2420,32 +2546,84 @@ namespace CalScec
             }
         }
 
+        bool RoutineChangeAvtive = true;
+
         private void PeakDetectionRoutineCIF_Checked(object sender, RoutedEventArgs e)
         {
-            PeakDetectionRoutineHyper.IsChecked = false;
-            PeakDetectionRoutineCIF.IsChecked = true;
-            CalScec.Properties.Settings.Default.UsedPeakDetectionId = 1;
+            if (RoutineChangeAvtive)
+            {
+                RoutineChangeAvtive = false;
+                PeakDetectionRoutineHyper.IsChecked = false;
+                PeakDetectionRoutineCIF.IsChecked = true;
+                PeakDetectionRoutinePattern.IsChecked = false;
+                CalScec.Properties.Settings.Default.UsedPeakDetectionId = 1;
+                RoutineChangeAvtive = true;
+            }
         }
 
         private void PeakDetectionRoutineCIF_Unchecked(object sender, RoutedEventArgs e)
         {
-            PeakDetectionRoutineHyper.IsChecked = true;
-            PeakDetectionRoutineCIF.IsChecked = false;
-            CalScec.Properties.Settings.Default.UsedPeakDetectionId = 0;
+            if (RoutineChangeAvtive)
+            {
+                RoutineChangeAvtive = false;
+                PeakDetectionRoutineHyper.IsChecked = true;
+                PeakDetectionRoutineCIF.IsChecked = false;
+                PeakDetectionRoutinePattern.IsChecked = false;
+                CalScec.Properties.Settings.Default.UsedPeakDetectionId = 0;
+                RoutineChangeAvtive = true;
+            }
         }
 
         private void PeakDetectionRoutineHyper_Checked(object sender, RoutedEventArgs e)
         {
-            PeakDetectionRoutineHyper.IsChecked = true;
-            PeakDetectionRoutineCIF.IsChecked = false;
-            CalScec.Properties.Settings.Default.UsedPeakDetectionId = 0;
+            if (RoutineChangeAvtive)
+            {
+                RoutineChangeAvtive = false;
+                PeakDetectionRoutineHyper.IsChecked = true;
+                PeakDetectionRoutineCIF.IsChecked = false;
+                PeakDetectionRoutinePattern.IsChecked = false;
+                CalScec.Properties.Settings.Default.UsedPeakDetectionId = 0;
+                RoutineChangeAvtive = true;
+            }
         }
 
         private void PeakDetectionRoutineHyper_Unchecked(object sender, RoutedEventArgs e)
         {
-            PeakDetectionRoutineHyper.IsChecked = false;
-            PeakDetectionRoutineCIF.IsChecked = true;
-            CalScec.Properties.Settings.Default.UsedPeakDetectionId = 1;
+            if (RoutineChangeAvtive)
+            {
+                RoutineChangeAvtive = false;
+                PeakDetectionRoutineHyper.IsChecked = false;
+                PeakDetectionRoutineCIF.IsChecked = true;
+                PeakDetectionRoutinePattern.IsChecked = false;
+                CalScec.Properties.Settings.Default.UsedPeakDetectionId = 1;
+                RoutineChangeAvtive = true;
+            }
+        }
+
+        private void PeakDetectionRoutinePattern_Checked(object sender, RoutedEventArgs e)
+        {
+            if (RoutineChangeAvtive)
+            {
+                RoutineChangeAvtive = false;
+                PeakDetectionRoutineHyper.IsChecked = false;
+                PeakDetectionRoutineCIF.IsChecked = false;
+                PeakDetectionRoutinePattern.IsChecked = true;
+                CalScec.Properties.Settings.Default.UsedPeakDetectionId = 2;
+                RoutineChangeAvtive = true;
+            }
+        }
+
+        private void PeakDetectionRoutinePattern_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (RoutineChangeAvtive)
+            {
+                RoutineChangeAvtive = false;
+                PeakDetectionRoutineHyper.IsChecked = false;
+                PeakDetectionRoutineCIF.IsChecked = true;
+                PeakDetectionRoutinePattern.IsChecked = false;
+                CalScec.Properties.Settings.Default.UsedPeakDetectionId = 1;
+                RoutineChangeAvtive = true;
+            }
         }
 
         #endregion
@@ -2492,6 +2670,12 @@ namespace CalScec
             }
             Analysis.MC.RandomAnalysisWindow NewWindow = new Analysis.MC.RandomAnalysisWindow(this.InvestigatedSample.ReussTensorData[0]);
             NewWindow.Show();
+        }
+
+        private void YieldSurfaceWindow_Click(object sender, RoutedEventArgs e)
+        {
+            Analysis.Stress.Plasticity.YieldSurfaceWindow YSW = new Analysis.Stress.Plasticity.YieldSurfaceWindow(this.InvestigatedSample);
+            YSW.Show();
         }
 
         #region Plots

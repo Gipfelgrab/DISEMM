@@ -53,7 +53,7 @@ namespace CalScec.Pattern
                 this.PatternAppliedStress.Text = SelectedPattern.Stress.ToString("F3");
                 this.PatternAppliedForce.Text = SelectedPattern.Force.ToString("F3");
                 this.PatternPhiSampleAngle.Text = SelectedPattern.PhiSampleAngle.ToString("F3");
-                this.PatternMacroStrain.Text = SelectedPattern.MacroStrain.ToString("F3");
+                this.PatternMacroStrain.Text = SelectedPattern.MacroStrain.ToString();
             }
             EditAktive = true;
         }
@@ -220,7 +220,7 @@ namespace CalScec.Pattern
 
                         SelectedPattern.MacroStrain = NewValue;
                         EditAktive = false;
-                        this.PatternMacroStrain.Text = SelectedPattern.MacroStrain.ToString("F3");
+                        this.PatternMacroStrain.Text = SelectedPattern.MacroStrain.ToString();
                         EditAktive = true;
                         this.PatternAppliedStress.Foreground = Brushes.DarkGreen;
                         this.PatternAppliedForce.Foreground = Brushes.DarkGreen;
@@ -231,6 +231,29 @@ namespace CalScec.Pattern
                         this.PatternAppliedForce.Foreground = Brushes.DarkRed;
                     }
                 }
+            }
+        }
+
+        private void Autofill_Click(object sender, RoutedEventArgs e)
+        {
+            for(int n = 0; n < this._sample.DiffractionPatterns.Count; n++)
+            {
+                char[] SepChars = { '.', '-', '_' };
+
+                string[] sepPatternName = this._sample.DiffractionPatterns[n].Name.Split(SepChars);
+
+                int ActChiAngle = Convert.ToInt32(sepPatternName[2]);
+                int patternIndex = Convert.ToInt32(sepPatternName[1]);
+
+                this._sample.DiffractionPatterns[n].OmegaAngle = 0.0;
+                this._sample.DiffractionPatterns[n].PhiSampleAngle = 0.0;
+                this._sample.DiffractionPatterns[n].ChiAngle = (10.0 * ActChiAngle) + 95;
+                //this._sample.DiffractionPatterns[n].Force = ((patternIndex - 20.0) * 45.0) + 200;
+
+                //if(this._sample.Area != 0.0)
+                //{
+                //    this._sample.DiffractionPatterns[n].Stress = this._sample.DiffractionPatterns[n].Force / this._sample.Area;
+                //}
             }
         }
     }

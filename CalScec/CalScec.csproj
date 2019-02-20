@@ -59,6 +59,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -113,11 +114,16 @@
     <Compile Include="Analysis\Stress\Microsopic\REKAssociationCalculationWindow.xaml.cs">
       <DependentUpon>REKAssociationCalculationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Analysis\Stress\Plasticity\ElastoPlasticExperiment.cs" />
+    <Compile Include="Analysis\Stress\Plasticity\EPModeling.cs" />
     <Compile Include="Analysis\Stress\Plasticity\PlasticityTensor.cs" />
     <Compile Include="Analysis\Stress\Plasticity\ReflexYield.cs" />
     <Compile Include="Analysis\Stress\Plasticity\YieldSurface.cs" />
     <Compile Include="Analysis\Stress\Plasticity\YieldSurfaceWindow.xaml.cs">
       <DependentUpon>YieldSurfaceWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\Stress\StrainAnalysisWindow.xaml.cs">
+      <DependentUpon>StrainAnalysisWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Analysis\Texture\OrientationDistributionFunction.cs" />
     <Compile Include="Analysis\Texture\PhaseSelectionWindow.xaml.cs">
@@ -128,6 +134,9 @@
     </Compile>
     <Compile Include="DataManagment\CrystalData\AddCrystalDataWindow.xaml.cs">
       <DependentUpon>AddCrystalDataWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DataManagment\CrystalData\CompositionWindow.xaml.cs">
+      <DependentUpon>CompositionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataManagment\CrystalData\ReflexCondition.cs" />
     <Compile Include="DataManagment\CrystalData\ShowCrystalDataWindow.xaml.cs">
@@ -142,14 +151,23 @@
     <Compile Include="DataManagment\Files\SCEC\PatternInformation.cs" />
     <Compile Include="DataManagment\Files\SCEC\PeakFunctionInformation.cs" />
     <Compile Include="DataManagment\Files\SCEC\PeakRegionInformation.cs" />
+    <Compile Include="DataManagment\Files\SCEC\PlasticityTensorInformation.cs" />
+    <Compile Include="DataManagment\Files\SCEC\ReflexYieldInformation.cs" />
     <Compile Include="DataManagment\Files\SCEC\REKInformation.cs" />
+    <Compile Include="DataManagment\Files\SCEC\YieldSurfaceInformation.cs" />
     <Compile Include="Pattern\DiffractionDataWindow.xaml.cs">
       <DependentUpon>DiffractionDataWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\Calculation.cs" />
     <Compile Include="Tools\FourthRankTensor.cs" />
     <Compile Include="Tools\IdManagment.cs" />
+    <Compile Include="Tools\PlottingWindow.xaml.cs">
+      <DependentUpon>PlottingWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Tools\TextureFitInformation.cs" />
+    <Compile Include="Tools\ValueSelection.xaml.cs">
+      <DependentUpon>ValueSelection.xaml</DependentUpon>
+    </Compile>
     <Page Include="Analysis\Fitting\PeakFittingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -182,6 +200,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Analysis\Stress\StrainAnalysisWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Analysis\Texture\PhaseSelectionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -195,6 +217,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DataManagment\CrystalData\AddCrystalDataWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="DataManagment\CrystalData\CompositionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -222,6 +248,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Pattern\DiffractionDataWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\PlottingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\ValueSelection.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -321,6 +355,7 @@
   <ItemGroup>
     <None Include="Res\ReflectionConditions\SlipSystems.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

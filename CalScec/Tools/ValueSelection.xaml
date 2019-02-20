@@ -1,0 +1,34 @@
+﻿<Window x:Class="CalScec.Tools.ValueSelection"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CalScec.Tools"
+        mc:Ignorable="d"
+        Title="ValueSelection" Height="200" Width="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.1*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="1.1*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.1*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="0.1*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">Please select the lower and upper border fot the anisitropy investigations</TextBlock>
+        <TextBox Grid.Row="2" Grid.Column="1" Name="LowerBox" MaxHeight="27" TextChanged="LowerBox_TextChanged"/>
+        <TextBlock Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="1" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">-</TextBlock>
+        <TextBox Grid.Row="2" Grid.Column="3" Name="UpperBox" MaxHeight="27" TextChanged="UpperBox_TextChanged"/>
+        <TextBlock Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="1" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">Step</TextBlock>
+        <TextBox Grid.Row="3" Grid.Column="2" Name="StepBox" MaxHeight="27" TextChanged="StepBox_TextChanged"/>
+        <CheckBox Grid.Row="3" Grid.Column="3" VerticalAlignment="Center" Name="StiffnessCheck" Checked="StiffnessCheck_Checked" Unchecked="StiffnessCheck_Unchecked">Stiffness</CheckBox>
+        <TextBox Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2" Name="FileNameBox" MaxHeight="27" TextChanged="FileNameBox_TextChanged"/>
+        <TextBlock Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="1" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">Name:</TextBlock>
+    </Grid>
+</Window>

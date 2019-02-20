@@ -26,7 +26,7 @@ namespace CalScec.DataManagment.Files.SCEC
 
         public int ActPatternId;
 
-        private double _usedWaveLength = CalScec.Properties.Settings.Default.UsedWaveLength;
+        private double _usedWaveLength;
         public double UsedWaveLength
         {
             get
@@ -77,13 +77,24 @@ namespace CalScec.DataManagment.Files.SCEC
 
         #endregion
 
+        #region EPSC
+
+        public List<Analysis.Stress.Plasticity.ElastoPlasticExperiment> SimulationData = new List<Analysis.Stress.Plasticity.ElastoPlasticExperiment>();
+
+        public List<PlasticityTensorInformation> PlasticTensor = new List<PlasticityTensorInformation>();
+
+        #endregion
+
+        public List<MathNet.Numerics.LinearAlgebra.Matrix<double>> StressTransitionFactors = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
+
         public Header(Analysis.Sample sample)
         {
             this.ActPatternId = sample.ActualPatterId;
             this.SampleArea = sample.Area;
             this.SampleName = sample.Name;
-
-            for(int n = 0; n < sample.CrystalData.Count; n++)
+            this._usedWaveLength = CalScec.Properties.Settings.Default.UsedWaveLength;
+            
+            for (int n = 0; n < sample.CrystalData.Count; n++)
             {
                 this.CrystalData.Add(new DataManagment.CrystalData.CODData(sample.CrystalData[n]));
 
@@ -108,7 +119,11 @@ namespace CalScec.DataManagment.Files.SCEC
 
                     this.ODFData.Add(ODFDataTmp);
                 }
+
+                this.PlasticTensor.Add(new PlasticityTensorInformation(sample.PlasticTensor[n]));
             }
+
+            this.SimulationData = sample.SimulationData;
 
             for (int n = 0; n < sample.MacroElasticData.Count; n++)
             {
@@ -119,6 +134,8 @@ namespace CalScec.DataManagment.Files.SCEC
             {
                 this.ContainingPatterns.Add(new PatternInformation(sample.DiffractionPatterns[n]));
             }
+
+            this.StressTransitionFactors = sample.StressTransitionFactors;
         }
 
         public Analysis.Sample GetSample()
@@ -128,10 +145,41 @@ namespace CalScec.DataManagment.Files.SCEC
             Ret.Name = this.SampleName;
             Ret.Area = this.SampleArea;
 
-            for(int n = 0; n < this.CrystalData.Count; n++)
+            CalScec.Properties.Settings.Default.UsedWaveLength = this._usedWaveLength;
+            Ret.SimulationData = this.SimulationData;
+            if (this.StressTransitionFactors == null)
+            {
+                for (int n = 0; n < this.CrystalData.Count; n++)
+                {
+                    MathNet.Numerics.LinearAlgebra.Matrix<double> tmp = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(6, 6, 0.0);
+                    Ret.StressTransitionFactors.Add(tmp);
+                }
+            }
+            else
+            {
+                Ret.StressTransitionFactors = this.StressTransitionFactors;
+            }
+
+            for (int n = 0; n < this.CrystalData.Count; n++)
             {
                 Ret.CrystalData.Add(new DataManagment.CrystalData.CODData(CrystalData[n]));
+
+                if(Ret.CrystalData[n].inclusionDimension == null)
+                {
+                    double[] tmp = { 0.0, 0.0, 0.0 };
+                    Ret.CrystalData[n].inclusionDimension = tmp;
+                    Ret.CrystalData[n].Matrix = true;
+                }
                 string SymString = "";
+                try
+                {
+                    Ret.PlasticTensor.Add(this.PlasticTensor[n].GetPlastticityTensor());
+                }
+                catch
+                {
+                    Ret.PlasticTensor.Add(new Analysis.Stress.Plasticity.PlasticityTensor());
+                    Ret.PlasticTensor[n].YieldSurfaceData = new Analysis.Stress.Plasticity.YieldSurface(this.CrystalData[n]);
+                }
                 try
                 {
                     Ret.VoigtTensorData.Add(this.VoigtTensorInformation[n].GetElasticityTensor());
@@ -205,6 +253,7 @@ namespace CalScec.DataManagment.Files.SCEC
                 {
 
                 }
+                Ret.DiffractionConstantsTexture.Add(new List<Analysis.Stress.Microsopic.REK>());
             }
 
             if (this.ODFData != null && this.ODFData.Count != 0)

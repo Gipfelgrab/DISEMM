@@ -7,40 +7,152 @@
         mc:Ignorable="d"
         xmlns:oxycore="clr-namespace:OxyPlot;assembly=OxyPlot"
         xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
-        Title="YieldSurfaceWindow" Height="600" Width="900">
+        Title="YieldSurfaceWindow" Height="1100" Width="1400">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.3*"/>
-            <ColumnDefinition Width="0.7*"/>
+            <ColumnDefinition Width="0.2*"/>
+            <ColumnDefinition Width="0.4*"/>
+            <ColumnDefinition Width="0.4*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="0.4*"/>
                 <RowDefinition Height="0.6*"/>
             </Grid.RowDefinitions>
-            <ListView Name="ReflexList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5" SelectionChanged="ReflexList_SelectionChanged">
+            <ListView Name="ReflexList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5" SelectionChanged="ReflexList_SelectionChanged" KeyDown="ReflexList_KeyDown">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Width="100" Header="Reflex" DisplayMemberBinding="{Binding Path=Reflex.HKLString}"/>
-                        <GridViewColumn Width="100" Header="Yield strength" DisplayMemberBinding="{Binding Path=YieldStrength}"/>
+                        <GridViewColumn Width="100" Header="Reflex" DisplayMemberBinding="{Binding Path=HKLString}"/>
+                        <GridViewColumn Width="100" Header="Yield strength" DisplayMemberBinding="{Binding Path=YieldMainStrength}"/>
+                        <GridViewColumn Width="100" Header="Slip Direction" DisplayMemberBinding="{Binding Path=HKLStringSlipDirection}"/>
+                        <GridViewColumn Width="70" Header="Plains" DisplayMemberBinding="{Binding Path=PlainMainMultiplizity}"/>
+                        <GridViewColumn Width="70" Header="Directions" DisplayMemberBinding="{Binding Path=DirectionMainMultiplizity}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
             <ListView Grid.Row="1" Name="PeakList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Width="100" Header="Lattice distance" DisplayMemberBinding="{Binding Path=Name}"/>
-                        <GridViewColumn Width="200" Header="Pattern name" DisplayMemberBinding="{Binding Path=Name}"/>
+                        <GridViewColumn Width="100" Header="Lattice distance" DisplayMemberBinding="{Binding Path=DifPeak.LatticeDistance}"/>
+                        <GridViewColumn Width="200" Header="Psi Angle" DisplayMemberBinding="{Binding Path=psiAngle}"/>
+                        <GridViewColumn Width="200" Header="Strain" DisplayMemberBinding="{Binding Path=Strain}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
         </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="0.65*"/>
+                <RowDefinition Height="0.7*"/>
                 <RowDefinition Height="0.35*"/>
+                <RowDefinition Height="0.45*"/>
             </Grid.RowDefinitions>
-            <oxy:PlotView Name="MainYieldPlot" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
+            <GroupBox Grid.Row="0" Grid.Column="1" Header="Experimental Settings">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <GroupBox Grid.Column="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <ComboBox Grid.Row="4" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalDataSelection" Margin="5,0,5,0" SelectionChanged="ExperimentalDataSelection_SelectionChanged">
+                                    <ComboBoxItem Content="Stress (c. f.)"/>
+                                    <ComboBoxItem Content="Strain (c. f.)"/>
+                                    <ComboBoxItem Content="Stress rate (c. f.)"/>
+                                    <ComboBoxItem Content="Strain rate (c. f.)"/>
+                                    <ComboBoxItem Content="Hardening history (c. f.)"/>
+                                    <ComboBoxItem Content="Stress (s. f.)"/>
+                                    <ComboBoxItem Content="Strain (s. f.)"/>
+                                    <ComboBoxItem Content="Stress rate (s. f.)"/>
+                                    <ComboBoxItem Content="Strain rate (s. f.)"/>
+                                    <ComboBoxItem Content="Hardening history (s. f.)"/>
+                                </ComboBox>
+                                <Grid Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="0.1*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="0.1*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="1" Text="-" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="3" Text="-" VerticalAlignment="Center"/>
+
+                                    <TextBox Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="EViewDirectionC1" ToolTip="Viewing direction in crystal frame along C1" Margin="5,0,5,0"/>
+                                    <TextBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="EViewDirectionC2" ToolTip="Viewing direction in crystal frame along C2" Margin="5,0,5,0"/>
+                                    <TextBox Grid.Row="0" Grid.Column="4" HorizontalAlignment="Stretch" MaxHeight="30" Name="EViewDirectionC3" ToolTip="Viewing direction in crystal frame along C3" Margin="5,0,5,0"/>
+                                </Grid>
+                                <Grid Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="0.1*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="0.1*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="1" Text="-" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="3" Text="-" VerticalAlignment="Center"/>
+
+                                    <TextBox Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="EViewDirection2C1" ToolTip="Viewing direction in crystal frame along C1" Margin="5,0,5,0"/>
+                                    <TextBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="EViewDirection2C2" ToolTip="Viewing direction in crystal frame along C2" Margin="5,0,5,0"/>
+                                    <TextBox Grid.Row="0" Grid.Column="4" HorizontalAlignment="Stretch" MaxHeight="30" Name="EViewDirection2C3" ToolTip="Viewing direction in crystal frame along C3" Margin="5,0,5,0"/>
+                                </Grid>
+                                
+                                <Button Grid.Row="0" Grid.Column="0" MaxHeight="28" Margin="0,0,0,0" Name="DriveToStress" Content="Drive to Value" Click="DriveToStress_Click"/>
+                                <CheckBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Name="SampleFrameSimulation" Checked="SampleFrameSimulation_Checked" Unchecked="SampleFrameSimulation_Unchecked">Sample Frame</CheckBox>
+                                <CheckBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Name="CrystalFrameSimulation" Checked="CrystalFrameSimulation_Checked" Unchecked="CrystalFrameSimulation_Unchecked">Crystal Frame</CheckBox>
+
+                                <TextBox Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalTicks" ToolTip="Ticks to drive" Margin="5,0,5,0"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalChiAngle" ToolTip="chi Angle" Margin="5,0,5,0" TextChanged="ExperimentalChiAngle_TextChanged"/>
+                                <TextBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalOmegaAngle" ToolTip="omega" Margin="5,0,5,0" TextChanged="ExperimentalOmegaAngle_TextChanged"/>
+                                <TextBox Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalValue33" ToolTip="Drive to Value in 33 direction" Margin="5,0,5,0"/>
+                                <TextBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalValue11" ToolTip="Drive to Value in 11 direction" Margin="5,0,5,0"/>
+                                <TextBox Grid.Row="2" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalValue22" ToolTip="Drive to Value in 22 direction" Margin="5,0,5,0"/>
+                                <TextBox Grid.Row="3" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalValue12" ToolTip="Drive to Value in 12 direction" Margin="5,0,5,0"/>
+                                <TextBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalValue13" ToolTip="Drive to Value in 13 direction" Margin="5,0,5,0"/>
+                                <TextBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalValue23" ToolTip="Drive to Value in 23 direction" Margin="5,0,5,0"/>
+
+                                <Button Grid.Row="5" Grid.Column="1" MaxHeight="28"  Margin="5,0,5,0" Name="SimulateExperiment" Content="Simulate experiment" Click="SimulateExperiment_Click"/>
+                                <Button Grid.Row="0" Grid.Column="3" MaxHeight="28"  Margin="5,0,5,0" Name="ShowExperiment" Content="Show experiment" Click="ShowExperiment_Click"/>
+                                <Button Grid.Row="1" Grid.Column="3" MaxHeight="28"  Margin="5,0,5,0" Name="ClearPlot" Content="Clear plot" Click="ClearPlot_Click"/>
+
+                                <Button Grid.Row="5" Grid.Column="2" MaxHeight="28"  Margin="5,0,5,0" Name="AddNewExperiment" Content="Add new experiment" Click="AddNewExperiment_Click"/>
+                                <ComboBox Grid.Row="5" Grid.Column="3" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentSelection" Margin="5,0,5,0" SelectionChanged="ExperimentSelection_SelectionChanged"/>
+                                <!--<TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextWrapping="Wrap">
+                                            asdf
+                            </TextBlock>-->
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                    <DataGrid Grid.Row="1" Margin="5,5,5,5" Name="StressTensorData" CellEditEnding="StressTensorData_CellEditEnding" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="11" Width="75" Binding="{Binding Path=Value1}"/>
+                            <DataGridTextColumn Header="22" Width="75" Binding="{Binding Path=Value2}"/>
+                            <DataGridTextColumn Header="33" Width="75" Binding="{Binding Path=Value3}"/>
+                            <DataGridTextColumn Header="12" Width="75" Binding="{Binding Path=Value4}"/>
+                            <DataGridTextColumn Header="13" Width="75" Binding="{Binding Path=Value5}"/>
+                            <DataGridTextColumn Header="23" Width="75" Binding="{Binding Path=Value6}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </GroupBox>
             <GroupBox Grid.Row="1" Header="Parameters">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -56,10 +168,10 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="PhaseSwitchBox" SelectionChanged="PhaseSwitchBox_SelectionChanged"/>
-                            <Button Grid.Row="2" MaxHeight="28" Margin="0,0,0,0" Name="ReflexGroup" Content="Group Reflexes" Click="ReflexGroup_Click"/>
+                            <Button Grid.Row="2" MaxHeight="28" Margin="0,1,0,-1" Name="ReflexGroup" Content="Group Reflexes" Click="ReflexGroup_Click"/>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Column="1" Header="Region management">
+                    <!--<GroupBox Grid.Column="1" Header="Region management">
                         <Grid Margin="5,5,5,5">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
@@ -72,18 +184,152 @@
                             <TextBox Grid.Row="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="PlasticLow" ToolTip="Lower plastic border"/>
                             <TextBox Grid.Row="3" HorizontalAlignment="Stretch" MaxHeight="30" Name="PlasticHigh" ToolTip="Upper plastic border"/>
                         </Grid>
-                    </GroupBox>
-                    <GroupBox Grid.Column="2" Header="Results">
+                    </GroupBox>-->
+                    <GroupBox Grid.Column="1" Header="Results">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <Button Grid.Row="3" MaxHeight="28" Margin="0,0,0,0" Name="FitYieldStrenght" Content="Fit yield strength" Click="FitYieldStrenght_Click"/>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="ReflexYieldSlipDirection" ToolTip="ReflexYield in slip direction" TextChanged="ReflexYieldSlipDirection_TextChanged"/>
+                            <TextBox Grid.Row="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="ReflexYieldSlipDirectionSecondary" ToolTip="ReflexYield in secondary slip direction" TextChanged="ReflexYieldSlipDirectionSecondary_TextChanged"/>
+
+                            <ComboBox Grid.Row="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="CalculationModel">
+                                <ComboBoxItem Content="Reuss"/>
+                                <ComboBoxItem Content="Hill"/>
+                                <ComboBoxItem Content="Kroener"/>
+                                <ComboBoxItem Content="DeWit"/>
+                                <ComboBoxItem Content="Geo Hill"/>
+                            </ComboBox>
+                            <Button Grid.Row="3" Grid.Column="1" MaxHeight="28" Margin="0,0,0,0" Name="ShowTestData" Content="Calcualted E data" Click="ShowTestData_Click"/>
+                            <Button Grid.Row="5" Grid.Column="1" MaxHeight="28" Margin="0,0,0,0" Name="FitYieldStrenght" Content="Fit yield strength" Click="FitYieldStrenght_Click"/>
                         </Grid>
                     </GroupBox>
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="2" Header="Plastic constants">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ComboBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="SelectedStiffnessTensor" Margin="5,0,5,0">
+                        <ComboBoxItem Content="Effective"/>
+                        <ComboBoxItem Content="Constraint"/>
+                        <ComboBoxItem Content="Grain"/>
+                    </ComboBox>
+                    <ComboBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="StiffnessComplianceSwitch" Margin="5,0,5,0">
+                        <ComboBoxItem Content="Stiffenss"/>
+                        <ComboBoxItem Content="Compliance"/>
+                    </ComboBox>
+                    <Button Grid.Row="0" Grid.Column="2" MaxHeight="28" Margin="0,0,0,0" Name="PlotPlasticData" Content="Plot calc." Click="PlotPlasticData_Click"/>
+                    <TextBox Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="Plastic11" ToolTip="[1, 1]" Margin="5,0,5,0" TextChanged="Plastic11_TextChanged"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="Plastic12" ToolTip="[1, 2]" Margin="5,0,5,0" TextChanged="Plastic12_TextChanged"/>
+                    <TextBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="Plastic44" ToolTip="[4, 4]" Margin="5,0,5,0" TextChanged="Plastic44_TextChanged"/>
+                    <TextBox Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="Plastic13" ToolTip="[1, 3]" Margin="5,0,5,0" TextChanged="Plastic13_TextChanged"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="Plastic33" ToolTip="[3, 3]" Margin="5,0,5,0" TextChanged="Plastic33_TextChanged"/>
+
+                    <TextBox Grid.Row="3" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="SampleYieldStrength" ToolTip="Total phase yield" Margin="5,0,5,0" TextChanged="SampleYieldStrength_TextChanged"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="SampleStrainRate" ToolTip="Sample strain rate" Margin="5,0,5,0" TextChanged="SampleStrainRate_TextChanged"/>
+                    <TextBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="SampleHardenningRate" ToolTip="Sample hardening rate" Margin="5,0,5,0" TextChanged="SampleHardenningRate_TextChanged"/>
+                </Grid>
+            </GroupBox>
+        </Grid>
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="0.7*"/>
+                <RowDefinition Height="0.35*"/>
+                <RowDefinition Height="0.45*"/>
+            </Grid.RowDefinitions>
+            <!--<oxy:PlotView Name="FractionPlot" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>-->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <DataGrid Grid.Row="0" Margin="5,5,5,5" Name="PotenitalSlipSystemsList" AutoGenerateColumns="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Slip Plane" Width="100" Binding="{Binding Path=HKLString}"/>
+                        <DataGridTextColumn Header="Yield strength" Width="100" Binding="{Binding Path=YieldMainStrength}"/>
+                        <DataGridTextColumn Header="Slip Direction" Width="100" Binding="{Binding Path=HKLStringSlipDirection}"/>
+                        <DataGridTextColumn Header="Plains" Width="75" Binding="{Binding Path=PlainMainMultiplizity}"/>
+                        <DataGridTextColumn Header="Directions" Width="75" Binding="{Binding Path=DirectionMainMultiplizity}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.8*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                
+                <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="x-Axes (m):"/>
+                <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="y-Axes (m):"/>
+                <Label Grid.Column="0" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="x-Axes (f):"/>
+                <Label Grid.Column="0" Grid.Row="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="y-Axes (f):"/>
+                <ComboBox Grid.Column="1" Grid.Row="0" Name="yAxesm" MaxWidth="350" MaxHeight="30" Margin="0,5,0,5" SelectionChanged="yAxesm_SelectionChanged"/>
+                <ComboBox Grid.Column="1" Grid.Row="1" Name="xAxesm" MaxWidth="350" MaxHeight="30" Margin="0,5,0,5" SelectionChanged="xAxesm_SelectionChanged"/>
+                <ComboBox Grid.Column="1" Grid.Row="2" Name="yAxesf" MaxWidth="350" MaxHeight="30" Margin="0,5,0,5" SelectionChanged="yAxesf_SelectionChanged"/>
+                <ComboBox Grid.Column="1" Grid.Row="3" Name="xAxesf" MaxWidth="350" MaxHeight="30" Margin="0,5,0,5" SelectionChanged="xAxesf_SelectionChanged"/>
+                <Label Grid.Column="2" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Psi Angle (m):"/>
+                <Label Grid.Column="2" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Psi Angle (f):"/>
+                <ComboBox Grid.Column="3" Grid.Row="0" Name="PsiAnglem" MaxWidth="350" MaxHeight="30" Margin="0,5,0,5" SelectionChanged="PsiAnglem_SelectionChanged"/>
+                <ComboBox Grid.Column="3" Grid.Row="1" Name="PsiAnglef" MaxWidth="350" MaxHeight="30" Margin="0,5,0,5" SelectionChanged="PsiAnglef_SelectionChanged"/>
+                <CheckBox Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Name="PlotAllPsim" Checked="PlotAllPsim_Checked" Unchecked="PlotAllPsim_Unchecked">Plot all psi</CheckBox>
+                <CheckBox Grid.Row="2" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" Name="PlotSimulatedData">Simulated Data</CheckBox>
+            </Grid>
+            <GroupBox Grid.Row="2" Header="Stress and Hardening">
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <DataGrid Grid.Row="0" Margin="5,5,5,5" Name="HardenningTensorData" CellEditEnding="HardenningTensorData_CellEditEnding">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="H 1" Width="75" Binding="{Binding Path=Value1}"/>
+                            <DataGridTextColumn Header="H 2" Width="75" Binding="{Binding Path=Value2}"/>
+                            <DataGridTextColumn Header="H 3" Width="75" Binding="{Binding Path=Value3}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    
+                    <DataGrid Grid.Row="1" Grid.Column="1" Margin="5,5,5,5" Name="SelectedStressTensorData" CellEditEnding="StressTensorData_CellEditEnding">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Stress 1" Width="75" Binding="{Binding Path=Value1}"/>
+                            <DataGridTextColumn Header="Stress 2" Width="75" Binding="{Binding Path=Value2}"/>
+                            <DataGridTextColumn Header="Stress 3" Width="75" Binding="{Binding Path=Value3}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
             </GroupBox>
         </Grid>

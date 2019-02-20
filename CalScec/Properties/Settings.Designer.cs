@@ -169,7 +169,7 @@ namespace CalScec.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.046226")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.338905")]
         public double FWHMU {
             get {
                 return ((double)(this["FWHMU"]));
@@ -181,7 +181,7 @@ namespace CalScec.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("-0.096256")]
+        [global::System.Configuration.DefaultSettingValueAttribute("-0.001")]
         public double FWHMV {
             get {
                 return ((double)(this["FWHMV"]));
@@ -193,7 +193,7 @@ namespace CalScec.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.148902")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.001674")]
         public double FWHMW {
             get {
                 return ((double)(this["FWHMW"]));
@@ -265,7 +265,7 @@ namespace CalScec.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1.5488")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.12619")]
         public double UsedWaveLength {
             get {
                 return ((double)(this["UsedWaveLength"]));
@@ -409,7 +409,7 @@ namespace CalScec.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public double PeakWidthFWHM {
             get {
                 return ((double)(this["PeakWidthFWHM"]));
@@ -697,7 +697,7 @@ namespace CalScec.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public int CubicFittingModel {
             get {
                 return ((int)(this["CubicFittingModel"]));
@@ -728,6 +728,42 @@ namespace CalScec.Properties {
             }
             set {
                 this["UsedPeakDetectionId"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ODFSymmetricCalculation {
+            get {
+                return ((bool)(this["ODFSymmetricCalculation"]));
+            }
+            set {
+                this["ODFSymmetricCalculation"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TextureTopologyCheck {
+            get {
+                return ((bool)(this["TextureTopologyCheck"]));
+            }
+            set {
+                this["TextureTopologyCheck"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ActivateDECTextureWeighting {
+            get {
+                return ((bool)(this["ActivateDECTextureWeighting"]));
+            }
+            set {
+                this["ActivateDECTextureWeighting"] = value;
             }
         }
     }

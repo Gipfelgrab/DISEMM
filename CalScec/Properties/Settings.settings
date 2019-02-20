@@ -39,13 +39,13 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="FWHMU" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0.046226</Value>
+      <Value Profile="(Default)">0.338905</Value>
     </Setting>
     <Setting Name="FWHMV" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">-0.096256</Value>
+      <Value Profile="(Default)">-0.001</Value>
     </Setting>
     <Setting Name="FWHMW" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0.148902</Value>
+      <Value Profile="(Default)">0.001674</Value>
     </Setting>
     <Setting Name="HyperSensitivity" Type="System.Double" Scope="User">
       <Value Profile="(Default)">3.5</Value>
@@ -63,7 +63,7 @@
       <Value Profile="(Default)">16</Value>
     </Setting>
     <Setting Name="UsedWaveLength" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">1.5488</Value>
+      <Value Profile="(Default)">0.12619</Value>
     </Setting>
     <Setting Name="MaxMeasurmentAngle" Type="System.Double" Scope="User">
       <Value Profile="(Default)">180</Value>
@@ -99,7 +99,7 @@
       <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="PeakWidthFWHM" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">3</Value>
+      <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="FitWindowIsMaximized" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -171,13 +171,22 @@
       <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="CubicFittingModel" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">2</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="RandomProbabilityIntervall" Type="System.Double" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="UsedPeakDetectionId" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="ODFSymmetricCalculation" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="TextureTopologyCheck" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ActivateDECTextureWeighting" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

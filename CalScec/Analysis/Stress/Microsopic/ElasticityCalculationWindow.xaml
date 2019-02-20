@@ -541,8 +541,9 @@
                                             <ListView Grid.Row="1" Name="TextureFittingPoolList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
                                                 <ListView.View>
                                                     <GridView>
-                                                        <GridViewColumn Width="100" Header="Model" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
-                                                        <GridViewColumn Width="100" Header="Started" DisplayMemberBinding="{Binding Path=MacroscopicS1}"/>
+                                                        <GridViewColumn Width="100" Header="Model" DisplayMemberBinding="{Binding Path=ModelName}"/>
+                                                        <GridViewColumn Width="100" Header="Started" DisplayMemberBinding="{Binding Path=TimeAdded}"/>
+                                                        <GridViewColumn Width="100" Header="Trial" DisplayMemberBinding="{Binding Path=LMATrial}"/>
                                                     </GridView>
                                                 </ListView.View>
                                             </ListView>
@@ -571,18 +572,73 @@
                         </ListView.View>
                     </ListView>
                 </GroupBox>
-                <GroupBox Grid.Column="1" Grid.Row="1" Header="List of macroscopic REKs">
-                    <ListView Name="REKMacroskopicCalculationList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Width="100" Header="(H K L)" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
-                                <GridViewColumn Width="100" Header="S1" DisplayMemberBinding="{Binding Path=MacroscopicS1}"/>
-                                <GridViewColumn Width="100" Header="S1 Error" DisplayMemberBinding="{Binding Path=MacroscopicS1Error}"/>
-                                <GridViewColumn Width="100" Header="S2" DisplayMemberBinding="{Binding Path=MacroscopicHS2}"/>
-                                <GridViewColumn Width="100" Header="S2 Error" DisplayMemberBinding="{Binding Path=MacroscopicHS2Error}"/>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
+                <GroupBox Grid.Column="1" Grid.Row="1" Header="Anisotropy parameters">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.5*"/>
+                            <RowDefinition Height="0.5*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Fixed Anisotropy value:"/>
+                            <TextBox Grid.Column="1" Grid.Row="1" Name="FixedAnisotropy" Margin="2,2,2,2" TextChanged="ZehnderAnisotropy_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15"/>
+                            <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Zehnder Anisotropy:"/>
+                            <Label Grid.Column="1" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ZehnderAnisitropyLabel"/>
+                            <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Log-Euk Anisotropy:"/>
+                            <Label Grid.Column="1" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="LogEukAnisitropyLabel"/>
+                            <Label Grid.Column="0" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Universal Anisotropy:"/>
+                            <Label Grid.Column="1" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="UniversalAnisotropyLabel"/>
+                            <Label Grid.Column="0" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Chung Buessem Anisotropy:"/>
+                            <Label Grid.Column="1" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ChungBuessemAnistropyLabel"/>
+                            <CheckBox Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Fix Anisotropy" Name="FixAnisotropyCheckBox" Checked="FixAnisotropyCheckBox_Checked" Unchecked="FixAnisotropyCheckBox_Unchecked"/>
+                            <Button Grid.Column="1" Grid.Row="6" Content="Start Analysis" Click="StartAnalysis_Click"></Button>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0.6*"/>
+                                <RowDefinition Height="0.4*"/>
+                            </Grid.RowDefinitions>
+                            <ListView Grid.Row="0" Name="StressTransitionFactorView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Width="100" Header="F1" DisplayMemberBinding="{Binding Path=f1}"/>
+                                        <GridViewColumn Width="100" Header="F2" DisplayMemberBinding="{Binding Path=f2}"/>
+                                        <GridViewColumn Width="100" Header="F3" DisplayMemberBinding="{Binding Path=f3}"/>
+                                        <GridViewColumn Width="100" Header="F4" DisplayMemberBinding="{Binding Path=f4}"/>
+                                        <GridViewColumn Width="100" Header="F5" DisplayMemberBinding="{Binding Path=f5}"/>
+                                        <GridViewColumn Width="100" Header="F6" DisplayMemberBinding="{Binding Path=f6}"/>
+                                    </GridView>
+                                </ListView.View>
+                            </ListView>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Button Grid.Column="0" Grid.Row="0" Content="Reset Stress" MaxHeight="32" Margin="5,5,5,5" Click="ResetPhaseStresses_Click"></Button>
+                                <Button Grid.Column="1" Grid.Row="0" Content="Refit DEC" MaxHeight="32" Margin="5,5,5,5" Click="RefitAllDEC_Click"></Button>
+
+                                <Button Grid.Column="2" Grid.Row="0" Content="Set transition factors" MaxHeight="32" Margin="5,5,5,5" Click="SetTransitionFactors_Click"></Button>
+                            </Grid>
+                        </Grid>
+                    </Grid>
                 </GroupBox>
             </Grid>
         </GroupBox>

@@ -35,7 +35,7 @@
   <SlipSystem>
     <SpaceGroup>P 63/m m c</SpaceGroup>
     <SpaceGroupId>194</SpaceGroupId>
-    <SlipPlain>001</SlipPlain>
+    <SlipPlain>002</SlipPlain>
     <SlipDirection>110</SlipDirection>
     <PlainCount>1</PlainCount>
     <DirectionCount>3</DirectionCount>

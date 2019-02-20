@@ -42,6 +42,8 @@ namespace CalScec.DataManagment.Files.SCEC
         public double Stress;
         public double Force;
 
+        public double MarcroStrain;
+
         public Pattern.Counts PatternCounts;
 
         public List<PeakFunctionInformation> FoundPeaks = new List<PeakFunctionInformation>();
@@ -59,6 +61,7 @@ namespace CalScec.DataManagment.Files.SCEC
             this.PhiSampleAngle = DP.PhiSampleAngle;
             this.Stress = DP.Stress;
             this.Force = DP.Force;
+            this.MarcroStrain = DP.MacroStrain;
 
             this.PatternCounts = DP.PatternCounts.Clone() as Pattern.Counts;
 
@@ -91,6 +94,8 @@ namespace CalScec.DataManagment.Files.SCEC
             }
             Ret.Stress = this.Stress;
             Ret.Force = this.Force;
+
+            Ret.MacroStrain = this.MarcroStrain;
 
             Ret.PatternCounts = this.PatternCounts.Clone() as Pattern.Counts;
 

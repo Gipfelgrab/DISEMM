@@ -26,11 +26,55 @@ namespace CalScec.Analysis.Stress.Plasticity
         public MathNet.Numerics.LinearAlgebra.Matrix<double> _effectiveComplianceTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
         public MathNet.Numerics.LinearAlgebra.Matrix<double> _effectiveComplianceTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _isotropicHardenningTensor;
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _independentHardenningTensor;
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _kinematicHardenningTensor;
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> _hardenningTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> _isotropicHardenningTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> _independentHardenningTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> _kinematicHardenningTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
 
-        private int _symmetry;
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> _plasticStrainRate = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        public List<MathNet.Numerics.LinearAlgebra.Matrix<double>> appliedCrystalStress = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
+
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> _phaseStrainRate = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        public double PhaseStrainRate
+        {
+            get
+            {
+                return this._phaseStrainRate[2, 2];
+            }
+            set
+            {
+                this._phaseStrainRate[2, 2] = value;
+            }
+        }
+
+        private double _phaseHardeningRate;
+        public double PhaseHardeningRate
+        {
+            get
+            {
+                return this._phaseHardeningRate;
+            }
+            set
+            {
+                this._phaseHardeningRate = value;
+            }
+        }
+        private double _phaseYieldStrength;
+        public double PhaseYieldStrength
+        {
+            get
+            {
+                return this._phaseYieldStrength;
+            }
+            set
+            {
+                this._phaseYieldStrength = value;
+                this.PhaseActYieldStrength = value;
+            }
+        }
+        public double PhaseActYieldStrength = 0.0;
+
+        public int _symmetry;
         public string Symmetry
         {
             get
@@ -96,6 +140,398 @@ namespace CalScec.Analysis.Stress.Plasticity
                 }
             }
         }
+
+        #region Voigt notation
+
+        #region stiffness
+
+        public double EffectiveC11
+        {
+            get
+            {
+                return this._effectiveStiffnessTensor[0, 0];
+            }
+            set
+            {
+                this._effectiveStiffnessTensor[0, 0] = value;
+                if(this._symmetry == 1)
+                {
+                    this._effectiveStiffnessTensor[1, 1] = value;
+                    this._effectiveStiffnessTensor[2, 2] = value;
+                }
+                else if(this._symmetry == 2)
+                {
+                    this._effectiveStiffnessTensor[1, 1] = value;
+                }
+            }
+        }
+        public double EffectiveC33
+        {
+            get
+            {
+                return this._effectiveStiffnessTensor[2, 2];
+            }
+            set
+            {
+                this._effectiveStiffnessTensor[2, 2] = value;
+                if (this._symmetry == 1)
+                {
+                    this._effectiveStiffnessTensor[0, 0] = value;
+                    this._effectiveStiffnessTensor[1, 1] = value;
+                }
+            }
+        }
+
+        public double EffectiveC12
+        {
+            get
+            {
+                return this._effectiveStiffnessTensor[0, 1];
+            }
+            set
+            {
+                this._effectiveStiffnessTensor[0, 1] = value;
+                if (this._symmetry == 1)
+                {
+                    this._effectiveStiffnessTensor[1, 2] = value;
+                    this._effectiveStiffnessTensor[0, 2] = value;
+                }
+            }
+        }
+        public double EffectiveC13
+        {
+            get
+            {
+                return this._effectiveStiffnessTensor[0, 2];
+            }
+            set
+            {
+                this._effectiveStiffnessTensor[0, 2] = value;
+                if (this._symmetry == 1)
+                {
+                    this._effectiveStiffnessTensor[0, 1] = value;
+                    this._effectiveStiffnessTensor[1, 2] = value;
+                }
+                else if (this._symmetry == 2)
+                {
+                    this._effectiveStiffnessTensor[1, 2] = value;
+                }
+            }
+        }
+
+        public double EffectiveC44
+        {
+            get
+            {
+                return this._effectiveStiffnessTensor[3, 3];
+            }
+            set
+            {
+                this._effectiveStiffnessTensor[3, 3] = value;
+                if (this._symmetry == 1)
+                {
+                    this._effectiveStiffnessTensor[4, 4] = value;
+                    this._effectiveStiffnessTensor[5, 5] = value;
+                }
+                else if (this._symmetry == 2)
+                {
+                    this._effectiveStiffnessTensor[4, 4] = value;
+                }
+            }
+        }
+
+        #endregion
+
+        #region compliance
+
+        public double EffectiveS11
+        {
+            get
+            {
+                return this._effectiveComplianceTensor[0, 0];
+            }
+            set
+            {
+                this._effectiveComplianceTensor[0, 0] = value;
+                if (this._symmetry == 1)
+                {
+                    this._effectiveComplianceTensor[1, 1] = value;
+                    this._effectiveComplianceTensor[2, 2] = value;
+                }
+                else if (this._symmetry == 2)
+                {
+                    this._effectiveComplianceTensor[1, 1] = value;
+                }
+            }
+        }
+        public double EffectiveS33
+        {
+            get
+            {
+                return this._effectiveComplianceTensor[2, 2];
+            }
+            set
+            {
+                this._effectiveComplianceTensor[2, 2] = value;
+                if (this._symmetry == 1)
+                {
+                    this._effectiveComplianceTensor[0, 0] = value;
+                    this._effectiveComplianceTensor[1, 1] = value;
+                }
+            }
+        }
+
+        public double EffectiveS12
+        {
+            get
+            {
+                return this._effectiveComplianceTensor[0, 1];
+            }
+            set
+            {
+                this._effectiveComplianceTensor[0, 1] = value;
+                if (this._symmetry == 1)
+                {
+                    this._effectiveComplianceTensor[1, 2] = value;
+                    this._effectiveComplianceTensor[0, 2] = value;
+                }
+            }
+        }
+        public double EffectiveS13
+        {
+            get
+            {
+                return this._effectiveComplianceTensor[0, 2];
+            }
+            set
+            {
+                this._effectiveComplianceTensor[0, 2] = value;
+                if (this._symmetry == 1)
+                {
+                    this._effectiveComplianceTensor[0, 1] = value;
+                    this._effectiveComplianceTensor[1, 2] = value;
+                }
+                else if (this._symmetry == 2)
+                {
+                    this._effectiveComplianceTensor[1, 2] = value;
+                }
+            }
+        }
+
+        public double EffectiveS44
+        {
+            get
+            {
+                return this._effectiveComplianceTensor[3, 3];
+            }
+            set
+            {
+                this._effectiveComplianceTensor[3, 3] = value;
+                if (this._symmetry == 1)
+                {
+                    this._effectiveComplianceTensor[4, 4] = value;
+                    this._effectiveComplianceTensor[5, 5] = value;
+                }
+                else if (this._symmetry == 2)
+                {
+                    this._effectiveComplianceTensor[4, 4] = value;
+                }
+            }
+        }
+
+        public double GrainS11
+        {
+            get
+            {
+                return this._instantaneousGrainComplianceTensor[0, 0];
+            }
+            set
+            {
+                this._instantaneousGrainComplianceTensor[0, 0] = value;
+                if (this._symmetry == 1)
+                {
+                    this._instantaneousGrainComplianceTensor[1, 1] = value;
+                    this._instantaneousGrainComplianceTensor[2, 2] = value;
+                }
+                else if (this._symmetry == 2)
+                {
+                    this._instantaneousGrainComplianceTensor[1, 1] = value;
+                }
+            }
+        }
+        public double GrainS33
+        {
+            get
+            {
+                return this._instantaneousGrainComplianceTensor[2, 2];
+            }
+            set
+            {
+                this._instantaneousGrainComplianceTensor[2, 2] = value;
+                if (this._symmetry == 1)
+                {
+                    this._instantaneousGrainComplianceTensor[0, 0] = value;
+                    this._instantaneousGrainComplianceTensor[1, 1] = value;
+                }
+            }
+        }
+
+        public double GrainS12
+        {
+            get
+            {
+                return this._instantaneousGrainComplianceTensor[0, 1];
+            }
+            set
+            {
+                this._instantaneousGrainComplianceTensor[0, 1] = value;
+                if (this._symmetry == 1)
+                {
+                    this._instantaneousGrainComplianceTensor[1, 2] = value;
+                    this._instantaneousGrainComplianceTensor[0, 2] = value;
+                }
+            }
+        }
+        public double GrainS13
+        {
+            get
+            {
+                return this._instantaneousGrainComplianceTensor[0, 2];
+            }
+            set
+            {
+                this._instantaneousGrainComplianceTensor[0, 2] = value;
+                if (this._symmetry == 1)
+                {
+                    this._instantaneousGrainComplianceTensor[0, 1] = value;
+                    this._instantaneousGrainComplianceTensor[1, 2] = value;
+                }
+                else if (this._symmetry == 2)
+                {
+                    this._instantaneousGrainComplianceTensor[1, 2] = value;
+                }
+            }
+        }
+
+        public double GrainS44
+        {
+            get
+            {
+                return this._instantaneousGrainComplianceTensor[3, 3];
+            }
+            set
+            {
+                this._instantaneousGrainComplianceTensor[3, 3] = value;
+                if (this._symmetry == 1)
+                {
+                    this._instantaneousGrainComplianceTensor[4, 4] = value;
+                    this._instantaneousGrainComplianceTensor[5, 5] = value;
+                }
+                else if (this._symmetry == 2)
+                {
+                    this._instantaneousGrainComplianceTensor[4, 4] = value;
+                }
+            }
+        }
+        
+        public double ConstraintS11
+        {
+            get
+            {
+                return this._instantaneousComplianceTensor[0, 0];
+            }
+            set
+            {
+                this._instantaneousComplianceTensor[0, 0] = value;
+                if (this._symmetry == 1)
+                {
+                    this._instantaneousComplianceTensor[1, 1] = value;
+                    this._instantaneousComplianceTensor[2, 2] = value;
+                }
+                else if (this._symmetry == 2)
+                {
+                    this._instantaneousComplianceTensor[1, 1] = value;
+                }
+            }
+        }
+        public double ConstraintS33
+        {
+            get
+            {
+                return this._instantaneousComplianceTensor[2, 2];
+            }
+            set
+            {
+                this._instantaneousComplianceTensor[2, 2] = value;
+                if (this._symmetry == 1)
+                {
+                    this._instantaneousComplianceTensor[0, 0] = value;
+                    this._instantaneousComplianceTensor[1, 1] = value;
+                }
+            }
+        }
+
+        public double ConstraintS12
+        {
+            get
+            {
+                return this._instantaneousComplianceTensor[0, 1];
+            }
+            set
+            {
+                this._instantaneousComplianceTensor[0, 1] = value;
+                if (this._symmetry == 1)
+                {
+                    this._instantaneousComplianceTensor[1, 2] = value;
+                    this._instantaneousComplianceTensor[0, 2] = value;
+                }
+            }
+        }
+        public double ConstraintS13
+        {
+            get
+            {
+                return this._instantaneousComplianceTensor[0, 2];
+            }
+            set
+            {
+                this._instantaneousComplianceTensor[0, 2] = value;
+                if (this._symmetry == 1)
+                {
+                    this._instantaneousComplianceTensor[0, 1] = value;
+                    this._instantaneousComplianceTensor[1, 2] = value;
+                }
+                else if (this._symmetry == 2)
+                {
+                    this._instantaneousComplianceTensor[1, 2] = value;
+                }
+            }
+        }
+
+        public double ConstraintS44
+        {
+            get
+            {
+                return this._instantaneousComplianceTensor[3, 3];
+            }
+            set
+            {
+                this._instantaneousComplianceTensor[3, 3] = value;
+                if (this._symmetry == 1)
+                {
+                    this._instantaneousComplianceTensor[4, 4] = value;
+                    this._instantaneousComplianceTensor[5, 5] = value;
+                }
+                else if (this._symmetry == 2)
+                {
+                    this._instantaneousComplianceTensor[4, 4] = value;
+                }
+            }
+        }
+
+        #endregion
+
+        #endregion
 
         public Texture.OrientationDistributionFunction ODF;
 

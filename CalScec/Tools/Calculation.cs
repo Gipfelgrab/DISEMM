@@ -150,15 +150,15 @@ namespace CalScec.Tools
         public static double GetEstimatedFWHM(double angle)
         {
             double Angle = angle / 2.0;
-            double Ret = CalScec.Properties.Settings.Default.FWHMU * Math.Pow(Math.Tan(Angle), 2);
-            Ret += CalScec.Properties.Settings.Default.FWHMV * Math.Tan(Angle);
+            double Ret = CalScec.Properties.Settings.Default.FWHMU * Math.Pow(Math.Tan(Angle * Math.PI / 180.0), 2);
+            Ret += CalScec.Properties.Settings.Default.FWHMV * Math.Tan(Angle * Math.PI / 180.0);
             Ret += CalScec.Properties.Settings.Default.FWHMW;
 
             Ret = Math.Sqrt(Ret);
 
-            if(Ret > 1)
+            if(Ret > 0.7)
             {
-                Ret = 1;
+                Ret = 0.7;
             }
 
             return Ret;

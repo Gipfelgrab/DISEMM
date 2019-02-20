@@ -172,6 +172,7 @@ namespace CalScec.Analysis.Stress.Macroskopic
     
     public class PeakStressAssociation
     {
+        public double PhaseFractionStress;
         public double Stress;
         public string stress
         {
@@ -265,6 +266,19 @@ namespace CalScec.Analysis.Stress.Macroskopic
             }
         }
 
+        private double _mRDValue = 0;
+        public double MRDValue
+        {
+            get
+            {
+                return this._mRDValue;
+            }
+            set
+            {
+                this._mRDValue = value;
+            }
+        }
+
         public MathNet.Numerics.LinearAlgebra.Vector<double> MeasurementDirektionVektor
         {
             get
@@ -283,6 +297,20 @@ namespace CalScec.Analysis.Stress.Macroskopic
             }
         }
 
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> CrystalSystemStress = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0);
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> CrystalSystemStrain = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0);
+
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> MeasurementSystemStress()
+        {
+            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0);
+
+            ret[0, 0] = Math.Pow(Math.Sin(this.PsiAngle * (Math.PI / 180.0)), 2) * this.Stress;
+            ret[0, 2] = -1 * Math.Cos(this.PsiAngle * (Math.PI / 180.0)) * Math.Sin(this.PsiAngle * (Math.PI / 180.0)) * this.Stress;
+            ret[2, 0] = -1 * Math.Cos(this.PsiAngle * (Math.PI / 180.0)) * Math.Sin(this.PsiAngle * (Math.PI / 180.0)) * this.Stress;
+            ret[2, 2] = Math.Pow(Math.Cos(this.PsiAngle * (Math.PI / 180.0)), 2) * this.Stress;
+
+            return ret;
+        }
 
         public Analysis.Peaks.DiffractionPeak DPeak;
         public Analysis.Peaks.DiffractionPeak DifPeak
@@ -442,6 +470,8 @@ namespace CalScec.Analysis.Stress.Macroskopic
 
             this._Strain = PSA._Strain;
             this._StrainError = PSA._StrainError;
+
+            this.MRDValue = PSA.MRDValue;
 
             this._elasticRegime = PSA._elasticRegime;
             this._macroskopicStrain = PSA._macroskopicStrain;

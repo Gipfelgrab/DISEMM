@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Microsoft.Office.Interop.Excel;
+
 namespace CalScec.Analysis.Stress.Microsopic
 {
     public class ElasticityTensors : ICloneable
@@ -15,6 +17,15 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public MathNet.Numerics.LinearAlgebra.Matrix<double> _complianceTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
         public MathNet.Numerics.LinearAlgebra.Matrix<double> _complianceTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+
+        public Tools.FourthRankTensor GetFourtRankCompliances()
+        {
+            return new Tools.FourthRankTensor(this._complianceTensor);
+        }
+        public Tools.FourthRankTensor GetFourtRankStiffnesses()
+        {
+            return new Tools.FourthRankTensor(this._stiffnessTensor);
+        }
 
         private int _symmetry;
         public string Symmetry
@@ -101,6 +112,7 @@ namespace CalScec.Analysis.Stress.Microsopic
         public Texture.OrientationDistributionFunction ODF;
 
         public List<REK> DiffractionConstants = new List<REK>();
+        public List<REK> DiffractionConstantsTexture = new List<REK>();
 
         #region Diffraction Elastic Constants
 
@@ -161,7 +173,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    if (this.IsIsotropic)
+                    if (this.FixedAnIsotropy)
                     {
                         Tmp.ClassicFittingFunction.Constant = this.S1VoigtCubicIsotrope();
                         Tmp.ClassicFittingFunction.Aclivity = this.HS2VoigtCubicIsotrope();
@@ -222,14 +234,29 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    for (int n = 0; n < crystalData.HKLList.Count; n++)
+                    if (this.FixedAnIsotropy)
                     {
-                        REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
+                        for (int n = 0; n < crystalData.HKLList.Count; n++)
+                        {
+                            REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
 
-                        Tmp.ClassicFittingFunction.Constant = this.S1ReussCubic(crystalData.HKLList[n]);
-                        Tmp.ClassicFittingFunction.Aclivity = this.HS2ReussCubic(crystalData.HKLList[n]);
+                            Tmp.ClassicFittingFunction.Constant = this.S1ReussCubicAnIso(crystalData.HKLList[n]);
+                            Tmp.ClassicFittingFunction.Aclivity = this.HS2ReussCubicAnIso(crystalData.HKLList[n]);
 
-                        Ret.Add(Tmp);
+                            Ret.Add(Tmp);
+                        }
+                    }
+                    else
+                    {
+                        for (int n = 0; n < crystalData.HKLList.Count; n++)
+                        {
+                            REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
+
+                            Tmp.ClassicFittingFunction.Constant = this.S1ReussCubic(crystalData.HKLList[n]);
+                            Tmp.ClassicFittingFunction.Aclivity = this.HS2ReussCubic(crystalData.HKLList[n]);
+
+                            Ret.Add(Tmp);
+                        }
                     }
                     break;
                 case "hexagonal":
@@ -279,14 +306,29 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    for (int n = 0; n < crystalData.HKLList.Count; n++)
+                    if (this.FixedAnIsotropy)
                     {
-                        REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
+                        for (int n = 0; n < crystalData.HKLList.Count; n++)
+                        {
+                            REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
 
-                        Tmp.ClassicFittingFunction.Constant = this.S1HillCubic(crystalData.HKLList[n]);
-                        Tmp.ClassicFittingFunction.Aclivity = this.HS2HillCubic(crystalData.HKLList[n]);
+                            Tmp.ClassicFittingFunction.Constant = this.S1HillCubicAnIso(crystalData.HKLList[n]);
+                            Tmp.ClassicFittingFunction.Aclivity = this.HS2HillCubicAnIso(crystalData.HKLList[n]);
 
-                        Ret.Add(Tmp);
+                            Ret.Add(Tmp);
+                        }
+                    }
+                    else
+                    {
+                        for (int n = 0; n < crystalData.HKLList.Count; n++)
+                        {
+                            REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
+
+                            Tmp.ClassicFittingFunction.Constant = this.S1HillCubic(crystalData.HKLList[n]);
+                            Tmp.ClassicFittingFunction.Aclivity = this.HS2HillCubic(crystalData.HKLList[n]);
+
+                            Ret.Add(Tmp);
+                        }
                     }
                     break;
                 case "hexagonal":
@@ -336,15 +378,32 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    for (int n = 0; n < crystalData.HKLList.Count; n++)
+                    if (this.FixedAnIsotropy)
                     {
-                        REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
-                        double S1Tmp = this.S1KroenerCubicCompliance();
-                        double HS2Tmp = this.S1KroenerCubicCompliance();
-                        Tmp.ClassicFittingFunction.Constant = S1Tmp;
-                        Tmp.ClassicFittingFunction.Aclivity = HS2Tmp;
+                        for (int n = 0; n < crystalData.HKLList.Count; n++)
+                        {
+                            REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
+                            
+                            double S1Tmp = this.S1KroenerCubicComplianceAnIso();
+                            double HS2Tmp = this.HS2KroenerCubicComplianceAnIso();
+                            Tmp.ClassicFittingFunction.Constant = S1Tmp;
+                            Tmp.ClassicFittingFunction.Aclivity = HS2Tmp;
 
-                        Ret.Add(Tmp);
+                            Ret.Add(Tmp);
+                        }
+                    }
+                    else
+                    {
+                        for (int n = 0; n < crystalData.HKLList.Count; n++)
+                        {
+                            REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
+                            double S1Tmp = this.S1KroenerCubicCompliance();
+                            double HS2Tmp = this.HS2KroenerCubicCompliance();
+                            Tmp.ClassicFittingFunction.Constant = S1Tmp;
+                            Tmp.ClassicFittingFunction.Aclivity = HS2Tmp;
+
+                            Ret.Add(Tmp);
+                        }
                     }
                     break;
                 case "hexagonal":
@@ -385,14 +444,31 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    for (int n = 0; n < crystalData.HKLList.Count; n++)
+                    if (this.FixedAnIsotropy)
                     {
-                        REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
+                        for (int n = 0; n < crystalData.HKLList.Count; n++)
+                        {
+                            REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
 
-                        Tmp.ClassicFittingFunction.Constant = this.S1DeWittCubicCompliance(crystalData.HKLList[n]);
-                        Tmp.ClassicFittingFunction.Aclivity = this.HS2DeWittCubicCompliance(crystalData.HKLList[n]);
+                            double S1Tmp = this.S1DeWittCubicComplianceAnIso(crystalData.HKLList[n]);
+                            double HS2Tmp = this.HS2DeWittCubicComplianceAnIso(crystalData.HKLList[n]);
+                            Tmp.ClassicFittingFunction.Constant = S1Tmp;
+                            Tmp.ClassicFittingFunction.Aclivity = HS2Tmp;
 
-                        Ret.Add(Tmp);
+                            Ret.Add(Tmp);
+                        }
+                    }
+                    else
+                    {
+                        for (int n = 0; n < crystalData.HKLList.Count; n++)
+                        {
+                            REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
+
+                            Tmp.ClassicFittingFunction.Constant = this.S1DeWittCubicCompliance(crystalData.HKLList[n]);
+                            Tmp.ClassicFittingFunction.Aclivity = this.HS2DeWittCubicCompliance(crystalData.HKLList[n]);
+
+                            Ret.Add(Tmp);
+                        }
                     }
                     break;
                 case "hexagonal":
@@ -433,14 +509,31 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    for (int n = 0; n < crystalData.HKLList.Count; n++)
+                    if (this.FixedAnIsotropy)
                     {
-                        REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
+                        for (int n = 0; n < crystalData.HKLList.Count; n++)
+                        {
+                            REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
 
-                        Tmp.ClassicFittingFunction.Constant = this.S1KroenerCubicStiffness();
-                        Tmp.ClassicFittingFunction.Aclivity = this.HS2KroenerCubicStiffness();
+                            double S1Tmp = this.S1KroenerCubicStiffnessAnIso();
+                            double HS2Tmp = this.HS2KroenerCubicStiffnessAnIso();
+                            Tmp.ClassicFittingFunction.Constant = S1Tmp;
+                            Tmp.ClassicFittingFunction.Aclivity = HS2Tmp;
 
-                        Ret.Add(Tmp);
+                            Ret.Add(Tmp);
+                        }
+                    }
+                    else
+                    {
+                        for (int n = 0; n < crystalData.HKLList.Count; n++)
+                        {
+                            REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
+
+                            Tmp.ClassicFittingFunction.Constant = this.S1KroenerCubicStiffness();
+                            Tmp.ClassicFittingFunction.Aclivity = this.HS2KroenerCubicStiffness();
+
+                            Ret.Add(Tmp);
+                        }
                     }
                     break;
                 case "hexagonal":
@@ -481,14 +574,31 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    for (int n = 0; n < crystalData.HKLList.Count; n++)
+                    if (this.FixedAnIsotropy)
                     {
-                        REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
+                        for (int n = 0; n < crystalData.HKLList.Count; n++)
+                        {
+                            REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
 
-                        Tmp.ClassicFittingFunction.Constant = this.S1DeWittCubicStiffness(crystalData.HKLList[n]);
-                        Tmp.ClassicFittingFunction.Aclivity = this.HS2DeWittCubicStiffness(crystalData.HKLList[n]);
+                            double S1Tmp = this.S1DeWittCubicStiffnessAnIso(crystalData.HKLList[n]);
+                            double HS2Tmp = this.HS2DeWittCubicStiffnessAnIso(crystalData.HKLList[n]);
+                            Tmp.ClassicFittingFunction.Constant = S1Tmp;
+                            Tmp.ClassicFittingFunction.Aclivity = HS2Tmp;
 
-                        Ret.Add(Tmp);
+                            Ret.Add(Tmp);
+                        }
+                    }
+                    else
+                    {
+                        for (int n = 0; n < crystalData.HKLList.Count; n++)
+                        {
+                            REK Tmp = new REK(crystalData, crystalData.HKLList[n]);
+
+                            Tmp.ClassicFittingFunction.Constant = this.S1DeWittCubicStiffness(crystalData.HKLList[n]);
+                            Tmp.ClassicFittingFunction.Aclivity = this.HS2DeWittCubicStiffness(crystalData.HKLList[n]);
+
+                            Ret.Add(Tmp);
+                        }
                     }
                     break;
                 case "hexagonal":
@@ -582,7 +692,41 @@ namespace CalScec.Analysis.Stress.Microsopic
         #endregion
 
         public bool IsIsotropic = false;
+        public bool FixedAnIsotropy = false;
         public bool FitConverged = false;
+
+        public double AnIsotropy = 1.0;
+        public double GetZehnderAnisotropy
+        {
+            get
+            {
+                return this.S44 / (2 * (this.S11 - this.S12));
+            }
+        }
+
+        public void ActivateDECMRDWeighting()
+        {
+            double dECTotMRD = 0;
+
+            for(int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                dECTotMRD += this.DiffractionConstantsTexture[n].TotalMRD;
+            }
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                this.DiffractionConstantsTexture[n].DECAllMRD = dECTotMRD;
+                this.DiffractionConstantsTexture[n].ActivateWeigthedMRD = true;
+            }
+        }
+
+        public void DeactivateDECMRDWeighting()
+        {
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                this.DiffractionConstantsTexture[n].ActivateWeigthedMRD = false;
+            }
+        }
 
         #region averaged parameters
 
@@ -679,112 +823,211 @@ namespace CalScec.Analysis.Stress.Microsopic
             this._averagedBulkModul /= CalculatedREK.Count;
         }
 
-        public void SetAverageParametersFit()
+        public void SetAverageParametersFit(bool textureEnabled)
         {
             this._averagedEModulFit = 0;
             this._averagedNuFit = 0;
             this._averagedShearModulFit = 0;
             this._averagedBulkModulFit = 0;
 
-            for (int n = 0; n < DiffractionConstants.Count; n++)
+            if (textureEnabled)
             {
-                this._averagedEModulFit += DiffractionConstants[n].ClassicEModulus;
-                this._averagedNuFit += DiffractionConstants[n].ClassicTransverseContraction;
-                this._averagedShearModulFit += DiffractionConstants[n].ClassicShearModulus;
-                this._averagedBulkModulFit += DiffractionConstants[n].ClassicBulkModulus;
-            }
+                for (int n = 0; n < DiffractionConstantsTexture.Count; n++)
+                {
+                    this._averagedEModulFit += DiffractionConstantsTexture[n].ClassicEModulus;
+                    this._averagedNuFit += DiffractionConstantsTexture[n].ClassicTransverseContraction;
+                    this._averagedShearModulFit += DiffractionConstantsTexture[n].ClassicShearModulus;
+                    this._averagedBulkModulFit += DiffractionConstantsTexture[n].ClassicBulkModulus;
+                }
 
-            this._averagedEModulFit /= DiffractionConstants.Count;
-            this._averagedNuFit /= DiffractionConstants.Count;
-            this._averagedShearModulFit /= DiffractionConstants.Count;
-            this._averagedBulkModulFit /= DiffractionConstants.Count;
+                this._averagedEModulFit /= DiffractionConstantsTexture.Count;
+                this._averagedNuFit /= DiffractionConstantsTexture.Count;
+                this._averagedShearModulFit /= DiffractionConstantsTexture.Count;
+                this._averagedBulkModulFit /= DiffractionConstantsTexture.Count;
+            }
+            else
+            {
+                for (int n = 0; n < DiffractionConstants.Count; n++)
+                {
+                    this._averagedEModulFit += DiffractionConstants[n].ClassicEModulus;
+                    this._averagedNuFit += DiffractionConstants[n].ClassicTransverseContraction;
+                    this._averagedShearModulFit += DiffractionConstants[n].ClassicShearModulus;
+                    this._averagedBulkModulFit += DiffractionConstants[n].ClassicBulkModulus;
+                }
+
+                this._averagedEModulFit /= DiffractionConstants.Count;
+                this._averagedNuFit /= DiffractionConstants.Count;
+                this._averagedShearModulFit /= DiffractionConstants.Count;
+                this._averagedBulkModulFit /= DiffractionConstants.Count;
+            }
         }
 
-        public double GetFittingChi2Cubic(int Model, bool Compliance)
+        public double GetFittingChi2Cubic(int Model, bool Compliance, bool textureEnabled)
         {
             double Ret = 0;
-
-            switch (Model)
+            if (textureEnabled)
             {
-                case 0:
-                    Ret = Fitting.Chi2.Chi2ClassicVoigtCubic(this);
-                    break;
-                case 1:
-                    Ret = Fitting.Chi2.Chi2ClassicReussCubic(this);
-                    break;
-                case 2:
-                    Ret = Fitting.Chi2.Chi2ClassicHillCubic(this);
-                    break;
-                case 3:
-                    if (Compliance)
-                    {
-                        Ret = Fitting.Chi2.Chi2ClassicKroenerCubicCompliance(this);
-                    }
-                    else
-                    {
-                        Ret = Fitting.Chi2.Chi2ClassicKroenerCubicStiffness(this);
-                    }
-                    break;
-                case 4:
-                    if (Compliance)
-                    {
-                        Ret = Fitting.Chi2.Chi2ClassicDeWittCubicCompliance(this);
-                    }
-                    else
-                    {
-                        Ret = Fitting.Chi2.Chi2ClassicDeWittCubicStiffness(this);
-                    }
-                    break;
-                case 5:
-                    Ret = Fitting.Chi2.Chi2ClassicGeometricHillCubic(this);
-                    break;
+                switch (Model)
+                {
+                    case 0:
+                        Ret = Fitting.Chi2.Chi2ClassicVoigtCubic(this);
+                        break;
+                    case 1:
+                        Ret = Fitting.Chi2.Chi2TextureReussCubic(this);
+                        break;
+                    case 2:
+                        Ret = Fitting.Chi2.Chi2TextureHillCubic(this);
+                        break;
+                    case 3:
+                        if (Compliance)
+                        {
+                            Ret = Fitting.Chi2.Chi2TextureKroenerCubicCompliance(this);
+                        }
+                        else
+                        {
+                            Ret = Fitting.Chi2.Chi2TextureKroenerCubicStiffness(this);
+                        }
+                        break;
+                    case 4:
+                        if (Compliance)
+                        {
+                            Ret = Fitting.Chi2.Chi2TextureDeWittCubicCompliance(this);
+                        }
+                        else
+                        {
+                            Ret = Fitting.Chi2.Chi2TextureDeWittCubicStiffness(this);
+                        }
+                        break;
+                    case 5:
+                        Ret = Fitting.Chi2.Chi2TextureGeometricHillCubic(this);
+                        break;
+                }
+            }
+            else
+            {
+                switch (Model)
+                {
+                    case 0:
+                        Ret = Fitting.Chi2.Chi2ClassicVoigtCubic(this);
+                        break;
+                    case 1:
+                        Ret = Fitting.Chi2.Chi2ClassicReussCubic(this);
+                        break;
+                    case 2:
+                        Ret = Fitting.Chi2.Chi2ClassicHillCubic(this);
+                        break;
+                    case 3:
+                        if (Compliance)
+                        {
+                            Ret = Fitting.Chi2.Chi2ClassicKroenerCubicCompliance(this);
+                        }
+                        else
+                        {
+                            Ret = Fitting.Chi2.Chi2ClassicKroenerCubicStiffness(this);
+                        }
+                        break;
+                    case 4:
+                        if (Compliance)
+                        {
+                            Ret = Fitting.Chi2.Chi2ClassicDeWittCubicCompliance(this);
+                        }
+                        else
+                        {
+                            Ret = Fitting.Chi2.Chi2ClassicDeWittCubicStiffness(this);
+                        }
+                        break;
+                    case 5:
+                        Ret = Fitting.Chi2.Chi2ClassicGeometricHillCubic(this);
+                        break;
+                }
             }
 
             return Ret;
         }
 
-        public double GetFittingChi2Hexagonal(int Model, bool Compliance)
+        public double GetFittingChi2Hexagonal(int Model, bool Compliance, bool textureEnabled)
         {
             double Ret = 0;
-
-            switch (Model)
+            if (textureEnabled)
             {
-                case 0:
-                    Ret = Fitting.Chi2.Chi2ClassicVoigtType1(this);
-                    break;
-                case 1:
-                    Ret = Fitting.Chi2.Chi2ClassicReussHexagonal(this);
-                    break;
-                case 2:
-                    Ret = Fitting.Chi2.Chi2ClassicHillHexagonal(this);
-                    break;
-                case 3:
-                    if (Compliance)
-                    {
-                        Ret = Fitting.Chi2.Chi2ClassicKroenerCubicCompliance(this);
-                    }
-                    else
-                    {
-                        Ret = Fitting.Chi2.Chi2ClassicKroenerCubicStiffness(this);
-                    }
-                    break;
-                case 4:
-                    if (Compliance)
-                    {
-                        Ret = Fitting.Chi2.Chi2ClassicDeWittCubicCompliance(this);
-                    }
-                    else
-                    {
-                        Ret = Fitting.Chi2.Chi2ClassicDeWittCubicStiffness(this);
-                    }
-                    break;
-                case 5:
-                    Ret = Fitting.Chi2.Chi2ClassicGeometricHillHexagonal(this);
-                    break;
+                switch (Model)
+                {
+                    case 0:
+                        Ret = Fitting.Chi2.Chi2ClassicVoigtType1(this);
+                        break;
+                    case 1:
+                        Ret = Fitting.Chi2.Chi2TextureReussHexagonal(this);
+                        break;
+                    case 2:
+                        Ret = Fitting.Chi2.Chi2TextureHillHexagonal(this);
+                        break;
+                    case 3:
+                        if (Compliance)
+                        {
+                            Ret = Fitting.Chi2.Chi2TextureKroenerCubicCompliance(this);
+                        }
+                        else
+                        {
+                            Ret = Fitting.Chi2.Chi2TextureKroenerCubicStiffness(this);
+                        }
+                        break;
+                    case 4:
+                        if (Compliance)
+                        {
+                            Ret = Fitting.Chi2.Chi2TextureDeWittCubicCompliance(this);
+                        }
+                        else
+                        {
+                            Ret = Fitting.Chi2.Chi2TextureDeWittCubicStiffness(this);
+                        }
+                        break;
+                    case 5:
+                        Ret = Fitting.Chi2.Chi2TextureGeometricHillHexagonal(this);
+                        break;
+                }
+            }
+            else
+            {
+                switch (Model)
+                {
+                    case 0:
+                        Ret = Fitting.Chi2.Chi2ClassicVoigtType1(this);
+                        break;
+                    case 1:
+                        Ret = Fitting.Chi2.Chi2ClassicReussHexagonal(this);
+                        break;
+                    case 2:
+                        Ret = Fitting.Chi2.Chi2ClassicHillHexagonal(this);
+                        break;
+                    case 3:
+                        if (Compliance)
+                        {
+                            Ret = Fitting.Chi2.Chi2ClassicKroenerCubicCompliance(this);
+                        }
+                        else
+                        {
+                            Ret = Fitting.Chi2.Chi2ClassicKroenerCubicStiffness(this);
+                        }
+                        break;
+                    case 4:
+                        if (Compliance)
+                        {
+                            Ret = Fitting.Chi2.Chi2ClassicDeWittCubicCompliance(this);
+                        }
+                        else
+                        {
+                            Ret = Fitting.Chi2.Chi2ClassicDeWittCubicStiffness(this);
+                        }
+                        break;
+                    case 5:
+                        Ret = Fitting.Chi2.Chi2ClassicGeometricHillHexagonal(this);
+                        break;
+                }
             }
 
             return Ret;
         }
+
         #endregion
 
         #region BulkModulus
@@ -1241,9 +1484,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensor[0, 0] = value;
                         this._stiffnessTensor[1, 1] = value;
                         this._stiffnessTensor[2, 2] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
                             this._stiffnessTensor[3, 3] = IsoValue;
                             this._stiffnessTensor[4, 4] = IsoValue;
                             this._stiffnessTensor[5, 5] = IsoValue;
@@ -1283,9 +1526,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensorError[0, 0] = value;
                         this._stiffnessTensorError[1, 1] = value;
                         this._stiffnessTensorError[2, 2] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
                             this._stiffnessTensorError[3, 3] = IsoValue;
                             this._stiffnessTensorError[4, 4] = IsoValue;
                             this._stiffnessTensorError[5, 5] = IsoValue;
@@ -1329,9 +1572,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensor[1, 0] = value;
                         this._stiffnessTensor[2, 0] = value;
                         this._stiffnessTensor[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
                             this._stiffnessTensor[3, 3] = IsoValue;
                             this._stiffnessTensor[4, 4] = IsoValue;
                             this._stiffnessTensor[5, 5] = IsoValue;
@@ -1369,9 +1612,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensorError[1, 0] = value;
                         this._stiffnessTensorError[2, 0] = value;
                         this._stiffnessTensorError[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
                             this._stiffnessTensorError[3, 3] = IsoValue;
                             this._stiffnessTensorError[4, 4] = IsoValue;
                             this._stiffnessTensorError[5, 5] = IsoValue;
@@ -1410,9 +1653,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensor[1, 0] = value;
                         this._stiffnessTensor[2, 0] = value;
                         this._stiffnessTensor[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
                             this._stiffnessTensor[3, 3] = IsoValue;
                             this._stiffnessTensor[4, 4] = IsoValue;
                             this._stiffnessTensor[5, 5] = IsoValue;
@@ -1456,9 +1699,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensorError[1, 0] = value;
                         this._stiffnessTensorError[2, 0] = value;
                         this._stiffnessTensorError[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
                             this._stiffnessTensorError[3, 3] = IsoValue;
                             this._stiffnessTensorError[4, 4] = IsoValue;
                             this._stiffnessTensorError[5, 5] = IsoValue;
@@ -1684,9 +1927,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensor[1, 0] = value;
                         this._stiffnessTensor[2, 0] = value;
                         this._stiffnessTensor[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
                             this._stiffnessTensor[3, 3] = IsoValue;
                             this._stiffnessTensor[4, 4] = IsoValue;
                             this._stiffnessTensor[5, 5] = IsoValue;
@@ -1724,9 +1967,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensorError[1, 0] = value;
                         this._stiffnessTensorError[2, 0] = value;
                         this._stiffnessTensorError[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
                             this._stiffnessTensorError[3, 3] = IsoValue;
                             this._stiffnessTensorError[4, 4] = IsoValue;
                             this._stiffnessTensorError[5, 5] = IsoValue;
@@ -1762,9 +2005,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensor[0, 0] = value;
                         this._stiffnessTensor[1, 1] = value;
                         this._stiffnessTensor[2, 2] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
                             this._stiffnessTensor[3, 3] = IsoValue;
                             this._stiffnessTensor[4, 4] = IsoValue;
                             this._stiffnessTensor[5, 5] = IsoValue;
@@ -1804,9 +2047,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensorError[0, 0] = value;
                         this._stiffnessTensorError[1, 1] = value;
                         this._stiffnessTensorError[2, 2] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
                             this._stiffnessTensorError[3, 3] = IsoValue;
                             this._stiffnessTensorError[4, 4] = IsoValue;
                             this._stiffnessTensorError[5, 5] = IsoValue;
@@ -1850,9 +2093,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensor[1, 0] = value;
                         this._stiffnessTensor[2, 0] = value;
                         this._stiffnessTensor[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
                             this._stiffnessTensor[3, 3] = IsoValue;
                             this._stiffnessTensor[4, 4] = IsoValue;
                             this._stiffnessTensor[5, 5] = IsoValue;
@@ -1896,9 +2139,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensorError[1, 0] = value;
                         this._stiffnessTensorError[2, 0] = value;
                         this._stiffnessTensorError[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
                             this._stiffnessTensorError[3, 3] = IsoValue;
                             this._stiffnessTensorError[4, 4] = IsoValue;
                             this._stiffnessTensorError[5, 5] = IsoValue;
@@ -2124,9 +2367,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensor[1, 0] = value;
                         this._stiffnessTensor[2, 0] = value;
                         this._stiffnessTensor[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
                             this._stiffnessTensor[3, 3] = IsoValue;
                             this._stiffnessTensor[4, 4] = IsoValue;
                             this._stiffnessTensor[5, 5] = IsoValue;
@@ -2170,9 +2413,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensorError[1, 0] = value;
                         this._stiffnessTensorError[2, 0] = value;
                         this._stiffnessTensorError[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
                             this._stiffnessTensorError[3, 3] = IsoValue;
                             this._stiffnessTensorError[4, 4] = IsoValue;
                             this._stiffnessTensorError[5, 5] = IsoValue;
@@ -2217,9 +2460,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensor[1, 0] = value;
                         this._stiffnessTensor[2, 0] = value;
                         this._stiffnessTensor[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
                             this._stiffnessTensor[3, 3] = IsoValue;
                             this._stiffnessTensor[4, 4] = IsoValue;
                             this._stiffnessTensor[5, 5] = IsoValue;
@@ -2263,9 +2506,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensorError[1, 0] = value;
                         this._stiffnessTensorError[2, 0] = value;
                         this._stiffnessTensorError[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
                             this._stiffnessTensorError[3, 3] = IsoValue;
                             this._stiffnessTensorError[4, 4] = IsoValue;
                             this._stiffnessTensorError[5, 5] = IsoValue;
@@ -2307,9 +2550,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensor[0, 0] = value;
                         this._stiffnessTensor[1, 1] = value;
                         this._stiffnessTensor[2, 2] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensor[0, 0] - this._stiffnessTensor[0, 1]);
                             this._stiffnessTensor[3, 3] = IsoValue;
                             this._stiffnessTensor[4, 4] = IsoValue;
                             this._stiffnessTensor[5, 5] = IsoValue;
@@ -2335,9 +2578,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._stiffnessTensorError[0, 0] = value;
                         this._stiffnessTensorError[1, 1] = value;
                         this._stiffnessTensorError[2, 2] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 0.5 * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
+                            double IsoValue = 0.5 * (1 / this.AnIsotropy) * (this._stiffnessTensorError[0, 0] - this._stiffnessTensorError[0, 1]);
                             this._stiffnessTensorError[3, 3] = IsoValue;
                             this._stiffnessTensorError[4, 4] = IsoValue;
                             this._stiffnessTensorError[5, 5] = IsoValue;
@@ -2663,7 +2906,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this._symmetry)
                 {
                     case 1:
-                        if(!this.IsIsotropic)
+                        if(!this.FixedAnIsotropy)
                         {
                             this._stiffnessTensor[3, 3] = value;
                             this._stiffnessTensor[4, 4] = value;
@@ -2699,7 +2942,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this._symmetry)
                 {
                     case 1:
-                        if (!this.IsIsotropic)
+                        if (!this.FixedAnIsotropy)
                         {
                             this._stiffnessTensorError[3, 3] = value;
                             this._stiffnessTensorError[4, 4] = value;
@@ -3050,7 +3293,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this._symmetry)
                 {
                     case 1:
-                        if (!this.IsIsotropic)
+                        if (!this.FixedAnIsotropy)
                         {
                             this._stiffnessTensor[3, 3] = value;
                             this._stiffnessTensor[4, 4] = value;
@@ -3086,7 +3329,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this._symmetry)
                 {
                     case 1:
-                        if (!this.IsIsotropic)
+                        if (!this.FixedAnIsotropy)
                         {
                             this._stiffnessTensorError[3, 3] = value;
                             this._stiffnessTensorError[4, 4] = value;
@@ -3473,7 +3716,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this._symmetry)
                 {
                     case 1:
-                        if (!this.IsIsotropic)
+                        if (!this.FixedAnIsotropy)
                         {
                             this._stiffnessTensor[3, 3] = value;
                             this._stiffnessTensor[4, 4] = value;
@@ -3503,7 +3746,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this._symmetry)
                 {
                     case 1:
-                        if (!this.IsIsotropic)
+                        if (!this.FixedAnIsotropy)
                         {
                             this._stiffnessTensorError[3, 3] = value;
                             this._stiffnessTensorError[4, 4] = value;
@@ -3541,9 +3784,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensor[0, 0] = value;
                         this._complianceTensor[1, 1] = value;
                         this._complianceTensor[2, 2] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
                             this._complianceTensor[3, 3] = IsoValue;
                             this._complianceTensor[4, 4] = IsoValue;
                             this._complianceTensor[5, 5] = IsoValue;
@@ -3583,9 +3826,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensorError[0, 0] = value;
                         this._complianceTensorError[1, 1] = value;
                         this._complianceTensorError[2, 2] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
                             this._complianceTensorError[3, 3] = IsoValue;
                             this._complianceTensorError[4, 4] = IsoValue;
                             this._complianceTensorError[5, 5] = IsoValue;
@@ -3629,9 +3872,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensor[1, 0] = value;
                         this._complianceTensor[2, 0] = value;
                         this._complianceTensor[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
                             this._complianceTensor[3, 3] = IsoValue;
                             this._complianceTensor[4, 4] = IsoValue;
                             this._complianceTensor[5, 5] = IsoValue;
@@ -3669,9 +3912,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensorError[1, 0] = value;
                         this._complianceTensorError[2, 0] = value;
                         this._complianceTensorError[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
                             this._complianceTensorError[3, 3] = IsoValue;
                             this._complianceTensorError[4, 4] = IsoValue;
                             this._complianceTensorError[5, 5] = IsoValue;
@@ -3710,9 +3953,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensor[1, 0] = value;
                         this._complianceTensor[2, 0] = value;
                         this._complianceTensor[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
                             this._complianceTensor[3, 3] = IsoValue;
                             this._complianceTensor[4, 4] = IsoValue;
                             this._complianceTensor[5, 5] = IsoValue;
@@ -3756,9 +3999,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensorError[1, 0] = value;
                         this._complianceTensorError[2, 0] = value;
                         this._complianceTensorError[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
                             this._complianceTensorError[3, 3] = IsoValue;
                             this._complianceTensorError[4, 4] = IsoValue;
                             this._complianceTensorError[5, 5] = IsoValue;
@@ -3984,9 +4227,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensor[1, 0] = value;
                         this._complianceTensor[2, 0] = value;
                         this._complianceTensor[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
                             this._complianceTensor[3, 3] = IsoValue;
                             this._complianceTensor[4, 4] = IsoValue;
                             this._complianceTensor[5, 5] = IsoValue;
@@ -4024,9 +4267,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensorError[1, 0] = value;
                         this._complianceTensorError[2, 0] = value;
                         this._complianceTensorError[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
                             this._complianceTensorError[3, 3] = IsoValue;
                             this._complianceTensorError[4, 4] = IsoValue;
                             this._complianceTensorError[5, 5] = IsoValue;
@@ -4062,9 +4305,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensor[0, 0] = value;
                         this._complianceTensor[1, 1] = value;
                         this._complianceTensor[2, 2] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
                             this._complianceTensor[3, 3] = IsoValue;
                             this._complianceTensor[4, 4] = IsoValue;
                             this._complianceTensor[5, 5] = IsoValue;
@@ -4104,9 +4347,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensorError[0, 0] = value;
                         this._complianceTensorError[1, 1] = value;
                         this._complianceTensorError[2, 2] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
                             this._complianceTensorError[3, 3] = IsoValue;
                             this._complianceTensorError[4, 4] = IsoValue;
                             this._complianceTensorError[5, 5] = IsoValue;
@@ -4150,9 +4393,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensor[1, 0] = value;
                         this._complianceTensor[2, 0] = value;
                         this._complianceTensor[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
                             this._complianceTensor[3, 3] = IsoValue;
                             this._complianceTensor[4, 4] = IsoValue;
                             this._complianceTensor[5, 5] = IsoValue;
@@ -4196,9 +4439,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensorError[1, 0] = value;
                         this._complianceTensorError[2, 0] = value;
                         this._complianceTensorError[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
                             this._complianceTensorError[3, 3] = IsoValue;
                             this._complianceTensorError[4, 4] = IsoValue;
                             this._complianceTensorError[5, 5] = IsoValue;
@@ -4424,9 +4667,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensor[1, 0] = value;
                         this._complianceTensor[2, 0] = value;
                         this._complianceTensor[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
                             this._complianceTensor[3, 3] = IsoValue;
                             this._complianceTensor[4, 4] = IsoValue;
                             this._complianceTensor[5, 5] = IsoValue;
@@ -4470,9 +4713,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensorError[1, 0] = value;
                         this._complianceTensorError[2, 0] = value;
                         this._complianceTensorError[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
                             this._complianceTensorError[3, 3] = IsoValue;
                             this._complianceTensorError[4, 4] = IsoValue;
                             this._complianceTensorError[5, 5] = IsoValue;
@@ -4517,9 +4760,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensor[1, 0] = value;
                         this._complianceTensor[2, 0] = value;
                         this._complianceTensor[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
                             this._complianceTensor[3, 3] = IsoValue;
                             this._complianceTensor[4, 4] = IsoValue;
                             this._complianceTensor[5, 5] = IsoValue;
@@ -4563,9 +4806,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensorError[1, 0] = value;
                         this._complianceTensorError[2, 0] = value;
                         this._complianceTensorError[2, 1] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
                             this._complianceTensorError[3, 3] = IsoValue;
                             this._complianceTensorError[4, 4] = IsoValue;
                             this._complianceTensorError[5, 5] = IsoValue;
@@ -4607,9 +4850,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensor[0, 0] = value;
                         this._complianceTensor[1, 1] = value;
                         this._complianceTensor[2, 2] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensor[0, 0] - this._complianceTensor[0, 1]);
                             this._complianceTensor[3, 3] = IsoValue;
                             this._complianceTensor[4, 4] = IsoValue;
                             this._complianceTensor[5, 5] = IsoValue;
@@ -4635,9 +4878,9 @@ namespace CalScec.Analysis.Stress.Microsopic
                         this._complianceTensorError[0, 0] = value;
                         this._complianceTensorError[1, 1] = value;
                         this._complianceTensorError[2, 2] = value;
-                        if (this.IsIsotropic)
+                        if (this.FixedAnIsotropy)
                         {
-                            double IsoValue = 2 * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
+                            double IsoValue = 2 * this.AnIsotropy * (this._complianceTensorError[0, 0] - this._complianceTensorError[0, 1]);
                             this._complianceTensorError[3, 3] = IsoValue;
                             this._complianceTensorError[4, 4] = IsoValue;
                             this._complianceTensorError[5, 5] = IsoValue;
@@ -4963,7 +5206,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this._symmetry)
                 {
                     case 1:
-                        if (!this.IsIsotropic)
+                        if (!this.FixedAnIsotropy)
                         {
                             this._complianceTensor[3, 3] = value;
                             this._complianceTensor[4, 4] = value;
@@ -4999,7 +5242,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this._symmetry)
                 {
                     case 1:
-                        if (!this.IsIsotropic)
+                        if (!this.FixedAnIsotropy)
                         {
                             this._complianceTensorError[3, 3] = value;
                             this._complianceTensorError[4, 4] = value;
@@ -5350,7 +5593,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this._symmetry)
                 {
                     case 1:
-                        if (!this.IsIsotropic)
+                        if (!this.FixedAnIsotropy)
                         {
                             this._complianceTensor[3, 3] = value;
                             this._complianceTensor[4, 4] = value;
@@ -5386,7 +5629,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this._symmetry)
                 {
                     case 1:
-                        if (!this.IsIsotropic)
+                        if (!this.FixedAnIsotropy)
                         {
                             this._complianceTensorError[3, 3] = value;
                             this._complianceTensorError[4, 4] = value;
@@ -5773,7 +6016,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this._symmetry)
                 {
                     case 1:
-                        if (!this.IsIsotropic)
+                        if (!this.FixedAnIsotropy)
                         {
                             this._complianceTensor[3, 3] = value;
                             this._complianceTensor[4, 4] = value;
@@ -5803,7 +6046,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this._symmetry)
                 {
                     case 1:
-                        if (!this.IsIsotropic)
+                        if (!this.FixedAnIsotropy)
                         {
                             this._complianceTensorError[3, 3] = value;
                             this._complianceTensorError[4, 4] = value;
@@ -5840,7 +6083,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    if (IsIsotropic)
+                    if (this.FixedAnIsotropy)
                     {
                         this.S11 = Inverted[0, 0];
                         this.S12 = Inverted[0, 1];
@@ -6145,7 +6388,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    if (IsIsotropic)
+                    if (FixedAnIsotropy)
                     {
                         this.C11 = Inverted[0, 0];
                         this.C12 = Inverted[0, 1];
@@ -6340,6 +6583,163 @@ namespace CalScec.Analysis.Stress.Microsopic
             }
         }
 
+        /// <summary>
+        /// Automatically fits the elasticity tensor for different anisotropy values.
+        /// </summary>
+        /// <param name="lborder">lower border of anisotropy</param>
+        /// <param name="uborder">upper border of anisotropy</param>
+        /// <param name="step">stepwitdh</param>
+        /// <param name="SC">true for caluclation in compliances and false for stiffnesses</param>
+        public void AutoAnisotropyFit(double lborder, double uborder, double step, bool SC, string filePath, int model, bool textureEnabled)
+        {
+            List<double> aValuesList = new List<double>();
+            if(SC)
+            {
+                for(double v = lborder; v <= uborder; v += step)
+                {
+                    aValuesList.Add(v);
+                }
+            }
+            else
+            {
+                for (double v = lborder; v <= uborder; v += step)
+                {
+                    aValuesList.Add(1.0 / v);
+                }
+            }
+
+            Microsoft.Office.Interop.Excel.Application ExcelLogApp;
+            Workbook ExcelLogBook;
+            Worksheet ExcelWorksheet;
+
+            try
+            {
+                ExcelLogApp = new Microsoft.Office.Interop.Excel.Application();
+
+                ExcelLogBook = (Microsoft.Office.Interop.Excel.Workbook)ExcelLogApp.Workbooks.Add(System.Reflection.Missing.Value);
+
+                if (ExcelLogBook.Sheets.Count < 3)
+                {
+                    for (int n = ExcelLogBook.Sheets.Count; n < 4; n++)
+                    {
+                        ExcelLogBook.Sheets.Add(System.Reflection.Missing.Value);
+                    }
+                }
+
+                ExcelLogBook.Sheets[1].Select();
+
+                ExcelWorksheet = (Microsoft.Office.Interop.Excel.Worksheet)ExcelLogBook.ActiveSheet;
+
+                ExcelWorksheet.Cells[1, 1] = "Konstanten";
+                ExcelWorksheet.Cells[1, 2] = "C11";
+                ExcelWorksheet.Cells[1, 3] = "C12";
+                ExcelWorksheet.Cells[1, 4] = "C44";
+                ExcelWorksheet.Cells[1, 5] = "S11";
+                ExcelWorksheet.Cells[1, 6] = "S12";
+                ExcelWorksheet.Cells[1, 7] = "S44";
+                ExcelWorksheet.Cells[1, 8] = "E Modul";
+                ExcelWorksheet.Cells[1, 9] = "G Modul";
+                ExcelWorksheet.Cells[1, 10] = "Bulk Modul";
+                ExcelWorksheet.Cells[1, 11] = "Nu";
+                ExcelWorksheet.Cells[1, 12] = "Zener Anisotropy";
+                ExcelWorksheet.Cells[1, 13] = "Chi2";
+
+                ExcelWorksheet.Cells[1, 14] = "DEC";
+                ExcelWorksheet.Cells[1, 15] = "H";
+                ExcelWorksheet.Cells[1, 16] = "K";
+                ExcelWorksheet.Cells[1, 17] = "L";
+                ExcelWorksheet.Cells[1, 18] = "S1";
+                ExcelWorksheet.Cells[1, 19] = "S2";
+                ExcelWorksheet.Cells[1, 20] = "E Modul";
+                ExcelWorksheet.Cells[1, 21] = "G Modul";
+                ExcelWorksheet.Cells[1, 22] = "Bulk Modul";
+                ExcelWorksheet.Cells[1, 23] = "Nu";
+
+                ElasticityTensors ProbingTensor = this.Clone() as ElasticityTensors;
+                ProbingTensor.FixedAnIsotropy = true;
+
+                int j = 2;
+                for (int n = 0; n < aValuesList.Count; n++)
+                {
+                    ProbingTensor.AnIsotropy = aValuesList[n];
+
+                    switch(model)
+                    {
+                        case 0:
+                            this.FitConverged = this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorVoigtCubicIsotrope(ProbingTensor, true);
+                            ProbingTensor.CalculateCompliances();
+                            break;
+                        case 1:
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorReussCubicAnIso(ProbingTensor, true);
+                            ProbingTensor.CalculateStiffnesses();
+                            break;
+                        case 2:
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorHillCubicAnIso(ProbingTensor, true);
+                            ProbingTensor.CalculateStiffnesses();
+                            break;
+                        case 3:
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorKroenerCubicStiffnessAnIso(ProbingTensor, true);
+                            ProbingTensor.CalculateCompliances();
+                            break;
+                        case 4:
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorDeWittCubicStiffnessAnIso(ProbingTensor, true);
+                            ProbingTensor.CalculateCompliances();
+                            break;
+                        case 5:
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorGeometricHillCubicAnIso(ProbingTensor, true);
+                            ProbingTensor.CalculateStiffnesses();
+                            break;
+                    }
+
+                    SetFittingErrorsReuss(true);
+
+                    List<REK> DECTmp = ProbingTensor.GetCalculatedDiffractionConstants(model, ProbingTensor.GetPhaseInformation, 0);
+                    ProbingTensor.SetAverageParameters(DECTmp);
+                    ProbingTensor.SetAverageParametersFit(textureEnabled);
+
+                    ExcelWorksheet.Cells[n + 2, 2] = ProbingTensor.C11;
+                    ExcelWorksheet.Cells[n + 2, 3] = ProbingTensor.C12;
+                    ExcelWorksheet.Cells[n + 2, 4] = ProbingTensor.C44;
+                    ExcelWorksheet.Cells[n + 2, 5] = ProbingTensor.S11;
+                    ExcelWorksheet.Cells[n + 2, 6] = ProbingTensor.S12;
+                    ExcelWorksheet.Cells[n + 2, 7] = ProbingTensor.S44;
+                    ExcelWorksheet.Cells[n + 2, 8] = ProbingTensor.AveragedEModul;
+                    ExcelWorksheet.Cells[n + 2, 9] = ProbingTensor._averagedShearModul;
+                    ExcelWorksheet.Cells[n + 2, 10] = ProbingTensor._averagedBulkModul;
+                    ExcelWorksheet.Cells[n + 2, 11] = ProbingTensor._averagedNu;
+                    ExcelWorksheet.Cells[n + 2, 12] = ProbingTensor.GetZehnderAnisotropy;
+                    ExcelWorksheet.Cells[n + 2, 13] = ProbingTensor.GetFittingChi2Cubic(model, true, false);
+
+                    for (int i = 0; i < DECTmp.Count; i++)
+                    {
+                        ExcelWorksheet.Cells[j, 15] = DECTmp[i].UsedReflex.H;
+                        ExcelWorksheet.Cells[j, 16] = DECTmp[i].UsedReflex.K;
+                        ExcelWorksheet.Cells[j, 17] = DECTmp[i].UsedReflex.L;
+                        ExcelWorksheet.Cells[j, 18] = DECTmp[i].ClassicS1;
+                        ExcelWorksheet.Cells[j, 19] = DECTmp[i].ClassicHS2;
+                        ExcelWorksheet.Cells[j, 20] = DECTmp[i].ClassicEModulus;
+                        ExcelWorksheet.Cells[j, 21] = DECTmp[i].ClassicShearModulus;
+                        ExcelWorksheet.Cells[j, 22] = DECTmp[i].ClassicBulkModulus;
+                        ExcelWorksheet.Cells[j, 23] = DECTmp[i].ClassicTransverseContraction;
+
+                        j++;
+                    }
+                }
+
+                ExcelLogApp.DisplayAlerts = false;
+                ExcelLogBook.Close(true, filePath, System.Reflection.Missing.Value);
+
+                if (ExcelLogApp != null)
+                {
+                    ExcelLogApp.Quit();
+                }
+            }
+            catch (Exception ex)
+            {
+                String myErrorString = ex.Message;
+            }
+        }
+
         #endregion
 
         #region Fitting
@@ -6351,7 +6751,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    if(this.IsIsotropic)
+                    if(this.FixedAnIsotropy)
                     {
                         this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorVoigtCubicIsotrope(this, classicCalculation);
                     }
@@ -6397,7 +6797,14 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorReussCubic(this, classicCalculation);
+                    if (this.FixedAnIsotropy)
+                    {
+                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorReussCubicAnIso(this, classicCalculation);
+                    }
+                    else
+                    {
+                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorReussCubic(this, classicCalculation);
+                    }
                     break;
                 case "hexagonal":
                     this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorReussHexagonal(this, classicCalculation);
@@ -6437,7 +6844,14 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorHillCubic(this, classicCalculation);
+                    if (this.FixedAnIsotropy)
+                    {
+                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorHillCubicAnIso(this, classicCalculation);
+                    }
+                    else
+                    {
+                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorHillCubic(this, classicCalculation);
+                    }
                     break;
                 case "hexagonal":
                     this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorHillHexagonal(this, classicCalculation);
@@ -6479,7 +6893,14 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this.Symmetry)
                 {
                     case "cubic":
-                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorKroenerCubicStiffness(this, classicCalculation);
+                        if (this.FixedAnIsotropy)
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorKroenerCubicStiffnessAnIso(this, classicCalculation);
+                        }
+                        else
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorKroenerCubicStiffness(this, classicCalculation);
+                        }
                         break;
                     case "hexagonal":
                         break;
@@ -6517,7 +6938,14 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this.Symmetry)
                 {
                     case "cubic":
-                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorKroenerCubicCompliance(this, classicCalculation);
+                        if (this.FixedAnIsotropy)
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorKroenerCubicComplianceAnIso(this, classicCalculation);
+                        }
+                        else
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorKroenerCubicCompliance(this, classicCalculation);
+                        }
                         break;
                     case "hexagonal":
                         break;
@@ -6559,7 +6987,14 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this.Symmetry)
                 {
                     case "cubic":
-                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorDeWittCubicStiffness(this, classicCalculation);
+                        if (this.FixedAnIsotropy)
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorDeWittCubicStiffnessAnIso(this, classicCalculation);
+                        }
+                        else
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorDeWittCubicStiffness(this, classicCalculation);
+                        }
                         break;
                     case "hexagonal":
                         break;
@@ -6597,7 +7032,14 @@ namespace CalScec.Analysis.Stress.Microsopic
                 switch (this.Symmetry)
                 {
                     case "cubic":
-                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorDeWittCubicCompliance(this, classicCalculation);
+                        if (this.FixedAnIsotropy)
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorDeWittCubicComplianceAnIso(this, classicCalculation);
+                        }
+                        else
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorDeWittCubicCompliance(this, classicCalculation);
+                        }
                         break;
                     case "hexagonal":
                         break;
@@ -6637,7 +7079,15 @@ namespace CalScec.Analysis.Stress.Microsopic
             switch (this.Symmetry)
             {
                 case "cubic":
-                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorGeometricHillCubic(this, classicCalculation);
+                    if (this.FixedAnIsotropy)
+                    {
+                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorGeometricHillCubicAnIso(this, classicCalculation);
+                    }
+                    else
+                    {
+                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorGeometricHillCubic(this, classicCalculation);
+                    }
+                    
                     break;
                 case "hexagonal":
                     this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorGeometricHillHexagonal(this, classicCalculation);
@@ -6671,6 +7121,333 @@ namespace CalScec.Analysis.Stress.Microsopic
             this.CalculateStiffnesses();
             SetFittingErrorsHill(classicCalculation);
         }
+
+        #region Textured
+        
+        public void FitReussTextured(bool classicCalculation)
+        {
+            switch (this.Symmetry)
+            {
+                case "cubic":
+                    if (this.FixedAnIsotropy)
+                    {
+                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorReussCubicAnIsoTexture(this, classicCalculation);
+                    }
+                    else
+                    {
+                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorReussCubicTexture(this, classicCalculation);
+                    }
+                    break;
+                case "hexagonal":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorReussHexagonalTexture(this, classicCalculation);
+                    break;
+                case "tetragonal type 1":
+
+                    break;
+                case "tetragonal type 2":
+
+                    break;
+                case "trigonal type 1":
+
+                    break;
+                case "trigonal type 2":
+
+                    break;
+                case "rhombic":
+
+                    break;
+                case "monoclinic":
+
+                    break;
+                case "triclinic":
+
+                    break;
+                default:
+
+                    break;
+            }
+
+            this.CalculateStiffnesses();
+            SetFittingErrorsReuss(classicCalculation);
+        }
+
+        public void FitHillTextured(bool classicCalculation)
+        {
+            switch (this.Symmetry)
+            {
+                case "cubic":
+                    if (this.FixedAnIsotropy)
+                    {
+                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorHillCubicAnIsoTexture(this, classicCalculation);
+                    }
+                    else
+                    {
+                        this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorHillCubicTexture(this, classicCalculation);
+                    }
+                    break;
+                case "hexagonal":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorHillHexagonalTexture(this, classicCalculation);
+                    break;
+                case "tetragonal type 1":
+
+                    break;
+                case "tetragonal type 2":
+
+                    break;
+                case "trigonal type 1":
+
+                    break;
+                case "trigonal type 2":
+
+                    break;
+                case "rhombic":
+
+                    break;
+                case "monoclinic":
+
+                    break;
+                case "triclinic":
+
+                    break;
+                default:
+
+                    break;
+            }
+
+            this.CalculateStiffnesses();
+            SetFittingErrorsHill(classicCalculation);
+        }
+
+        public void FitKroenerTextured(bool classicCalculation, bool stiffnessCalc)
+        {
+            if (stiffnessCalc)
+            {
+                switch (this.Symmetry)
+                {
+                    case "cubic":
+                        if (this.FixedAnIsotropy)
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorKroenerCubicStiffnessAnIsoTexture(this, classicCalculation);
+                        }
+                        else
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorKroenerCubicStiffnessTexture(this, classicCalculation);
+                        }
+                        break;
+                    case "hexagonal":
+                        break;
+                    case "tetragonal type 1":
+
+                        break;
+                    case "tetragonal type 2":
+
+                        break;
+                    case "trigonal type 1":
+
+                        break;
+                    case "trigonal type 2":
+
+                        break;
+                    case "rhombic":
+
+                        break;
+                    case "monoclinic":
+
+                        break;
+                    case "triclinic":
+
+                        break;
+                    default:
+
+                        break;
+                }
+
+                this.CalculateCompliances();
+                SetFittingErrorsKroener(classicCalculation);
+            }
+            else
+            {
+                switch (this.Symmetry)
+                {
+                    case "cubic":
+                        if (this.FixedAnIsotropy)
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorKroenerCubicComplianceAnIsoTexture(this, classicCalculation);
+                        }
+                        else
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorKroenerCubicComplianceTexture(this, classicCalculation);
+                        }
+                        break;
+                    case "hexagonal":
+                        break;
+                    case "tetragonal type 1":
+
+                        break;
+                    case "tetragonal type 2":
+
+                        break;
+                    case "trigonal type 1":
+
+                        break;
+                    case "trigonal type 2":
+
+                        break;
+                    case "rhombic":
+
+                        break;
+                    case "monoclinic":
+
+                        break;
+                    case "triclinic":
+
+                        break;
+                    default:
+
+                        break;
+                }
+
+                this.CalculateStiffnesses();
+                SetFittingErrorsKroener(classicCalculation);
+            }
+        }
+
+        public void FitDeWittTextured(bool classicCalculation, bool stiffnessCalc)
+        {
+            if (stiffnessCalc)
+            {
+                switch (this.Symmetry)
+                {
+                    case "cubic":
+                        if (this.FixedAnIsotropy)
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorDeWittCubicStiffnessAnIsoTexture(this, classicCalculation);
+                        }
+                        else
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorDeWittCubicStiffnessTexture(this, classicCalculation);
+                        }
+                        break;
+                    case "hexagonal":
+                        break;
+                    case "tetragonal type 1":
+
+                        break;
+                    case "tetragonal type 2":
+
+                        break;
+                    case "trigonal type 1":
+
+                        break;
+                    case "trigonal type 2":
+
+                        break;
+                    case "rhombic":
+
+                        break;
+                    case "monoclinic":
+
+                        break;
+                    case "triclinic":
+
+                        break;
+                    default:
+
+                        break;
+                }
+
+                this.CalculateCompliances();
+                SetFittingErrorsDeWitt(classicCalculation);
+            }
+            else
+            {
+                switch (this.Symmetry)
+                {
+                    case "cubic":
+                        if (this.FixedAnIsotropy)
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorDeWittCubicComplianceAnIsoTexture(this, classicCalculation);
+                        }
+                        else
+                        {
+                            this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorDeWittCubicComplianceTexture(this, classicCalculation);
+                        }
+                        break;
+                    case "hexagonal":
+                        break;
+                    case "tetragonal type 1":
+
+                        break;
+                    case "tetragonal type 2":
+
+                        break;
+                    case "trigonal type 1":
+
+                        break;
+                    case "trigonal type 2":
+
+                        break;
+                    case "rhombic":
+
+                        break;
+                    case "monoclinic":
+
+                        break;
+                    case "triclinic":
+
+                        break;
+                    default:
+
+                        break;
+                }
+
+                this.CalculateStiffnesses();
+                SetFittingErrorsDeWitt(classicCalculation);
+            }
+        }
+
+        public void FitGeometricHillTextured(bool classicCalculation)
+        {
+            switch (this.Symmetry)
+            {
+                case "cubic":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorGeometricHillCubicTexture(this, classicCalculation);
+                    break;
+                case "hexagonal":
+                    this.FitConverged = Analysis.Fitting.LMA.FitElasticityTensorGeometricHillHexagonalTexture(this, classicCalculation);
+                    break;
+                case "tetragonal type 1":
+
+                    break;
+                case "tetragonal type 2":
+
+                    break;
+                case "trigonal type 1":
+
+                    break;
+                case "trigonal type 2":
+
+                    break;
+                case "rhombic":
+
+                    break;
+                case "monoclinic":
+
+                    break;
+                case "triclinic":
+
+                    break;
+                default:
+
+                    break;
+            }
+
+            this.CalculateStiffnesses();
+            SetFittingErrorsHill(classicCalculation);
+        }
+
+
+        #endregion
 
         #endregion
 
@@ -7372,6 +8149,8 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         #region Cubic Isotrope
 
+        #region Stiffnesses
+
         public double S1VoigtCubicIsotrope()
         {
             double Ret = -5 * this.C12;
@@ -7564,8 +8343,74 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         #endregion
 
+        #region Compliance components
+
+        public double S1VoigtCubicComplianceAnIso()
+        {
+            double tS44 = 2 * this.AnIsotropy * (this.S11 - this.S12);
+            double Ret = this.S11 / 5.0;
+            Ret += (4.0 / 5.0) * this.S12;
+            Ret -= tS44 / 10.0;
+
+            return Ret;
+        }
+
+        public double HS2VoigtCubicComplianceAnIso()
+        {
+            double tS44 = 2 * this.AnIsotropy * (this.S11 - this.S12);
+            double Ret = this.S11 * (2.0 / 5.0);
+            Ret -= (2.0 / 5.0) * this.S12;
+            Ret += tS44 * (3.0 / 10.0);
+
+            return Ret;
+        }
+
+        #region First derivative
+
+        public double FirstDerivativeS11S1VoigtCubicAnIso()
+        {
+            double tS44 = 2 * this.AnIsotropy;
+            double Ret = 1 / 5.0;
+            Ret -= tS44 / 10.0;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS12S1VoigtCubicAnIso()
+        {
+            double tS44 = 2 * this.AnIsotropy * (-1);
+            double Ret = (4.0 / 5.0) * 1;
+            Ret -= tS44 / 10.0;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS11HS2VoigtCubicAnIso()
+        {
+            double tS44 = 2 * this.AnIsotropy;
+            double Ret = 1 * (2.0 / 5.0);
+            Ret += tS44 * (3.0 / 10.0);
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS12HS2VoigtCubicAnIso()
+        {
+            double tS44 = 2 * this.AnIsotropy * (-1);
+            double Ret = (2.0 / 5.0) * 1;
+            Ret += tS44 * (3.0 / 10.0);
+
+            return Ret;
+        }
+
+        #endregion
+
+        #endregion
+
+        #endregion
+
         #region Cubic
-        
+
         #region Stiffnes components
 
         public double S1VoigtCubic()
@@ -10381,8 +11226,6 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         #region Reuss
 
-        #region Cubic
-
         private double CubicGamma(DataManagment.CrystalData.HKLReflex hKL)
         {
             double Gamma = Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
@@ -10393,6 +11236,451 @@ namespace CalScec.Analysis.Stress.Microsopic
 
             return Gamma / N;
         }
+
+        #region Cubic fixed anisotropy
+
+        public double S1ReussCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            if (CalScec.Properties.Settings.Default.CubicFittingModel == 1)
+            {
+                double Gamma = this.CubicGamma(hKL);
+
+                double Ret = this.S12;
+                double tS44 = 2 * this.AnIsotropy * (this.S11 - this.S12);
+                double S0 = this.S11 - this.S12 - (0.5 * tS44);
+
+                Ret += S0 * Gamma;
+
+                return Ret;
+            }
+            else if (CalScec.Properties.Settings.Default.CubicFittingModel == 2)
+            {
+                #region Implementation after Howard and Kisi
+                
+                double tS44 = 2 * this.AnIsotropy * (this.S11 - this.S12);
+
+                double Sum = Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
+                Sum += Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
+                Sum += Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
+                Sum *= this.S11 - (tS44 / 2);
+
+                double Sum1 = Math.Pow(hKL.H, 4) + Math.Pow(hKL.K, 4) + Math.Pow(hKL.L, 4);
+                Sum1 += Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
+                Sum1 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
+                Sum1 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
+                Sum1 *= this.S12;
+
+                double N = Math.Pow(Math.Pow(hKL.H, 2) + Math.Pow(hKL.K, 2) + Math.Pow(hKL.L, 2), 2);
+
+                double Ret = Sum + Sum1;
+                Ret /= N;
+
+                return Ret;
+
+                #endregion
+            }
+
+            return 0;
+        }
+
+        public double HS2ReussCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            if (CalScec.Properties.Settings.Default.CubicFittingModel == 1)
+            {
+                double Gamma = this.CubicGamma(hKL);
+
+                double tS44 = 2 * this.AnIsotropy * (this.S11 - this.S12);
+
+                double Ret = this.S11 - this.S12;
+                double S0 = this.S11 - this.S12 - (0.5 * tS44);
+
+                Ret -= 3 * S0 * Gamma;
+
+                return Ret;
+            }
+            else if (CalScec.Properties.Settings.Default.CubicFittingModel == 2)
+            {
+                #region Implementation after Howard and Kisi
+
+                double tS44 = 2 * this.AnIsotropy * (this.S11 - this.S12);
+
+                double Sum = Math.Pow(hKL.H, 4) + Math.Pow(hKL.K, 4) + Math.Pow(hKL.L, 4);
+                Sum -= Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
+                Sum -= Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
+                Sum -= Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
+                Sum *= this.S11;
+
+                double Sum1 = Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
+                Sum1 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
+                Sum1 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
+                Sum1 -= (Math.Pow(hKL.H, 4) + Math.Pow(hKL.K, 4) + Math.Pow(hKL.L, 4));
+                Sum1 *= this.S12;
+
+                double Sum2 = Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
+                Sum2 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
+                Sum2 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
+                Sum2 *= 1.5 * tS44;
+
+                double N = Math.Pow(Math.Pow(hKL.H, 2) + Math.Pow(hKL.K, 2) + Math.Pow(hKL.L, 2), 2);
+
+                double Ret = Sum + Sum1 + Sum2;
+                Ret /= N;
+
+                return Ret;
+
+                #endregion
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorReussCubicClassicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicS1 - this.S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicS1 - this.S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorReussCubicMacroscopicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+         /// <summary>
+         /// Calculates the Hessian matrix and the solution vecor
+         /// </summary>
+         /// <returns>
+         /// The Deltas for the paramaeters:
+         ///[0] C11
+         ///[1] C12
+         ///[2] C44
+         /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorReussCubicTexturedAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2ReussCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        #region First derivative
+
+        public double FirstDerivativeS11S1ReussCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            if (CalScec.Properties.Settings.Default.CubicFittingModel == 1)
+            {
+                double Gamma = this.CubicGamma(hKL);
+                
+                double tS44 = 2 * this.AnIsotropy;
+                double S0 = 1 - (0.5 * tS44);
+
+                double Ret = S0 * Gamma;
+
+                return Ret;
+            }
+            else if (CalScec.Properties.Settings.Default.CubicFittingModel == 2)
+            {
+                #region Implementation after Howard and Kisi
+
+                double tS44 = 2 * this.AnIsotropy;
+
+                double Sum = Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
+                Sum += Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
+                Sum += Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
+                Sum *= 1 - (tS44 / 2);
+
+                double N = Math.Pow(Math.Pow(hKL.H, 2) + Math.Pow(hKL.K, 2) + Math.Pow(hKL.L, 2), 2);
+
+                double Ret = Sum;
+                Ret /= N;
+
+                return Ret;
+
+                #endregion
+            }
+
+            return 0;
+        }
+
+        public double FirstDerivativeS12S1ReussCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            if (CalScec.Properties.Settings.Default.CubicFittingModel == 1)
+            {
+                double Gamma = this.CubicGamma(hKL);
+
+                double Ret = 1;
+                double tS44 = 2 * this.AnIsotropy * (-1);
+                double S0 = -1 - (0.5 * tS44);
+
+                Ret += S0 * Gamma;
+
+                return Ret;
+            }
+            else if (CalScec.Properties.Settings.Default.CubicFittingModel == 2)
+            {
+                #region Implementation after Howard and Kisi
+
+                double tS44 = 2 * this.AnIsotropy * (-1);
+
+                double Sum = Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
+                Sum += Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
+                Sum += Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
+                Sum *= -(tS44 / 2);
+
+                double Sum1 = Math.Pow(hKL.H, 4) + Math.Pow(hKL.K, 4) + Math.Pow(hKL.L, 4);
+                Sum1 += Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
+                Sum1 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
+                Sum1 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
+                Sum1 *= 1;
+
+                double N = Math.Pow(Math.Pow(hKL.H, 2) + Math.Pow(hKL.K, 2) + Math.Pow(hKL.L, 2), 2);
+
+                double Ret = Sum + Sum1;
+                Ret /= N;
+
+                return Ret;
+
+                #endregion
+            }
+
+            return 0;
+        }
+
+        public double FirstDerivativeS11HS2ReussCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            if (CalScec.Properties.Settings.Default.CubicFittingModel == 1)
+            {
+                double Gamma = this.CubicGamma(hKL);
+
+                double tS44 = 2 * this.AnIsotropy;
+
+                double Ret = 1;
+                double S0 = 1 - (0.5 * tS44);
+
+                Ret -= 3 * S0 * Gamma;
+
+                return Ret;
+            }
+            else if (CalScec.Properties.Settings.Default.CubicFittingModel == 2)
+            {
+                #region Implementation after Howard and Kisi
+
+                double tS44 = 2 * this.AnIsotropy;
+
+                double Sum = Math.Pow(hKL.H, 4) + Math.Pow(hKL.K, 4) + Math.Pow(hKL.L, 4);
+                Sum -= Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
+                Sum -= Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
+                Sum -= Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
+                Sum *= 1;
+
+                double Sum2 = Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
+                Sum2 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
+                Sum2 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
+                Sum2 *= 1.5 * tS44;
+
+                double N = Math.Pow(Math.Pow(hKL.H, 2) + Math.Pow(hKL.K, 2) + Math.Pow(hKL.L, 2), 2);
+
+                double Ret = Sum + Sum2;
+                Ret /= N;
+
+                return Ret;
+
+                #endregion
+            }
+
+            return 0;
+        }
+
+        public double FirstDerivativeS12HS2ReussCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            if (CalScec.Properties.Settings.Default.CubicFittingModel == 1)
+            {
+                double Gamma = this.CubicGamma(hKL);
+
+                double tS44 = 2 * this.AnIsotropy * (-1);
+
+                double Ret = -1;
+                double S0 = -1 - (0.5 * tS44);
+
+                Ret -= 3 * S0 * Gamma;
+
+                return Ret;
+            }
+            else if (CalScec.Properties.Settings.Default.CubicFittingModel == 2)
+            {
+                #region Implementation after Howard and Kisi
+
+                double tS44 = 2 * this.AnIsotropy * (-1);
+                
+
+                double Sum1 = Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
+                Sum1 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
+                Sum1 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
+                Sum1 -= (Math.Pow(hKL.H, 4) + Math.Pow(hKL.K, 4) + Math.Pow(hKL.L, 4));
+                Sum1 *= 1;
+
+                double Sum2 = Math.Pow(hKL.K, 2) * Math.Pow(hKL.L, 2);
+                Sum2 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.L, 2);
+                Sum2 += Math.Pow(hKL.H, 2) * Math.Pow(hKL.K, 2);
+                Sum2 *= 1.5 * tS44;
+
+                double N = Math.Pow(Math.Pow(hKL.H, 2) + Math.Pow(hKL.K, 2) + Math.Pow(hKL.L, 2), 2);
+
+                double Ret = Sum1 + Sum2;
+                Ret /= N;
+
+                return Ret;
+
+                #endregion
+            }
+
+            return 0;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Cubic
 
         public double S1ReussCubic(DataManagment.CrystalData.HKLReflex hKL)
         {
@@ -10604,6 +11892,75 @@ namespace CalScec.Analysis.Stress.Microsopic
                 SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2ReussCubic(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS12HS2ReussCubic(this.DiffractionConstants[n].UsedReflex);
                 SolutionVector[2] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1ReussCubic(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeS44S1ReussCubic(this.DiffractionConstants[n].UsedReflex);
                 SolutionVector[2] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2ReussCubic(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS44HS2ReussCubic(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 3; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorReussCubicTexture(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS44S1ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS44HS2ReussCubic(this.DiffractionConstantsTexture[n].UsedReflex);
 
                 #endregion
             }
@@ -11127,6 +12484,116 @@ namespace CalScec.Analysis.Stress.Microsopic
             return ParamDelta;
         }
 
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C33
+        ///[2] C12
+        ///[3] C13
+        ///[4] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorReussHexagonalTexture(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(5, 5, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(5);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[3, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[3, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[3, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[3, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[4, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[4, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[4, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[4, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[3, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[4, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS33S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS33HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[3] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS13S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[3] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS13HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[4] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS44S1ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[4] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS44HS2ReussHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 5; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(5);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
         #region First derivative
 
         public double FirstDerivativeS11S1ReussHexagonal(DataManagment.CrystalData.HKLReflex hKL)
@@ -11384,6 +12851,231 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         #region Hill
 
+        #region Cubic Aniso
+
+        public double S1HillCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double Ret = this.S1ReussCubicAnIso(hKL) + this.S1VoigtCubicComplianceAnIso();
+            Ret /= 2.0;
+
+            return Ret;
+        }
+
+        public double HS2HillCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double Ret = this.HS2ReussCubicAnIso(hKL) + this.HS2VoigtCubicComplianceAnIso();
+            Ret /= 2.0;
+
+            return Ret;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorHillCubicClassicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicS1 - this.S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicS1 - this.S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorHillCubicMacroscopicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorHillCubicTextureAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2HillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        #region First derivative
+
+        public double FirstDerivativeS11S1HillCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double Ret = this.FirstDerivativeS11S1ReussCubicAnIso(hKL) + this.FirstDerivativeS11S1VoigtCubicAnIso();
+            Ret /= 2.0;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS12S1HillCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double Ret = this.FirstDerivativeS12S1ReussCubicAnIso(hKL) + this.FirstDerivativeS12S1VoigtCubicAnIso();
+            Ret /= 2.0;
+
+            return Ret;
+        }
+        
+        public double FirstDerivativeS11HS2HillCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double Ret = this.FirstDerivativeS11HS2ReussCubicAnIso(hKL) + this.FirstDerivativeS11HS2VoigtCubicAnIso();
+            Ret /= 2.0;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS12HS2HillCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double Ret = this.FirstDerivativeS12HS2ReussCubicAnIso(hKL) + this.FirstDerivativeS12HS2VoigtCubicAnIso();
+            Ret /= 2.0;
+
+            return Ret;
+        }
+
+        #endregion
+
+        #endregion
+
         #region Cubic
 
         public double S1HillCubic(DataManagment.CrystalData.HKLReflex hKL)
@@ -11524,6 +13216,75 @@ namespace CalScec.Analysis.Stress.Microsopic
                 SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2HillCubic(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS12HS2HillCubic(this.DiffractionConstants[n].UsedReflex);
                 SolutionVector[2] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1HillCubic(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeS44S1HillCubic(this.DiffractionConstants[n].UsedReflex);
                 SolutionVector[2] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2HillCubic(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS44HS2HillCubic(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 3; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorHillCubicTexture(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS44S1HillCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS44HS2HillCubic(this.DiffractionConstantsTexture[n].UsedReflex);
 
                 #endregion
             }
@@ -11832,6 +13593,116 @@ namespace CalScec.Analysis.Stress.Microsopic
             return ParamDelta;
         }
 
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C33
+        ///[2] C12
+        ///[3] C13
+        ///[4] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorHillHexagonalTexture(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(5, 5, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(5);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[3, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[3, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[3, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[3, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[4, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[4, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[4, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[4, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[3, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[4, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS33S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS33HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[3] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS13S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[3] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS13HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[4] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS44S1HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[4] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS44HS2HillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 5; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(5);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
         #region First derivative
 
         public double FirstDerivativeS11S1HillHexagonal(DataManagment.CrystalData.HKLReflex hKL)
@@ -12057,6 +13928,11 @@ namespace CalScec.Analysis.Stress.Microsopic
             return this.C44;
         }
 
+        public double GetMu2KroenerDeWittCubicStiffnessAnIso()
+        {
+            return 0.5 * (1 / this.AnIsotropy) * (this.C11 - this.C12);
+        }
+
         #region First Derivatives
 
         public double FirstDerivativeC11Mu1KroenerDeWittCubic()
@@ -12095,6 +13971,16 @@ namespace CalScec.Analysis.Stress.Microsopic
             return 1.0;
         }
 
+        public double FirstDerivativeC11Mu2KroenerDeWittCubicAnIso()
+        {
+            return 0.5 * (1 / this.AnIsotropy);
+        }
+
+        public double FirstDerivativeC12Mu2KroenerDeWittCubicAnIso()
+        {
+            return 0.5 * (1 / this.AnIsotropy) * (-1); ;
+        }
+
         #endregion
 
         #endregion
@@ -12114,6 +14000,11 @@ namespace CalScec.Analysis.Stress.Microsopic
         public double GetMu2KroenerDeWittCubicCompliance()
         {
             return 1.0 / this.S44;
+        }
+
+        public double GetMu2KroenerDeWittCubicComplianceAnIso()
+        {
+            return 1.0 / (2 * this.AnIsotropy * (this.S11 - this.S12));
         }
 
         #region First Derivatives
@@ -12155,6 +14046,18 @@ namespace CalScec.Analysis.Stress.Microsopic
         {
             double Ret = -1.0 / Math.Pow(this.S44, 2);
             return Ret;
+        }
+
+        public double FirstDerivativeS11Mu2KroenerDeWittCubicAnIso()
+        {
+            double Ret = 1.0 / Math.Pow((2 * this.AnIsotropy * (this.S11 - this.S12)), 2);
+            return Ret * 2 * this.AnIsotropy;
+        }
+
+        public double FirstDerivativeS12Mu2KroenerDeWittCubicAnIso()
+        {
+            double Ret = 1.0 / Math.Pow((2 * this.AnIsotropy * (this.S11 - this.S12)), 2);
+            return Ret * -2 * this.AnIsotropy;
         }
 
         #endregion
@@ -12399,7 +14302,76 @@ namespace CalScec.Analysis.Stress.Microsopic
 
             return ParamDelta;
         }
-        
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorKroenerCubicStiffnessTexture(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC11S1KroenerCubic() * this.FirstDerivativeC11S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC11HS2KroenerCubic() * this.FirstDerivativeC11HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12S1KroenerCubic() * this.FirstDerivativeC12S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12HS2KroenerCubic() * this.FirstDerivativeC12HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12S1KroenerCubic() * this.FirstDerivativeC11S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12HS2KroenerCubic() * this.FirstDerivativeC11HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12S1KroenerCubic() * this.FirstDerivativeC11S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12HS2KroenerCubic() * this.FirstDerivativeC11HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44S1KroenerCubic() * this.FirstDerivativeC44S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44HS2KroenerCubic() * this.FirstDerivativeC44HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44S1KroenerCubic() * this.FirstDerivativeC11S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44HS2KroenerCubic() * this.FirstDerivativeC11HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44S1KroenerCubic() * this.FirstDerivativeC11S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44HS2KroenerCubic() * this.FirstDerivativeC11HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44S1KroenerCubic() * this.FirstDerivativeC12S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44HS2KroenerCubic() * this.FirstDerivativeC12HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44S1KroenerCubic() * this.FirstDerivativeC12S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44HS2KroenerCubic() * this.FirstDerivativeC12HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1KroenerCubicStiffness()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeC11S1KroenerCubic();
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2KroenerCubicStiffness()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeC11HS2KroenerCubic();
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1KroenerCubicStiffness()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeC12S1KroenerCubic();
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2KroenerCubicStiffness()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeC12HS2KroenerCubic();
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1KroenerCubicStiffness()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeC44S1KroenerCubic();
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2KroenerCubicStiffness()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeC44HS2KroenerCubic();
+
+                #endregion
+            }
+
+            for (int n = 0; n < 3; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
         #region First derivative
 
         public double FirstDerivativeC11S1KroenerCubic()
@@ -12855,6 +14827,75 @@ namespace CalScec.Analysis.Stress.Microsopic
             return ParamDelta;
         }
 
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorKroenerCubicComplianceTexture(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1KroenerCubic() * this.FirstDerivativeS11S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2KroenerCubic() * this.FirstDerivativeS11HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1KroenerCubic() * this.FirstDerivativeS12S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2KroenerCubic() * this.FirstDerivativeS12HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1KroenerCubic() * this.FirstDerivativeS11S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2KroenerCubic() * this.FirstDerivativeS11HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1KroenerCubic() * this.FirstDerivativeS11S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2KroenerCubic() * this.FirstDerivativeS11HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1KroenerCubic() * this.FirstDerivativeS44S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2KroenerCubic() * this.FirstDerivativeS44HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1KroenerCubic() * this.FirstDerivativeS11S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2KroenerCubic() * this.FirstDerivativeS11HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1KroenerCubic() * this.FirstDerivativeS11S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2KroenerCubic() * this.FirstDerivativeS11HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1KroenerCubic() * this.FirstDerivativeS12S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2KroenerCubic() * this.FirstDerivativeS12HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1KroenerCubic() * this.FirstDerivativeS12S1KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2KroenerCubic() * this.FirstDerivativeS12HS2KroenerCubic() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1KroenerCubicCompliance()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1KroenerCubic();
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2KroenerCubicCompliance()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2KroenerCubic();
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1KroenerCubicCompliance()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1KroenerCubic();
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2KroenerCubicCompliance()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2KroenerCubic();
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1KroenerCubicCompliance()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS44S1KroenerCubic();
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2KroenerCubicCompliance()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS44HS2KroenerCubic();
+
+                #endregion
+            }
+
+            for (int n = 0; n < 3; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
         #region First derivative
 
         public double FirstDerivativeS11S1KroenerCubic()
@@ -13081,6 +15122,793 @@ namespace CalScec.Analysis.Stress.Microsopic
 
             return Ret;
         }
+
+        #endregion
+
+        #endregion
+
+        #region Anisotropy fixed
+
+        #region Stiffness components
+
+        public double S1KroenerCubicStiffnessAnIso()
+        {
+            double UsedKappa = this.KappaCubicStiffness;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicStiffness();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicStiffnessAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double[] AllShearModulusSolutions = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+
+            this._kroenerShearModulus = AllShearModulusSolutions;
+
+            double UsedShearModulus = this.KroenerShearModulus;
+
+            double Ret = this.S1KroenerDeWittCubic(UsedKappa, UsedShearModulus);
+
+            return Ret;
+        }
+
+        public double HS2KroenerCubicStiffnessAnIso()
+        {
+            double UsedKappa = this.KappaCubicStiffness;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicStiffness();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicStiffnessAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double[] AllShearModulusSolutions = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+
+            this._kroenerShearModulus = AllShearModulusSolutions;
+
+            double UsedSHearModulus = this.KroenerShearModulus;
+
+            double Ret = this.HS2KroenerDeWittCubic(UsedSHearModulus);
+
+            return Ret;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorKroenerCubicStiffnessClassicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeC11S1KroenerCubicAnIso() * this.FirstDerivativeC11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeC11HS2KroenerCubicAnIso() * this.FirstDerivativeC11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeC12S1KroenerCubicAnIso() * this.FirstDerivativeC12S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeC12HS2KroenerCubicAnIso() * this.FirstDerivativeC12HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeC12S1KroenerCubicAnIso() * this.FirstDerivativeC11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeC12HS2KroenerCubicAnIso() * this.FirstDerivativeC11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeC12S1KroenerCubicAnIso() * this.FirstDerivativeC11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeC12HS2KroenerCubicAnIso() * this.FirstDerivativeC11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicS1 - this.S1KroenerCubicStiffnessAnIso()) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeC11S1KroenerCubicAnIso();
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2KroenerCubicStiffnessAnIso()) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeC11HS2KroenerCubicAnIso();
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicS1 - this.S1KroenerCubicStiffnessAnIso()) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeC12S1KroenerCubicAnIso();
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2KroenerCubicStiffnessAnIso()) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeC12HS2KroenerCubicAnIso();
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorKroenerCubicStiffnessMacroscopicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeC11S1KroenerCubicAnIso() * this.FirstDerivativeC11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeC11HS2KroenerCubicAnIso() * this.FirstDerivativeC11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeC12S1KroenerCubicAnIso() * this.FirstDerivativeC12S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeC12HS2KroenerCubicAnIso() * this.FirstDerivativeC12HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeC12S1KroenerCubicAnIso() * this.FirstDerivativeC11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeC12HS2KroenerCubicAnIso() * this.FirstDerivativeC11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeC12S1KroenerCubicAnIso() * this.FirstDerivativeC11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeC12HS2KroenerCubicAnIso() * this.FirstDerivativeC11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1KroenerCubicStiffnessAnIso()) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeC11S1KroenerCubicAnIso();
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2KroenerCubicStiffnessAnIso()) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeC11HS2KroenerCubicAnIso();
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1KroenerCubicStiffnessAnIso()) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeC12S1KroenerCubicAnIso();
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2KroenerCubicStiffnessAnIso()) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeC12HS2KroenerCubicAnIso();
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorKroenerCubicStiffnessTextureAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC11S1KroenerCubicAnIso() * this.FirstDerivativeC11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC11HS2KroenerCubicAnIso() * this.FirstDerivativeC11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12S1KroenerCubicAnIso() * this.FirstDerivativeC12S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12HS2KroenerCubicAnIso() * this.FirstDerivativeC12HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12S1KroenerCubicAnIso() * this.FirstDerivativeC11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12HS2KroenerCubicAnIso() * this.FirstDerivativeC11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12S1KroenerCubicAnIso() * this.FirstDerivativeC11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12HS2KroenerCubicAnIso() * this.FirstDerivativeC11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1KroenerCubicStiffnessAnIso()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeC11S1KroenerCubicAnIso();
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2KroenerCubicStiffnessAnIso()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeC11HS2KroenerCubicAnIso();
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1KroenerCubicStiffnessAnIso()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeC12S1KroenerCubicAnIso();
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2KroenerCubicStiffnessAnIso()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeC12HS2KroenerCubicAnIso();
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        #region First derivative
+
+        public double FirstDerivativeC11S1KroenerCubicAnIso()
+        {
+            double UsedKappa = this.KappaCubicStiffness;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicStiffness();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicStiffnessAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeC11KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeC11Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeC11Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1Kroener(UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1Kroener(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            #region Linear
+
+            //double Ret = UsedKappaFD / 9.0;
+            //Ret -= UsedShearModulusFD / 6.0;
+
+            #endregion
+
+            #region Inverse
+
+            double Ret = FirstDerivativeS1ConstantsKroenerDeWittCubic(UsedKappa, UsedKappaFD, UsedShearModulus[0], UsedShearModulusFD);
+
+            #endregion
+
+
+
+            return Ret;
+        }
+
+        public double FirstDerivativeC12S1KroenerCubicAnIso()
+        {
+            double UsedKappa = this.KappaCubicStiffness;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicStiffness();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicStiffnessAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeC12KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeC12Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeC12Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1Kroener(UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1Kroener(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            #region Linear
+
+            //double Ret = UsedKappaFD / 9.0;
+            //Ret -= UsedShearModulusFD / 6.0;
+
+            #endregion
+
+            #region Inverse
+
+            double Ret = FirstDerivativeS1ConstantsKroenerDeWittCubic(UsedKappa, UsedKappaFD, UsedShearModulus[0], UsedShearModulusFD);
+
+            #endregion
+
+            return Ret;
+        }
+
+        public double FirstDerivativeC11HS2KroenerCubicAnIso()
+        {
+            double UsedKappa = this.KappaCubicStiffness;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicStiffness();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicStiffnessAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeC11KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeC11Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeC11Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1Kroener(UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1Kroener(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            //double Ret = -1.0 / Math.Pow(UsedShearModulus[0], 2);
+            double Ret = -0.5 / Math.Pow(UsedShearModulus[0], 2);
+            Ret *= UsedShearModulusFD;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeC12HS2KroenerCubicAnIso()
+        {
+            double UsedKappa = this.KappaCubicStiffness;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicStiffness();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicStiffnessAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeC12KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeC12Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeC12Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1Kroener(UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1Kroener(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            //double Ret = -1.0 / Math.Pow(UsedShearModulus[0], 2);
+            double Ret = -0.5 / Math.Pow(UsedShearModulus[0], 2);
+            Ret *= UsedShearModulusFD;
+
+            return Ret;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Compliance components
+
+        public double S1KroenerCubicComplianceAnIso()
+        {
+            double UsedKappa = this.KappaCubicCompliance;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicCompliance();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicComplianceAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double[] AllShearModulusSolutions = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+
+            this._kroenerShearModulus = AllShearModulusSolutions;
+
+            double UsedShearModulus = this.KroenerShearModulus;
+
+            double Ret = this.S1KroenerDeWittCubic(UsedKappa, UsedShearModulus);
+
+            return Ret;
+        }
+
+        public double HS2KroenerCubicComplianceAnIso()
+        {
+            double UsedKappa = this.KappaCubicCompliance;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicCompliance();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicComplianceAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double[] AllShearModulusSolutions = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+
+            this._kroenerShearModulus = AllShearModulusSolutions;
+
+            double UsedSHearModulus = this.KroenerShearModulus;
+
+            double Ret = this.HS2KroenerDeWittCubic(UsedSHearModulus);
+
+            return Ret;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorKroenerCubicComplianceClassicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11S1KroenerCubicAnIso() * this.FirstDerivativeS11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11HS2KroenerCubicAnIso() * this.FirstDerivativeS11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12S1KroenerCubicAnIso() * this.FirstDerivativeS12S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12HS2KroenerCubicAnIso() * this.FirstDerivativeS12HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12S1KroenerCubicAnIso() * this.FirstDerivativeS11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12HS2KroenerCubicAnIso() * this.FirstDerivativeS11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12S1KroenerCubicAnIso() * this.FirstDerivativeS11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12HS2KroenerCubicAnIso() * this.FirstDerivativeS11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicS1 - this.S1KroenerCubicComplianceAnIso()) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1KroenerCubicAnIso();
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2KroenerCubicComplianceAnIso()) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2KroenerCubicAnIso();
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicS1 - this.S1KroenerCubicComplianceAnIso()) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1KroenerCubicAnIso();
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2KroenerCubicComplianceAnIso()) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2KroenerCubicAnIso();
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorKroenerCubicComplianceMacroscopicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11S1KroenerCubicAnIso() * this.FirstDerivativeS11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11HS2KroenerCubicAnIso() * this.FirstDerivativeS11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12S1KroenerCubicAnIso() * this.FirstDerivativeS12S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12HS2KroenerCubicAnIso() * this.FirstDerivativeS12HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12S1KroenerCubicAnIso() * this.FirstDerivativeS11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12HS2KroenerCubicAnIso() * this.FirstDerivativeS11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12S1KroenerCubicAnIso() * this.FirstDerivativeS11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12HS2KroenerCubicAnIso() * this.FirstDerivativeS11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1KroenerCubicComplianceAnIso()) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeS11S1KroenerCubicAnIso();
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2KroenerCubicComplianceAnIso()) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS11HS2KroenerCubicAnIso();
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1KroenerCubicComplianceAnIso()) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeS12S1KroenerCubicAnIso();
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2KroenerCubicComplianceAnIso()) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS12HS2KroenerCubicAnIso();
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorKroenerCubicComplianceTextureAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1KroenerCubicAnIso() * this.FirstDerivativeS11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2KroenerCubicAnIso() * this.FirstDerivativeS11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1KroenerCubicAnIso() * this.FirstDerivativeS12S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2KroenerCubicAnIso() * this.FirstDerivativeS12HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1KroenerCubicAnIso() * this.FirstDerivativeS11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2KroenerCubicAnIso() * this.FirstDerivativeS11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1KroenerCubicAnIso() * this.FirstDerivativeS11S1KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2KroenerCubicAnIso() * this.FirstDerivativeS11HS2KroenerCubicAnIso() / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1KroenerCubicComplianceAnIso()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1KroenerCubicAnIso();
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2KroenerCubicComplianceAnIso()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2KroenerCubicAnIso();
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1KroenerCubicComplianceAnIso()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1KroenerCubicAnIso();
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2KroenerCubicComplianceAnIso()) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2KroenerCubicAnIso();
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        #region First derivative
+
+        public double FirstDerivativeS11S1KroenerCubicAnIso()
+        {
+            double UsedKappa = this.KappaCubicCompliance;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicCompliance();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicComplianceAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeS11KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeS11Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeS11Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1Kroener(UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1Kroener(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            double Ret = UsedKappaFD / 9.0;
+            Ret -= UsedShearModulusFD / 6.0;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS12S1KroenerCubicAnIso()
+        {
+            double UsedKappa = this.KappaCubicCompliance;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicCompliance();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicComplianceAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeS12KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeS12Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeS12Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1Kroener(UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1Kroener(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            double Ret = UsedKappaFD / 9.0;
+            Ret -= UsedShearModulusFD / 6.0;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS11HS2KroenerCubicAnIso()
+        {
+            double UsedKappa = this.KappaCubicCompliance;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicCompliance();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicComplianceAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeS11KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeS11Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeS11Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1Kroener(UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1Kroener(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            //double Ret = -1.0 / Math.Pow(UsedShearModulus[0], 2);
+            double Ret = -0.5 / Math.Pow(UsedShearModulus[0], 2);
+            Ret *= UsedShearModulusFD;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS12HS2KroenerCubicAnIso()
+        {
+            double UsedKappa = this.KappaCubicCompliance;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicCompliance();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicComplianceAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeS12KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeS12Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeS12Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1Kroener(UsedKappa, UsedMu1, UsedMu2);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1Kroener(UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1Kroener(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            //double Ret = -1.0 / Math.Pow(UsedShearModulus[0], 2);
+            double Ret = -0.5 / Math.Pow(UsedShearModulus[0], 2);
+            Ret *= UsedShearModulusFD;
+
+            return Ret;
+        }
+
+        #endregion
 
         #endregion
 
@@ -13321,6 +16149,75 @@ namespace CalScec.Analysis.Stress.Microsopic
                 SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2DeWittCubicStiffness(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeC12HS2DeWittCubic(this.DiffractionConstants[n].UsedReflex);
                 SolutionVector[2] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1DeWittCubicStiffness(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeC44S1DeWittCubic(this.DiffractionConstants[n].UsedReflex);
                 SolutionVector[2] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2DeWittCubicStiffness(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeC44HS2DeWittCubic(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 3; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorDeWittCubicStiffnessTexture(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1DeWittCubicStiffness(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeC11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2DeWittCubicStiffness(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeC11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1DeWittCubicStiffness(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeC12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2DeWittCubicStiffness(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeC12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1DeWittCubicStiffness(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeC44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2DeWittCubicStiffness(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeC44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex);
 
                 #endregion
             }
@@ -13790,6 +16687,75 @@ namespace CalScec.Analysis.Stress.Microsopic
             return ParamDelta;
         }
 
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorDeWittCubicComplianceTexture(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1DeWittCubicCompliance(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2DeWittCubicCompliance(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1DeWittCubicCompliance(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2DeWittCubicCompliance(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1DeWittCubicCompliance(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS44S1DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2DeWittCubicCompliance(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS44HS2DeWittCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 3; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
         #region First derivative
 
         public double FirstDerivativeS11S1DeWittCubic(DataManagment.CrystalData.HKLReflex hKL)
@@ -14051,6 +17017,812 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         #endregion
 
+        #region Anisotropy fixed
+
+        #region Stiffness components
+
+        public double S1DeWittCubicStiffnessAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double UsedKappa = this.KappaCubicStiffness;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicStiffness();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicStiffnessAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double[] AllShearModulusSolutions = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+
+            this._deWittShearModulus = AllShearModulusSolutions;
+
+            double UsedShearModulus = this.DeWittShearModulus;
+
+            double Ret = this.S1KroenerDeWittCubic(UsedKappa, UsedShearModulus);
+
+            return Ret;
+        }
+
+        public double HS2DeWittCubicStiffnessAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double UsedKappa = this.KappaCubicStiffness;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicStiffness();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicStiffnessAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double[] AllShearModulusSolutions = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+
+            this._deWittShearModulus = AllShearModulusSolutions;
+
+            double UsedSHearModulus = this.DeWittShearModulus;
+
+            double Ret = this.HS2KroenerDeWittCubic(UsedSHearModulus);
+
+            return Ret;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorDeWittCubicStiffnessClassicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicS1 - this.S1DeWittCubicStiffnessAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2DeWittCubicStiffnessAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicS1 - this.S1DeWittCubicStiffnessAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2DeWittCubicStiffnessAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorDeWittCubicStiffnessMacroscopicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1DeWittCubicStiffnessAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2DeWittCubicStiffnessAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1DeWittCubicStiffnessAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2DeWittCubicStiffnessAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorDeWittCubicStiffnessTextureAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1DeWittCubicStiffnessAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeC11S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2DeWittCubicStiffnessAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeC11HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1DeWittCubicStiffnessAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeC12S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2DeWittCubicStiffnessAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeC12HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        #region First derivative
+
+        public double FirstDerivativeC11S1DeWittCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double UsedKappa = this.KappaCubicStiffness;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicStiffness();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicStiffnessAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeC11KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeC11Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeC11Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1DeWitt(UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            #region Linear
+
+            //double Ret = UsedKappaFD / 9.0;
+            //Ret -= UsedShearModulusFD / 6.0;
+
+            #endregion
+
+            #region Inverse
+
+            double Ret = FirstDerivativeS1ConstantsKroenerDeWittCubic(UsedKappa, UsedKappaFD, UsedShearModulus[0], UsedShearModulusFD);
+
+            #endregion
+
+            return Ret;
+        }
+
+        public double FirstDerivativeC12S1DeWittCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double UsedKappa = this.KappaCubicStiffness;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicStiffness();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicStiffnessAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeC12KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeC12Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeC12Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1DeWitt(UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            #region Linear
+
+            //double Ret = UsedKappaFD / 9.0;
+            //Ret -= UsedShearModulusFD / 6.0;
+
+            #endregion
+
+            #region Inverse
+
+            double Ret = FirstDerivativeS1ConstantsKroenerDeWittCubic(UsedKappa, UsedKappaFD, UsedShearModulus[0], UsedShearModulusFD);
+
+            #endregion
+
+            return Ret;
+        }
+
+        public double FirstDerivativeC11HS2DeWittCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double UsedKappa = this.KappaCubicStiffness;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicStiffness();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicStiffnessAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeC11KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeC11Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeC11Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1DeWitt(UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            //double Ret = -1.0 / Math.Pow(UsedShearModulus[0], 2);
+            double Ret = -0.5 / Math.Pow(UsedShearModulus[0], 2);
+            Ret *= UsedShearModulusFD;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeC12HS2DeWittCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double UsedKappa = this.KappaCubicStiffness;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicStiffness();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicStiffnessAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeC12KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeC12Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeC12Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1DeWitt(UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            //double Ret = -1.0 / Math.Pow(UsedShearModulus[0], 2);
+            double Ret = -0.5 / Math.Pow(UsedShearModulus[0], 2);
+            Ret *= UsedShearModulusFD;
+
+            return Ret;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Compliance components
+
+        public double S1DeWittCubicComplianceAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double UsedKappa = this.KappaCubicCompliance;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicCompliance();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicComplianceAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double[] AllShearModulusSolutions = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+
+            this._deWittShearModulus = AllShearModulusSolutions;
+
+            double UsedShearModulus = this.DeWittShearModulus;
+
+            double Ret = this.S1KroenerDeWittCubic(UsedKappa, UsedShearModulus);
+
+            return Ret;
+        }
+
+        public double HS2DeWittCubicComplianceAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double UsedKappa = this.KappaCubicCompliance;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicCompliance();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicComplianceAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double[] AllShearModulusSolutions = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+
+            this._deWittShearModulus = AllShearModulusSolutions;
+
+            double UsedSHearModulus = this.DeWittShearModulus;
+
+            double Ret = this.HS2KroenerDeWittCubic(UsedSHearModulus);
+
+            return Ret;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorDeWittCubicComplianceClassicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicS1 - this.S1DeWittCubicComplianceAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2DeWittCubicComplianceAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicS1 - this.S1DeWittCubicComplianceAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2DeWittCubicComplianceAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorDeWittCubicComplianceMacroscopicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1DeWittCubicComplianceAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2DeWittCubicComplianceAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1DeWittCubicComplianceAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2DeWittCubicComplianceAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorDeWittCubicComplianceTextureAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1DeWittCubicComplianceAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2DeWittCubicComplianceAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1DeWittCubicComplianceAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2DeWittCubicComplianceAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2DeWittCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        #region First derivative
+
+        public double FirstDerivativeS11S1DeWittCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double UsedKappa = this.KappaCubicCompliance;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicCompliance();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicComplianceAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeS11KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeS11Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeS11Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1DeWitt(UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            #region Linear
+
+            //double Ret = UsedKappaFD / 9.0;
+            //Ret -= UsedShearModulusFD / 6.0;
+
+            #endregion
+
+            #region Inverse
+
+            double Ret = FirstDerivativeS1ConstantsKroenerDeWittCubic(UsedKappa, UsedKappaFD, UsedShearModulus[0], UsedShearModulusFD);
+
+            #endregion
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS12S1DeWittCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double UsedKappa = this.KappaCubicCompliance;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicCompliance();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicComplianceAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeS12KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeS12Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeS12Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1DeWitt(UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            #region Linear
+
+            //double Ret = UsedKappaFD / 9.0;
+            //Ret -= UsedShearModulusFD / 6.0;
+
+            #endregion
+
+            #region Inverse
+
+            double Ret = FirstDerivativeS1ConstantsKroenerDeWittCubic(UsedKappa, UsedKappaFD, UsedShearModulus[0], UsedShearModulusFD);
+
+            #endregion
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS11HS2DeWittCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double UsedKappa = this.KappaCubicCompliance;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicCompliance();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicComplianceAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeS11KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeS11Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeS11Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1DeWitt(UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            //double Ret = -1.0 / Math.Pow(UsedShearModulus[0], 2);
+            double Ret = -0.5 / Math.Pow(UsedShearModulus[0], 2);
+            Ret *= UsedShearModulusFD;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS12HS2DeWittCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double UsedKappa = this.KappaCubicCompliance;
+            double UsedMu1 = this.GetMu1KroenerDeWittCubicCompliance();
+            double UsedMu2 = this.GetMu2KroenerDeWittCubicComplianceAnIso();
+
+            double UsedKappaFD = this.FirstDerivativeS12KappaCubic();
+            double UsedMu1FD = this.FirstDerivativeS12Mu1KroenerDeWittCubic();
+            double UsedMu2FD = this.FirstDerivativeS12Mu2KroenerDeWittCubicAnIso();
+
+            double UsedAlpha1 = this.GetAlpha1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedAlpha2 = this.GetAlpha2KroenerDeWitt(UsedMu1, UsedMu2);
+            double UsedBeta1 = this.GetBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, hKL);
+            double UsedBeta2 = this.GetBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+            double UsedGammaParameter = this.GetGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2);
+
+            double UsedAlpha1FD = this.GetAlpha1DeWitt(UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedAlpha2FD = this.GetAlpha2KroenerDeWitt(UsedMu1FD, UsedMu2FD);
+            double UsedBeta1FD = this.FirstDerivativeBeta1DeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD, hKL);
+            double UsedBeta2FD = this.FirstDerivativeBeta2KroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+            double UsedGammaParameterFD = this.FirstDerivativeGammaParameterKroenerDeWitt(UsedKappa, UsedMu1, UsedMu2, UsedKappaFD, UsedMu1FD, UsedMu2FD);
+
+            double UsedAlpha = UsedAlpha2 - UsedAlpha1;
+            double UsedBeta = UsedBeta2 - UsedBeta1;
+
+            double UsedAlphaFD = UsedAlpha2FD - UsedAlpha1FD;
+            double UsedBetaFD = UsedBeta2FD - UsedBeta1FD;
+
+            double[] UsedShearModulus = this.CalculateShearModulus(UsedAlpha, UsedBeta, UsedGammaParameter);
+            double UsedShearModulusFD = this.FirstDerivativeShearModulusCubic(UsedAlpha, UsedBeta, UsedGammaParameter, UsedAlphaFD, UsedBetaFD, UsedGammaParameterFD);
+
+            //double Ret = -1.0 / Math.Pow(UsedShearModulus[0], 2);
+            double Ret = -0.5 / Math.Pow(UsedShearModulus[0], 2);
+            Ret *= UsedShearModulusFD;
+
+            return Ret;
+        }
+
+        #endregion
+
+        #endregion
+
+        #endregion
+
         #endregion
 
         #endregion
@@ -14061,9 +17833,242 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         #region Cubic
 
+        public double S1GeometricHillCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double Ret = -1 * Math.Sqrt(this.S1ReussCubicAnIso(hKL) * this.S1VoigtCubicComplianceAnIso());
+
+            return Ret;
+        }
+
+        public double HS2GeometricHillCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double Ret = Math.Sqrt(this.HS2ReussCubicAnIso(hKL) * this.HS2VoigtCubicComplianceAnIso());
+
+            return Ret;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorGeometricHillCubicClassicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2));
+                
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicS1 - this.S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[0] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicS1 - this.S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].ClassicHS2 - this.HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorGeometricHillCubicMacroscopicAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstants.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 0] += (this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 1] += (this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[0, 1] += (this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2));
+                HessianMatrix[1, 0] += (this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2));
+                
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[0] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicS1 - this.S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicS1Error, 2)) * this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+                SolutionVector[1] += ((this.DiffractionConstants[n].MacroscopicHS2 - this.HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex)) / Math.Pow(this.DiffractionConstants[n].MacroscopicHS2Error, 2)) * this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstants[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorGeometricHillCubicTextureAnIso(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2GeometricHillCubicAnIso(this.DiffractionConstantsTexture[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 2; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(2);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
+        #region First derivative
+
+        public double FirstDerivativeS11S1GeometricHillCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double Ret = this.FirstDerivativeS11S1ReussCubicAnIso(hKL) * this.S1VoigtCubicComplianceAnIso();
+            Ret += this.S1ReussCubicAnIso(hKL) * this.FirstDerivativeS11S1VoigtCubicAnIso();
+            Ret /= Math.Sqrt(this.S1ReussCubicAnIso(hKL) * this.S1VoigtCubicComplianceAnIso());
+            Ret *= -0.5;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS12S1GeometricHillCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double Ret = this.FirstDerivativeS12S1ReussCubicAnIso(hKL) * this.S1VoigtCubicComplianceAnIso();
+            Ret += this.S1ReussCubicAnIso(hKL) * this.FirstDerivativeS12S1VoigtCubicAnIso();
+            Ret /= Math.Sqrt(this.S1ReussCubicAnIso(hKL) * this.S1VoigtCubicComplianceAnIso());
+            Ret *= -0.5;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS11HS2GeometricHillCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double Ret = this.FirstDerivativeS11HS2ReussCubicAnIso(hKL) * this.HS2VoigtCubicComplianceAnIso();
+            Ret += this.HS2ReussCubicAnIso(hKL) * this.FirstDerivativeS11HS2VoigtCubicAnIso();
+            Ret /= Math.Sqrt(this.HS2ReussCubicAnIso(hKL) * this.HS2VoigtCubicComplianceAnIso());
+            Ret *= 0.5;
+
+            return Ret;
+        }
+
+        public double FirstDerivativeS12HS2GeometricHillCubicAnIso(DataManagment.CrystalData.HKLReflex hKL)
+        {
+            double Ret = this.FirstDerivativeS12HS2ReussCubicAnIso(hKL) * this.HS2VoigtCubicComplianceAnIso();
+            Ret += this.HS2ReussCubicAnIso(hKL) * this.FirstDerivativeS12HS2VoigtCubicAnIso();
+            Ret /= Math.Sqrt(this.HS2ReussCubicAnIso(hKL) * this.HS2VoigtCubicComplianceAnIso());
+            Ret *= 0.5;
+
+            return Ret;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Cubic
+
         public double S1GeometricHillCubic(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = Math.Sqrt(this.S1ReussCubic(hKL) * this.S1VoigtCubicCompliance());
+            double Ret = -1 * Math.Sqrt(this.S1ReussCubic(hKL) * this.S1VoigtCubicCompliance());
 
             return Ret;
         }
@@ -14213,6 +18218,75 @@ namespace CalScec.Analysis.Stress.Microsopic
             return ParamDelta;
         }
 
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C12
+        ///[2] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorGeometricHillCubicTexture(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS44S1GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS44HS2GeometricHillCubic(this.DiffractionConstantsTexture[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 3; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(3);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
         #region First derivative
 
         public double FirstDerivativeS11S1GeometricHillCubic(DataManagment.CrystalData.HKLReflex hKL)
@@ -14220,7 +18294,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS11S1ReussCubic(hKL) * this.S1VoigtCubicCompliance();
             Ret += this.S1ReussCubic(hKL) * this.FirstDerivativeS11S1VoigtCubic();
             Ret /= Math.Sqrt(this.S1ReussCubic(hKL) * this.S1VoigtCubicCompliance());
-            Ret *= 0.5;
+            Ret *= -0.5;
 
             return Ret;
         }
@@ -14230,7 +18304,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS12S1ReussCubic(hKL) * this.S1VoigtCubicCompliance();
             Ret += this.S1ReussCubic(hKL) * this.FirstDerivativeS12S1VoigtCubic();
             Ret /= Math.Sqrt(this.S1ReussCubic(hKL) * this.S1VoigtCubicCompliance());
-            Ret *= 0.5;
+            Ret *= -0.5;
 
             return Ret;
         }
@@ -14240,7 +18314,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS44S1ReussCubic(hKL) * this.S1VoigtCubicCompliance();
             Ret += this.S1ReussCubic(hKL) * this.FirstDerivativeS44S1VoigtCubic();
             Ret /= Math.Sqrt(this.S1ReussCubic(hKL) * this.S1VoigtCubicCompliance());
-            Ret *= 0.5;
+            Ret *= -0.5;
 
             return Ret;
         }
@@ -14283,7 +18357,7 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public double S1GeometricHillHexagonal(DataManagment.CrystalData.HKLReflex hKL)
         {
-            double Ret = Math.Sqrt(this.S1ReussHexagonal(hKL) * this.S1VoigtType1Compliance());
+            double Ret = -1 * Math.Sqrt(this.S1ReussHexagonal(hKL) * this.S1VoigtType1Compliance());
 
             return Ret;
         }
@@ -14515,6 +18589,116 @@ namespace CalScec.Analysis.Stress.Microsopic
             return ParamDelta;
         }
 
+        /// <summary>
+        /// Calculates the Hessian matrix and the solution vecor
+        /// </summary>
+        /// <returns>
+        /// The Deltas for the paramaeters:
+        ///[0] C11
+        ///[1] C33
+        ///[2] C12
+        ///[3] C13
+        ///[4] C44
+        /// </returns>
+        public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektorGeometricHillHexagonalTexture(double Lambda)
+        {
+            //[0][0] C11
+            //[1][1] C12
+            MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(5, 5, 0.0);
+
+            //[0] Aclivity
+            //[1] Constant
+            MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(5);
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                #region Matrix Build
+
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS11HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS33HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS12HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[3, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[3, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[3, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[3, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS13HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                HessianMatrix[4, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS44HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[0, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[0, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[4, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 0] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS11HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[1, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[1, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[4, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 1] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS33HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[2, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[2, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[4, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 2] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS12HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[3, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[3, 4] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+                HessianMatrix[4, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2));
+                HessianMatrix[4, 3] += this.DiffractionConstantsTexture[n].TotalMRD * (this.FirstDerivativeS44HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) * this.FirstDerivativeS13HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2));
+
+                #endregion
+
+                #region Vector build
+
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS11S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[0] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS11HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS33S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[1] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS33HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS12S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[2] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS12HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[3] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS13S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[3] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS13HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[4] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicS1 - this.S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicS1Error, 2)) * this.FirstDerivativeS44S1GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+                SolutionVector[4] += (this.DiffractionConstantsTexture[n].TotalMRD * (this.DiffractionConstantsTexture[n].ClassicHS2 - this.HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex)) / Math.Pow(this.DiffractionConstantsTexture[n].ClassicHS2Error, 2)) * this.FirstDerivativeS44HS2GeometricHillHexagonal(this.DiffractionConstantsTexture[n].UsedReflex);
+
+                #endregion
+            }
+
+            for (int n = 0; n < 5; n++)
+            {
+                HessianMatrix[n, n] *= (1 + Lambda);
+            }
+
+            MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(5);
+
+            HessianMatrix.Solve(SolutionVector, ParamDelta);
+
+            return ParamDelta;
+        }
+
         #region First derivative
 
         public double FirstDerivativeS11S1GeometricHillHexagonal(DataManagment.CrystalData.HKLReflex hKL)
@@ -14522,6 +18706,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS11S1ReussHexagonal(hKL) * this.S1VoigtType1();
             Ret += this.S1ReussHexagonal(hKL) * this.FirstDerivativeS11S1VoigtType1();
             Ret /= Math.Sqrt(this.S1ReussHexagonal(hKL) * this.S1VoigtType1());
+            Ret *= -0.5;
 
             return Ret;
         }
@@ -14531,6 +18716,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS33S1ReussHexagonal(hKL) * this.S1VoigtType1();
             Ret += this.S1ReussHexagonal(hKL) * this.FirstDerivativeS33S1VoigtType1();
             Ret /= Math.Sqrt(this.S1ReussHexagonal(hKL) * this.S1VoigtType1());
+            Ret *= -0.5;
 
             return Ret;
         }
@@ -14540,6 +18726,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS44S1ReussHexagonal(hKL) * this.S1VoigtType1();
             Ret += this.S1ReussHexagonal(hKL) * this.FirstDerivativeS44S1VoigtType1();
             Ret /= Math.Sqrt(this.S1ReussHexagonal(hKL) * this.S1VoigtType1());
+            Ret *= -0.5;
 
             return Ret;
         }
@@ -14549,6 +18736,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS12S1ReussHexagonal(hKL) * this.S1VoigtType1();
             Ret += this.S1ReussHexagonal(hKL) * this.FirstDerivativeS12S1VoigtType1();
             Ret /= Math.Sqrt(this.S1ReussHexagonal(hKL) * this.S1VoigtType1());
+            Ret *= -0.5;
 
             return Ret;
         }
@@ -14558,6 +18746,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS13S1ReussHexagonal(hKL) * this.S1VoigtType1();
             Ret += this.S1ReussHexagonal(hKL) * this.FirstDerivativeS13S1VoigtType1();
             Ret /= Math.Sqrt(this.S1ReussHexagonal(hKL) * this.S1VoigtType1());
+            Ret *= -0.5;
 
             return Ret;
         }
@@ -14567,6 +18756,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS11HS2ReussHexagonal(hKL) * this.HS2VoigtType1();
             Ret += this.HS2ReussHexagonal(hKL) * this.FirstDerivativeS11HS2VoigtType1();
             Ret /= Math.Sqrt(this.HS2ReussHexagonal(hKL) * this.HS2VoigtType1());
+            Ret *= 0.5;
 
             return Ret;
         }
@@ -14576,6 +18766,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS33HS2ReussHexagonal(hKL) * this.HS2VoigtType1();
             Ret += this.HS2ReussHexagonal(hKL) * this.FirstDerivativeS33HS2VoigtType1();
             Ret /= Math.Sqrt(this.HS2ReussHexagonal(hKL) * this.HS2VoigtType1());
+            Ret *= 0.5;
 
             return Ret;
         }
@@ -14585,6 +18776,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS12HS2ReussHexagonal(hKL) * this.HS2VoigtType1();
             Ret += this.HS2ReussHexagonal(hKL) * this.FirstDerivativeS12HS2VoigtType1();
             Ret /= Math.Sqrt(this.HS2ReussHexagonal(hKL) * this.HS2VoigtType1());
+            Ret *= 0.5;
 
             return Ret;
         }
@@ -14594,6 +18786,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS13HS2ReussHexagonal(hKL) * this.HS2VoigtType1();
             Ret += this.HS2ReussHexagonal(hKL) * this.FirstDerivativeS13HS2VoigtType1();
             Ret /= Math.Sqrt(this.HS2ReussHexagonal(hKL) * this.HS2VoigtType1());
+            Ret *= 0.5;
 
             return Ret;
         }
@@ -14603,6 +18796,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             double Ret = this.FirstDerivativeS44HS2ReussHexagonal(hKL) * this.HS2VoigtType1();
             Ret += this.HS2ReussHexagonal(hKL) * this.FirstDerivativeS44HS2VoigtType1();
             Ret /= Math.Sqrt(this.HS2ReussHexagonal(hKL) * this.HS2VoigtType1());
+            Ret *= 0.5;
 
             return Ret;
         }
@@ -14623,6 +18817,7 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public void SetPeakStressAssociation(Sample actSample)
         {
+            this.UsedPSA.Clear();
             for (int i = 0; i < this.GetPhaseInformation.HKLList.Count; i++)
             {
                 for (int j = 0; j < actSample.DiffractionPatterns.Count; j++)
@@ -14634,7 +18829,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                             if (actSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedHKLReflex.HKLString == this.GetPhaseInformation.HKLList[i].HKLString)
                             {
                                 Stress.Macroskopic.PeakStressAssociation NewAssociation = new Stress.Macroskopic.PeakStressAssociation(actSample.DiffractionPatterns[j].Stress, actSample.DiffractionPatterns[j].PsiAngle(actSample.DiffractionPatterns[j].FoundPeaks[k].Angle), actSample.DiffractionPatterns[j].FoundPeaks[k], actSample.DiffractionPatterns[j].PhiAngle(actSample.DiffractionPatterns[j].FoundPeaks[k].Angle));
-
+                                NewAssociation._macroskopicStrain = actSample.DiffractionPatterns[j].MacroStrain;
                                 this.UsedPSA.Add(NewAssociation);
                             }
                         }
@@ -14643,7 +18838,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             }
         }
 
-        public void SetStrainData()
+        public List<List<Stress.Macroskopic.PeakStressAssociation>> SetStrainData()
         {
             List<List<Stress.Macroskopic.PeakStressAssociation>> SortedDataPre = new List<List<Stress.Macroskopic.PeakStressAssociation>>();
 
@@ -14795,6 +18990,90 @@ namespace CalScec.Analysis.Stress.Microsopic
                     this.UsedPSA.Add(SortedData[n][i]);
                 }
             }
+
+            return SortedData;
+        }
+
+        public List<List<List<Stress.Macroskopic.PeakStressAssociation>>> SetStrainDataReflexYield()
+        {
+            List<List<List<Stress.Macroskopic.PeakStressAssociation>>> ret = new List<List<List<Macroskopic.PeakStressAssociation>>>();
+
+            #region Sorting
+
+            List<List<Stress.Macroskopic.PeakStressAssociation>> hKLSort = new List<List<Macroskopic.PeakStressAssociation>>();
+            for (int n = 0; n < this.UsedPSA.Count; n++)
+            {
+                bool ass = false;
+                for(int i = 0; i < hKLSort.Count; i++)
+                {
+                    if(hKLSort[i][0].HKLAssociation == this.UsedPSA[n].HKLAssociation)
+                    {
+                        hKLSort[i].Add(this.UsedPSA[n]);
+                        ass = true;
+                        break;
+                    }
+                }
+
+                if(!ass)
+                {
+                    List<Stress.Macroskopic.PeakStressAssociation> hKLTmp = new List<Macroskopic.PeakStressAssociation>();
+                    hKLTmp.Add(this.UsedPSA[n]);
+
+                    hKLSort.Add(hKLTmp);
+                }
+            }
+
+            for (int n = 0; n < hKLSort.Count; n++)
+            {
+                List<List<Stress.Macroskopic.PeakStressAssociation>> psiSort = new List<List<Macroskopic.PeakStressAssociation>>();
+
+                for(int i = 0; i < hKLSort[n].Count; i++)
+                {
+                    bool ass = false;
+                    for (int j = 0; j < psiSort.Count; j++)
+                    {
+                        if(Math.Abs(psiSort[j][0].PsiAngle - hKLSort[n][i].PsiAngle) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
+                        {
+                            psiSort[j].Add(hKLSort[n][i]);
+                            ass = true;
+                            break;
+                        }
+                    }
+
+                    if(!ass)
+                    {
+                        List<Stress.Macroskopic.PeakStressAssociation> psiTmp = new List<Macroskopic.PeakStressAssociation>();
+                        psiTmp.Add(hKLSort[n][i]);
+
+                        psiSort.Add(psiTmp);
+                    }
+                }
+
+                ret.Add(psiSort);
+            }
+
+            #endregion
+
+            #region Set strain data
+
+            for(int n = 0; n < ret.Count; n++)
+            {
+                for(int i = 0; i < ret[n].Count; i++)
+                {
+                    ret[n][i].Sort((x, y) => x.MacroskopicStrain.CompareTo(y.MacroskopicStrain));
+
+                    for(int j = 0; j < ret[n][i].Count; j++)
+                    {
+                        ret[n][i][j].Strain = (ret[n][i][j].DPeak.LatticeDistance - ret[n][i][0].DPeak.LatticeDistance) / ret[n][i][0].DPeak.LatticeDistance;
+                        ret[n][i][j].Stress = ret[n][i][j].Stress - ret[n][i][0].Stress;
+                        ret[n][i][j]._StrainError = ret[n][i][j].DPeak.LatticeDistanceError / ret[n][i][0].DPeak.LatticeDistance;
+                    }
+                }
+            }
+
+            #endregion
+
+            return ret;
         }
 
         #endregion
@@ -15195,6 +19474,15 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         #endregion
 
+        #region Operatoren
+
+        //public static MathNet.Numerics.LinearAlgebra.Matrix<double> operator *(ElasticityTensors a, MathNet.Numerics.LinearAlgebra.Matrix<double> b)
+        //{
+            
+        //}
+
+        #endregion
+
         #region Cloning
 
         public object Clone()
@@ -15210,8 +19498,11 @@ namespace CalScec.Analysis.Stress.Microsopic
             Ret._symmetry = this._symmetry;
 
             Ret.IsIsotropic = this.IsIsotropic;
+            Ret.FixedAnIsotropy = this.FixedAnIsotropy;
+            Ret.AnIsotropy = this.AnIsotropy;
 
             Ret.DiffractionConstants = new List<REK>();
+            Ret.DiffractionConstantsTexture = new List<REK>();
 
             Ret._kroenerShearModulus = this._kroenerShearModulus;
             Ret._deWittShearModulus = this._deWittShearModulus;
@@ -15219,6 +19510,11 @@ namespace CalScec.Analysis.Stress.Microsopic
             for (int n = 0; n < this.DiffractionConstants.Count; n++)
             {
                 Ret.DiffractionConstants.Add(this.DiffractionConstants[n].Clone() as REK);
+            }
+
+            for (int n = 0; n < this.DiffractionConstantsTexture.Count; n++)
+            {
+                Ret.DiffractionConstantsTexture.Add(this.DiffractionConstantsTexture[n].Clone() as REK);
             }
 
             for (int n = 0; n < this.UsedPSA.Count; n++)

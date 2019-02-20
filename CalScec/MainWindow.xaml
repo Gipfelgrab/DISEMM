@@ -33,6 +33,7 @@
             </MenuItem>
             <MenuItem Header="Data">
                 <MenuItem Header="Sample and pattern data" Click="ChangeSamplePatternData_Click"/>
+                <MenuItem Header="Phase composition" Click="EditPhaseCompositionData_Click"/>
             </MenuItem>
             <Separator/>
             <MenuItem Header="Peak fitting">
@@ -50,6 +51,9 @@
                 <MenuItem Header="REK calculation" Click="REKCalculation_Click"/>
                 <MenuItem Header="Elasticity tensor calculation" Click="ElasticityTensorCalculation_Click"/>
                 <MenuItem Header="Model Fitting simulation" Click="OpenModelSimulationWindow_Click"/>
+            </MenuItem>
+            <MenuItem Header="Plastic calculation">
+                <MenuItem Header="Yield surface" Click="YieldSurfaceWindow_Click"/>
             </MenuItem>
             <MenuItem Header="Texture">
                 <MenuItem Header="Load texture" Click="LoadTexture_Click"/>
@@ -105,6 +109,7 @@
                     <MenuItem Header="Used detection">
                         <MenuItem Name="PeakDetectionRoutineCIF" Header="CIF-based detection" IsCheckable="True" Checked="PeakDetectionRoutineCIF_Checked" Unchecked="PeakDetectionRoutineCIF_Unchecked"/>
                         <MenuItem Name="PeakDetectionRoutineHyper" Header="Hyper detection" IsCheckable="True" Checked="PeakDetectionRoutineHyper_Checked" Unchecked="PeakDetectionRoutineHyper_Unchecked"/>
+                        <MenuItem Name="PeakDetectionRoutinePattern" Header="Pattern detection" IsCheckable="True" Checked="PeakDetectionRoutinePattern_Checked"  Unchecked="PeakDetectionRoutinePattern_Unchecked"/>
                     </MenuItem>
                     <MenuItem Header="Pattern limits">
                         <StackPanel Orientation="Horizontal">

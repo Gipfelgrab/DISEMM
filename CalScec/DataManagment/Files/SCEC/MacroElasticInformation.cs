@@ -35,6 +35,14 @@ namespace CalScec.DataManagment.Files.SCEC
         public bool _elasticRegime;
 
         public double _macroskopicStrain;
+        public double _Strain;
+        public double _StrainError;
+
+        private double _mRDValue;
+
+
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> CrystalSystemStress;
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> CrystalSystemStrain;
 
         public PeakFunctionInformation DPeak;
 
@@ -47,6 +55,13 @@ namespace CalScec.DataManagment.Files.SCEC
             this.SecondarySlipDirectionAngle = PSA.SecondarySlipDirectionAngle;
             this._elasticRegime = PSA.ElasticRegime;
             this._macroskopicStrain = PSA.MacroskopicStrain;
+            this._mRDValue = PSA.MRDValue;
+            this.CrystalSystemStrain = PSA.CrystalSystemStrain;
+            this.CrystalSystemStress = PSA.CrystalSystemStress;
+
+
+            this._Strain = PSA._Strain;
+            this._StrainError = PSA._StrainError;
 
             DPeak = new PeakFunctionInformation(PSA.DPeak);
         }

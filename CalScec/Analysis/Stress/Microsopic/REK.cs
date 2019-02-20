@@ -255,6 +255,125 @@ namespace CalScec.Analysis.Stress.Microsopic
             }
         }
 
+        public Pattern.Counts GetClassicPhaseREKFittingData()
+        {
+            Pattern.Counts Ret = new Pattern.Counts();
+
+            List<List<Macroskopic.PeakStressAssociation>> SortedData = new List<List<Macroskopic.PeakStressAssociation>>();
+
+            List<double> UsedPsiAngles = new List<double>();
+            int AllDataUsed = 0;
+
+            while (AllDataUsed < this.ElasticStressData.Count)
+            {
+                List<Macroskopic.PeakStressAssociation> ActAngle = new List<Macroskopic.PeakStressAssociation>();
+                int StartingNumber = 0;
+                double ActPsiAngle = 0;
+
+                for (int n = 0; n < this.ElasticStressData.Count; n++)
+                {
+                    bool Contained = false;
+                    for (int i = 0; i < UsedPsiAngles.Count; i++)
+                    {
+                        if (Math.Abs(this.ElasticStressData[n].PsiAngle - UsedPsiAngles[i]) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
+                        {
+                            Contained = true;
+                            break;
+                        }
+                    }
+
+                    if (!Contained)
+                    {
+                        StartingNumber = n + 1;
+                        ActPsiAngle = this.ElasticStressData[n].PsiAngle;
+                        ActAngle.Add(this.ElasticStressData[n]);
+                        AllDataUsed++;
+                        break;
+                    }
+                }
+
+                for (int n = StartingNumber; n < this.ElasticStressData.Count; n++)
+                {
+                    if (Math.Abs(ActPsiAngle - this.ElasticStressData[n].PsiAngle) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
+                    {
+                        ActAngle.Add(this.ElasticStressData[n]);
+                        AllDataUsed++;
+                    }
+                }
+
+                UsedPsiAngles.Add(ActPsiAngle);
+                SortedData.Add(ActAngle);
+            }
+
+            for (int n = 0; n < SortedData.Count; n++)
+            {
+                if (SortedData[n].Count > 1)
+                {
+                    double SmallestStress = SortedData[n][0].PhaseFractionStress;
+                    double SmallestDistance = SortedData[n][0].DPeak.LatticeDistance;
+
+                    for (int i = 1; i < SortedData[n].Count; i++)
+                    {
+                        if (SmallestStress > SortedData[n][i].PhaseFractionStress)
+                        {
+                            SmallestStress = SortedData[n][i].PhaseFractionStress;
+                            SmallestDistance = SortedData[n][i].DPeak.LatticeDistance;
+                        }
+                    }
+
+                    for (int i = 0; i < SortedData[n].Count; i++)
+                    {
+                        if (SmallestStress != SortedData[n][i].PhaseFractionStress)
+                        {
+                            double FValue = (SortedData[n][i].DPeak.LatticeDistance - SmallestDistance);
+                            FValue /= SmallestDistance;
+                            FValue /= (SortedData[n][i].PhaseFractionStress - SmallestStress);
+
+                            double[] NewCount = { Math.Pow(Math.Cos((Math.PI * SortedData[n][i].PsiAngle) / 180.0), 2), FValue, SortedData[n][i].DPeak.LatticeDistanceError };
+                            Ret.Add(NewCount);
+                        }
+                    }
+                }
+            }
+
+            return Ret;
+        }
+
+        public void FitClassicPhaseREKFunction()
+        {
+            Pattern.Counts UsedCounts = this.GetClassicPhaseREKFittingData();
+            if (UsedCounts.Count == 2)
+            {
+                double aclivity = (UsedCounts[0][1] - UsedCounts[1][1]) / (UsedCounts[0][0] - UsedCounts[1][0]);
+
+                double _constant = UsedCounts[0][1] - (aclivity * UsedCounts[0][0]);
+
+                this.ClassicFittingFunction.Aclivity = aclivity;
+                this.ClassicFittingFunction.Constant = _constant;
+
+                MathNet.Numerics.LinearAlgebra.Matrix<double> ErrorMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+                double aclivityError = Math.Pow((1 / (UsedCounts[0][0] - UsedCounts[1][0])) * UsedCounts[0][2], 2) + Math.Pow((-1 / (UsedCounts[0][0] - UsedCounts[1][0])) * UsedCounts[1][2], 2);
+                ErrorMatrix[0, 0] = Math.Sqrt(aclivityError);
+
+                double ConstantError = Math.Pow(UsedCounts[0][0] * aclivityError, 2) + Math.Pow(UsedCounts[0][2], 2);
+
+                ErrorMatrix[1, 1] = Math.Sqrt(ConstantError);
+
+                this.ClassicFittingFunction._hessianMatrix = ErrorMatrix;
+                this.ClassicREKFittingConverged = true;
+            }
+            else if (UsedCounts.Count > 2)
+            {
+                this.ClassicREKFittingConverged = Fitting.LMA.FitMacroElasticModul(this.ClassicFittingFunction, UsedCounts);
+                this.SetClassicDeviation();
+            }
+            else
+            {
+                this.ClassicREKFittingConverged = false;
+            }
+        }
+
         #endregion
 
         #region Macroscopic calculation
@@ -328,6 +447,283 @@ namespace CalScec.Analysis.Stress.Microsopic
                 {
                     return 0.0;
                 }
+            }
+        }
+
+        #endregion
+
+        #region Texture
+
+        public bool ActivateWeigthedMRD = false;
+        public double DECAllMRD = -1;
+
+        public double TotalMRD
+        {
+            get
+            {
+                double ret = 0;
+
+                for (int n = 0; n < this.ElasticStressData.Count; n++)
+                {
+                    ret += this.ElasticStressData[n].MRDValue;
+                }
+
+                if (ActivateWeigthedMRD && DECAllMRD != -1)
+                {
+                    return ret / DECAllMRD;
+                }
+                else
+                {
+                    return ret;
+                }
+            }
+        }
+
+        public Pattern.Counts GetTexturedREKFittingData(List<double> weightings)
+        {
+            Pattern.Counts Ret = new Pattern.Counts();
+            weightings.Clear();
+
+            List<List<Macroskopic.PeakStressAssociation>> SortedData = new List<List<Macroskopic.PeakStressAssociation>>();
+
+            List<double> UsedPsiAngles = new List<double>();
+            int AllDataUsed = 0;
+
+            while (AllDataUsed < this.ElasticStressData.Count)
+            {
+                List<Macroskopic.PeakStressAssociation> ActAngle = new List<Macroskopic.PeakStressAssociation>();
+                int StartingNumber = 0;
+                double ActPsiAngle = 0;
+
+                for (int n = 0; n < this.ElasticStressData.Count; n++)
+                {
+                    bool Contained = false;
+                    for (int i = 0; i < UsedPsiAngles.Count; i++)
+                    {
+                        if (Math.Abs(this.ElasticStressData[n].PsiAngle - UsedPsiAngles[i]) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
+                        {
+                            Contained = true;
+                            break;
+                        }
+                    }
+
+                    if (!Contained)
+                    {
+                        StartingNumber = n + 1;
+                        ActPsiAngle = this.ElasticStressData[n].PsiAngle;
+                        ActAngle.Add(this.ElasticStressData[n]);
+                        AllDataUsed++;
+                        break;
+                    }
+                }
+
+                for (int n = StartingNumber; n < this.ElasticStressData.Count; n++)
+                {
+                    if (Math.Abs(ActPsiAngle - this.ElasticStressData[n].PsiAngle) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
+                    {
+                        ActAngle.Add(this.ElasticStressData[n]);
+                        AllDataUsed++;
+                    }
+                }
+
+                UsedPsiAngles.Add(ActPsiAngle);
+                SortedData.Add(ActAngle);
+            }
+
+            for (int n = 0; n < SortedData.Count; n++)
+            {
+                if (SortedData[n].Count > 1)
+                {
+                    double SmallestStress = SortedData[n][0].Stress;
+                    double SmallestDistance = SortedData[n][0].DPeak.LatticeDistance;
+
+                    for (int i = 1; i < SortedData[n].Count; i++)
+                    {
+                        if (SmallestStress > SortedData[n][i].Stress)
+                        {
+                            SmallestStress = SortedData[n][i].Stress;
+                            SmallestDistance = SortedData[n][i].DPeak.LatticeDistance;
+                        }
+                    }
+
+                    for (int i = 0; i < SortedData[n].Count; i++)
+                    {
+                        if (SmallestStress != SortedData[n][i].Stress)
+                        {
+                            double FValue = (SortedData[n][i].DPeak.LatticeDistance - SmallestDistance);
+                            FValue /= SmallestDistance;
+                            FValue /= (SortedData[n][i].Stress - SmallestStress);
+
+                            double[] NewCount = { Math.Pow(Math.Cos((Math.PI * SortedData[n][i].PsiAngle) / 180.0), 2), FValue, SortedData[n][i].DPeak.LatticeDistanceError };
+                            double mRDTmp = SortedData[n][i].MRDValue;
+                            weightings.Add(mRDTmp);
+                            
+                            Ret.Add(NewCount);
+                        }
+                    }
+                }
+            }
+
+            return Ret;
+        }
+
+        public void FitTexturedREKFunction()
+        {
+            List<double> weightings = new List<double>();
+            Pattern.Counts UsedCounts = this.GetTexturedREKFittingData(weightings);
+            if (UsedCounts.Count == 2)
+            {
+                double aclivity = (UsedCounts[0][1] - UsedCounts[1][1]) / (UsedCounts[0][0] - UsedCounts[1][0]);
+
+                double _constant = UsedCounts[0][1] - (aclivity * UsedCounts[0][0]);
+
+                this.ClassicFittingFunction.Aclivity = aclivity;
+                this.ClassicFittingFunction.Constant = _constant;
+
+                MathNet.Numerics.LinearAlgebra.Matrix<double> ErrorMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+                double aclivityError = Math.Pow((1 / (UsedCounts[0][0] - UsedCounts[1][0])) * UsedCounts[0][2], 2) + Math.Pow((-1 / (UsedCounts[0][0] - UsedCounts[1][0])) * UsedCounts[1][2], 2);
+                ErrorMatrix[0, 0] = Math.Sqrt(aclivityError);
+
+                double ConstantError = Math.Pow(UsedCounts[0][0] * aclivityError, 2) + Math.Pow(UsedCounts[0][2], 2);
+
+                ErrorMatrix[1, 1] = Math.Sqrt(ConstantError);
+
+                this.ClassicFittingFunction._hessianMatrix = ErrorMatrix;
+                this.ClassicREKFittingConverged = true;
+            }
+            else if (UsedCounts.Count > 2)
+            {
+                this.ClassicREKFittingConverged = Fitting.LMA.FitMacroElasticModulTextured(this.ClassicFittingFunction, UsedCounts, weightings);
+                this.SetClassicDeviation();
+            }
+            else
+            {
+                this.ClassicREKFittingConverged = false;
+            }
+        }
+
+        public Pattern.Counts GetTexturedPhaseREKFittingData(List<double> weightings)
+        {
+            Pattern.Counts Ret = new Pattern.Counts();
+            weightings.Clear();
+
+            List<List<Macroskopic.PeakStressAssociation>> SortedData = new List<List<Macroskopic.PeakStressAssociation>>();
+
+            List<double> UsedPsiAngles = new List<double>();
+            int AllDataUsed = 0;
+
+            while (AllDataUsed < this.ElasticStressData.Count)
+            {
+                List<Macroskopic.PeakStressAssociation> ActAngle = new List<Macroskopic.PeakStressAssociation>();
+                int StartingNumber = 0;
+                double ActPsiAngle = 0;
+
+                for (int n = 0; n < this.ElasticStressData.Count; n++)
+                {
+                    bool Contained = false;
+                    for (int i = 0; i < UsedPsiAngles.Count; i++)
+                    {
+                        if (Math.Abs(this.ElasticStressData[n].PsiAngle - UsedPsiAngles[i]) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
+                        {
+                            Contained = true;
+                            break;
+                        }
+                    }
+
+                    if (!Contained)
+                    {
+                        StartingNumber = n + 1;
+                        ActPsiAngle = this.ElasticStressData[n].PsiAngle;
+                        ActAngle.Add(this.ElasticStressData[n]);
+                        AllDataUsed++;
+                        break;
+                    }
+                }
+
+                for (int n = StartingNumber; n < this.ElasticStressData.Count; n++)
+                {
+                    if (Math.Abs(ActPsiAngle - this.ElasticStressData[n].PsiAngle) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
+                    {
+                        ActAngle.Add(this.ElasticStressData[n]);
+                        AllDataUsed++;
+                    }
+                }
+
+                UsedPsiAngles.Add(ActPsiAngle);
+                SortedData.Add(ActAngle);
+            }
+
+            for (int n = 0; n < SortedData.Count; n++)
+            {
+                if (SortedData[n].Count > 1)
+                {
+                    double SmallestStress = SortedData[n][0].PhaseFractionStress;
+                    double SmallestDistance = SortedData[n][0].DPeak.LatticeDistance;
+
+                    for (int i = 1; i < SortedData[n].Count; i++)
+                    {
+                        if (SmallestStress > SortedData[n][i].PhaseFractionStress)
+                        {
+                            SmallestStress = SortedData[n][i].PhaseFractionStress;
+                            SmallestDistance = SortedData[n][i].DPeak.LatticeDistance;
+                        }
+                    }
+
+                    for (int i = 0; i < SortedData[n].Count; i++)
+                    {
+                        if (SmallestStress != SortedData[n][i].PhaseFractionStress)
+                        {
+                            double FValue = (SortedData[n][i].DPeak.LatticeDistance - SmallestDistance);
+                            FValue /= SmallestDistance;
+                            FValue /= (SortedData[n][i].PhaseFractionStress - SmallestStress);
+
+                            double[] NewCount = { Math.Pow(Math.Cos((Math.PI * SortedData[n][i].PsiAngle) / 180.0), 2), FValue, SortedData[n][i].DPeak.LatticeDistanceError };
+                            double mRDTmp = SortedData[n][i].MRDValue;
+                            weightings.Add(mRDTmp);
+
+                            Ret.Add(NewCount);
+                        }
+                    }
+                }
+            }
+
+            return Ret;
+        }
+
+        public void FitTexturedPhaseREKFunction()
+        {
+            List<double> weightings = new List<double>();
+            Pattern.Counts UsedCounts = this.GetTexturedPhaseREKFittingData(weightings);
+            if (UsedCounts.Count == 2)
+            {
+                double aclivity = (UsedCounts[0][1] - UsedCounts[1][1]) / (UsedCounts[0][0] - UsedCounts[1][0]);
+
+                double _constant = UsedCounts[0][1] - (aclivity * UsedCounts[0][0]);
+
+                this.ClassicFittingFunction.Aclivity = aclivity;
+                this.ClassicFittingFunction.Constant = _constant;
+
+                MathNet.Numerics.LinearAlgebra.Matrix<double> ErrorMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(2, 2, 0.0);
+
+                double aclivityError = Math.Pow((1 / (UsedCounts[0][0] - UsedCounts[1][0])) * UsedCounts[0][2], 2) + Math.Pow((-1 / (UsedCounts[0][0] - UsedCounts[1][0])) * UsedCounts[1][2], 2);
+                ErrorMatrix[0, 0] = Math.Sqrt(aclivityError);
+
+                double ConstantError = Math.Pow(UsedCounts[0][0] * aclivityError, 2) + Math.Pow(UsedCounts[0][2], 2);
+
+                ErrorMatrix[1, 1] = Math.Sqrt(ConstantError);
+
+                this.ClassicFittingFunction._hessianMatrix = ErrorMatrix;
+                this.ClassicREKFittingConverged = true;
+            }
+            else if (UsedCounts.Count > 2)
+            {
+                this.ClassicREKFittingConverged = Fitting.LMA.FitMacroElasticModulTextured(this.ClassicFittingFunction, UsedCounts, weightings);
+                this.SetClassicDeviation();
+            }
+            else
+            {
+                this.ClassicREKFittingConverged = false;
             }
         }
 
@@ -411,9 +807,12 @@ namespace CalScec.Analysis.Stress.Microsopic
             for(int n = 0; n < this.ElasticStressData.Count; n++)
             {
                 Macroskopic.PeakStressAssociation Tmp = new Macroskopic.PeakStressAssociation(this.ElasticStressData[n].Stress, this.ElasticStressData[n].PsiAngle, this.ElasticStressData[n].DifPeak.Clone() as Analysis.Peaks.DiffractionPeak, this.ElasticStressData[n].PhiAngle);
-
+                Tmp.MRDValue = this.ElasticStressData[n].MRDValue;
                 Ret.ElasticStressData.Add(Tmp);
             }
+
+            Ret.DECAllMRD = this.DECAllMRD;
+            Ret.ActivateWeigthedMRD = this.ActivateWeigthedMRD;
 
             Ret.ClassicFittingFunction = this.ClassicFittingFunction.Clone() as Analysis.Fitting.LinearFunction;
             Ret._strainFreeD0 = this._strainFreeD0;
@@ -426,7 +825,6 @@ namespace CalScec.Analysis.Stress.Microsopic
             {
                 Ret.TransversalElasticity = this.TransversalElasticity.Clone() as Macroskopic.Elasticity;
             }
-
 
             Ret._classicChi2 = this._classicChi2;
             Ret._classicS1Error = this._classicS1Error;

@@ -767,7 +767,159 @@ namespace CalScec.Analysis.Fitting
             return Converged;
         }
 
+        public static bool FitMacroElasticModulTextured(Fitting.LinearFunction fittingFunction, Pattern.Counts UsedCounts, List<double> weightings)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Fitting.LinearFunction TrialFittingFunction = fittingFunction.Clone() as Fitting.LinearFunction;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = fittingFunction.ParameterDeltaVektorAclivityConstant(Lambda, UsedCounts, weightings);
+
+                #region Parameter calculations
+
+                TrialFittingFunction.Aclivity += ParamDelta[0];
+                TrialFittingFunction.Constant += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2LinearFunction(TrialFittingFunction, UsedCounts, weightings);
+                double Chi2Real = Chi2.Chi2LinearFunction(fittingFunction, UsedCounts, weightings);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2.Chi2LinearFunction(TrialFittingFunction, UsedCounts) > Chi2.Chi2LinearFunction(fittingFunction, UsedCounts))
+                    {
+                        TrialFittingFunction.Aclivity = fittingFunction.Aclivity;
+                        TrialFittingFunction.Constant = fittingFunction.Constant;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        fittingFunction.Aclivity = TrialFittingFunction.Aclivity;
+                        fittingFunction.Constant = TrialFittingFunction.Constant;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            fittingFunction.Aclivity = TrialFittingFunction.Aclivity;
+                            fittingFunction.Constant = TrialFittingFunction.Constant;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
         #region Elastic contant fit routines
+
+        #region Load partitioning
+
+        //public static bool FitElasticityTensorReussLoad(Sample sample)
+        //{
+        //    bool Converged = false;
+        //    double Lambda = LMA._lambda;
+
+        //    List<Stress.Microsopic.ElasticityTensors> TrialET = new List<Stress.Microsopic.ElasticityTensors>();
+        //    for(int n = 0; n < sample.CrystalData.Count; n++)
+        //    {
+        //        TrialET.Add(sample.ReussTensorData[n].Clone() as Stress.Microsopic.ElasticityTensors);
+        //    }
+
+        //    for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+        //        ParamDelta = sample.ParameterDeltaVektorReussFraction(Lambda);
+
+        //        #region Parameter calculations
+        //        int actparamIndex = 0;
+        //        for (int n = 0; n < sample.CrystalData.Count; n++)
+        //        {
+        //            if (sample.CrystalData[n].SymmetryGroupID == 194)
+        //            {
+        //                TrialET[n].S11 = ParamDelta[actparamIndex + 0];
+        //                TrialET[n].S33 = ParamDelta[actparamIndex + 1];
+        //                TrialET[n].S12 = ParamDelta[actparamIndex + 2];
+        //                TrialET[n].S13 = ParamDelta[actparamIndex + 3];
+        //                TrialET[n].S44 = ParamDelta[actparamIndex + 4];
+
+        //                actparamIndex += 5;
+        //            }
+        //            else
+        //            {
+        //                TrialET[n].S11 += ParamDelta[actparamIndex + 0];
+        //                TrialET[n].S12 += ParamDelta[actparamIndex + 1];
+        //                TrialET[n].S44 += ParamDelta[actparamIndex + 2];
+
+        //                actparamIndex += 3;
+        //            }
+        //        }
+
+        //        #endregion
+
+        //        double Chi2Trial = Chi2.Chi2ClassicReussCubic(TrialET);
+        //        double Chi2Real = Chi2.Chi2ClassicReussCubic(ET);
+
+        //        if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+        //        {
+        //            if (Chi2Trial > Chi2Real)
+        //            {
+        //                TrialET.S11 = ET.S11;
+        //                TrialET.S12 = ET.S12;
+        //                TrialET.S44 = ET.S44;
+
+        //                Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //            else
+        //            {
+        //                ET.S11 = TrialET.S11;
+        //                ET.S12 = TrialET.S12;
+        //                ET.S44 = TrialET.S44;
+
+        //                Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (TotalTrials > 3)
+        //            {
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                if (Chi2Real > Chi2Trial)
+        //                {
+        //                    ET.S11 = TrialET.S11;
+        //                    ET.S12 = TrialET.S12;
+        //                    ET.S44 = TrialET.S44;
+
+        //                    Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return Converged;
+        //}
+
+        #endregion
 
         #region Voigt
 
@@ -1251,6 +1403,75 @@ namespace CalScec.Analysis.Fitting
 
         #region Reuss
 
+        public static bool FitElasticityTensorReussCubicAnIso(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                if (classicCalculation)
+                {
+                    ParamDelta = ET.ParameterDeltaVektorReussCubicClassicAnIso(Lambda);
+                }
+                else
+                {
+                    ParamDelta = ET.ParameterDeltaVektorReussCubicMacroscopicAnIso(Lambda);
+                }
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2ClassicReussCubicAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2ClassicReussCubicAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S12 = TrialET.S12;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
         public static bool FitElasticityTensorReussCubic(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
         {
             bool Converged = false;
@@ -1471,9 +1692,282 @@ namespace CalScec.Analysis.Fitting
             return Converged;
         }
 
+        #region Texture
+
+        public static bool FitElasticityTensorReussCubicAnIsoTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta = ET.ParameterDeltaVektorReussCubicTexturedAnIso(Lambda); ;
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TexturedReussCubicAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2TexturedReussCubicAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S12 = TrialET.S12;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorReussCubicTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorReussCubicTexture(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+                TrialET.S44 += ParamDelta[2];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureReussCubic(TrialET);
+                double Chi2Real = Chi2.Chi2TextureReussCubic(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+                        TrialET.S44 = ET.S44;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+                        ET.S44 = TrialET.S44;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S12 = TrialET.S12;
+                            ET.S44 = TrialET.S44;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorReussHexagonalTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorReussHexagonalTexture(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S33 += ParamDelta[1];
+                TrialET.S12 += ParamDelta[2];
+                TrialET.S13 += ParamDelta[3];
+                TrialET.S44 += ParamDelta[4];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureReussHexagonal(TrialET);
+                double Chi2Real = Chi2.Chi2TextureReussHexagonal(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S33 = ET.S33;
+                        TrialET.S12 = ET.S12;
+                        TrialET.S13 = ET.S13;
+                        TrialET.S44 = ET.S44;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S33 = TrialET.S33;
+                        ET.S12 = TrialET.S12;
+                        ET.S13 = TrialET.S13;
+                        ET.S44 = TrialET.S44;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S33 = TrialET.S33;
+                            ET.S12 = TrialET.S12;
+                            ET.S13 = TrialET.S13;
+                            ET.S44 = TrialET.S44;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+        
+        #endregion
+
         #endregion
 
         #region Hill
+
+        public static bool FitElasticityTensorHillCubicAnIso(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                if (classicCalculation)
+                {
+                    ParamDelta = ET.ParameterDeltaVektorHillCubicClassicAnIso(Lambda);
+                }
+                else
+                {
+                    ParamDelta = ET.ParameterDeltaVektorHillCubicMacroscopicAnIso(Lambda);
+                }
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2ClassicHillCubicAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2ClassicHillCubicAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S12 = TrialET.S12;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
 
         public static bool FitElasticityTensorHillCubic(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
         {
@@ -1629,9 +2123,294 @@ namespace CalScec.Analysis.Fitting
             return Converged;
         }
 
+        public static bool FitElasticityTensorHillCubicAnIsoTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorHillCubicTextureAnIso(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureHillCubicAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2TextureHillCubicAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S12 = TrialET.S12;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorHillCubicTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorHillCubicTexture(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+                TrialET.S44 += ParamDelta[2];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureHillCubic(TrialET);
+                double Chi2Real = Chi2.Chi2TextureHillCubic(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+                        TrialET.S44 = ET.S44;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+                        ET.S44 = TrialET.S44;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S12 = TrialET.S12;
+                            ET.S44 = TrialET.S44;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorHillHexagonalTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorHillHexagonalTexture(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S33 += ParamDelta[1];
+                TrialET.S12 += ParamDelta[2];
+                TrialET.S13 += ParamDelta[3];
+                TrialET.S44 += ParamDelta[4];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureHillHexagonal(TrialET);
+                double Chi2Real = Chi2.Chi2TextureHillHexagonal(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S33 = ET.S33;
+                        TrialET.S12 = ET.S12;
+                        TrialET.S13 = ET.S13;
+                        TrialET.S44 = ET.S44;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S33 = TrialET.S33;
+                        ET.S12 = TrialET.S12;
+                        ET.S13 = TrialET.S13;
+                        ET.S44 = TrialET.S44;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S33 = TrialET.S33;
+                            ET.S12 = TrialET.S12;
+                            ET.S13 = TrialET.S13;
+                            ET.S44 = TrialET.S44;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
         #endregion
 
         #region Geometric Hill
+
+        public static bool FitElasticityTensorGeometricHillCubicAnIso(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            int NaNTrials = 0;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorGeometricHillCubicClassicAnIso(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2ClassicGeometricHillCubicAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2ClassicGeometricHillCubicAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    NaNTrials = 0;
+
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (double.IsNaN(Chi2Trial) || double.IsInfinity(Chi2Trial))
+                    {
+                        NaNTrials++;
+
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+
+                        if (NaNTrials > 5)
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if (TotalTrials > 3)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            if (Chi2Real > Chi2Trial)
+                            {
+                                ET.S11 = TrialET.S11;
+                                ET.S12 = TrialET.S12;
+
+                                Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
 
         public static bool FitElasticityTensorGeometricHillCubic(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
         {
@@ -1809,9 +2588,316 @@ namespace CalScec.Analysis.Fitting
             return Converged;
         }
 
+        public static bool FitElasticityTensorGeometricHillCubicTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            int NaNTrials = 0;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorGeometricHillCubicTexture(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+                TrialET.S44 += ParamDelta[2];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureGeometricHillCubic(TrialET);
+                double Chi2Real = Chi2.Chi2TextureGeometricHillCubic(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    NaNTrials = 0;
+
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+                        TrialET.S44 = ET.S44;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+                        ET.S44 = TrialET.S44;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (double.IsNaN(Chi2Trial) || double.IsInfinity(Chi2Trial))
+                    {
+                        NaNTrials++;
+
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+                        TrialET.S44 = ET.S44;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+
+                        if (NaNTrials > 5)
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if (TotalTrials > 3)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            if (Chi2Real > Chi2Trial)
+                            {
+                                ET.S11 = TrialET.S11;
+                                ET.S12 = TrialET.S12;
+                                ET.S44 = TrialET.S44;
+
+                                Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorGeometricHillHexagonalTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                if (classicCalculation)
+                {
+                    ParamDelta = ET.ParameterDeltaVektorGeometricHillHexagonalTexture(Lambda);
+                }
+                else
+                {
+                    ParamDelta = ET.ParameterDeltaVektorGeometricHillHexagonalMacroscopic(Lambda);
+                }
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S33 += ParamDelta[1];
+                TrialET.S12 += ParamDelta[2];
+                TrialET.S13 += ParamDelta[3];
+                TrialET.S44 += ParamDelta[4];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureGeometricHillHexagonal(TrialET);
+                double Chi2Real = Chi2.Chi2TextureGeometricHillHexagonal(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S33 = ET.S33;
+                        TrialET.S12 = ET.S12;
+                        TrialET.S13 = ET.S13;
+                        TrialET.S44 = ET.S44;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S33 = TrialET.S33;
+                        ET.S12 = TrialET.S12;
+                        ET.S13 = TrialET.S13;
+                        ET.S44 = TrialET.S44;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S33 = TrialET.S33;
+                            ET.S12 = TrialET.S12;
+                            ET.S13 = TrialET.S13;
+                            ET.S44 = TrialET.S44;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
         #endregion
 
         #region Kroener
+
+        public static bool FitElasticityTensorKroenerCubicStiffnessAnIso(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                if (classicCalculation)
+                {
+                    ParamDelta = ET.ParameterDeltaVektorKroenerCubicStiffnessClassicAnIso(Lambda);
+                }
+                else
+                {
+                    ParamDelta = ET.ParameterDeltaVektorKroenerCubicStiffnessMacroscopicAnIso(Lambda);
+                }
+
+                #region Parameter calculations
+
+                TrialET.C11 += ParamDelta[0];
+                TrialET.C12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2ClassicKroenerCubicStiffnessAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2ClassicKroenerCubicStiffnessAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.C11 = ET.C11;
+                        TrialET.C12 = ET.C12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.C11 = TrialET.C11;
+                        ET.C12 = TrialET.C12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.C11 = TrialET.C11;
+                            ET.C12 = TrialET.C12;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorKroenerCubicComplianceAnIso(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                if (classicCalculation)
+                {
+                    ParamDelta = ET.ParameterDeltaVektorKroenerCubicComplianceClassicAnIso(Lambda);
+                }
+                else
+                {
+                    ParamDelta = ET.ParameterDeltaVektorKroenerCubicComplianceMacroscopicAnIso(Lambda);
+                }
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2ClassicKroenerCubicComplianceAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2ClassicKroenerCubicComplianceAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S12 = TrialET.S12;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
 
         public static bool FitElasticityTensorKroenerCubicStiffness(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
         {
@@ -1959,9 +3045,403 @@ namespace CalScec.Analysis.Fitting
             return Converged;
         }
 
+        public static bool FitElasticityTensorKroenerCubicStiffnessAnIsoTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorKroenerCubicStiffnessTextureAnIso(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.C11 += ParamDelta[0];
+                TrialET.C12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureKroenerCubicStiffnessAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2TextureKroenerCubicStiffnessAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.C11 = ET.C11;
+                        TrialET.C12 = ET.C12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.C11 = TrialET.C11;
+                        ET.C12 = TrialET.C12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.C11 = TrialET.C11;
+                            ET.C12 = TrialET.C12;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorKroenerCubicComplianceAnIsoTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorKroenerCubicComplianceTextureAnIso(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureKroenerCubicComplianceAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2TextureKroenerCubicComplianceAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S12 = TrialET.S12;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorKroenerCubicStiffnessTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorKroenerCubicStiffnessTexture(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.C11 += ParamDelta[0];
+                TrialET.C12 += ParamDelta[1];
+                TrialET.C44 += ParamDelta[2];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureKroenerCubicStiffness(TrialET);
+                double Chi2Real = Chi2.Chi2TextureKroenerCubicStiffness(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.C11 = ET.C11;
+                        TrialET.C12 = ET.C12;
+                        TrialET.C44 = ET.C44;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.C11 = TrialET.C11;
+                        ET.C12 = TrialET.C12;
+                        ET.C44 = TrialET.C44;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.C11 = TrialET.C11;
+                            ET.C12 = TrialET.C12;
+                            ET.C44 = TrialET.C44;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorKroenerCubicComplianceTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorKroenerCubicComplianceTexture(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+                TrialET.S44 += ParamDelta[2];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureKroenerCubicCompliance(TrialET);
+                double Chi2Real = Chi2.Chi2TextureKroenerCubicCompliance(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+                        TrialET.S44 = ET.S44;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+                        ET.S44 = TrialET.S44;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S12 = TrialET.S12;
+                            ET.S44 = TrialET.S44;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
         #endregion
 
         #region DeWitt
+
+        public static bool FitElasticityTensorDeWittCubicStiffnessAnIso(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                if (classicCalculation)
+                {
+                    ParamDelta = ET.ParameterDeltaVektorDeWittCubicStiffnessClassicAnIso(Lambda);
+                }
+                else
+                {
+                    ParamDelta = ET.ParameterDeltaVektorDeWittCubicStiffnessMacroscopicAnIso(Lambda);
+                }
+
+                #region Parameter calculations
+
+                TrialET.C11 += ParamDelta[0];
+                TrialET.C12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2ClassicDeWittCubicStiffnessAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2ClassicDeWittCubicStiffnessAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.C11 = ET.C11;
+                        TrialET.C12 = ET.C12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.C11 = TrialET.C11;
+                        ET.C12 = TrialET.C12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.C11 = TrialET.C11;
+                            ET.C12 = TrialET.C12;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorDeWittCubicComplianceAnIso(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                if (classicCalculation)
+                {
+                    ParamDelta = ET.ParameterDeltaVektorDeWittCubicComplianceClassicAnIso(Lambda);
+                }
+                else
+                {
+                    ParamDelta = ET.ParameterDeltaVektorDeWittCubicComplianceMacroscopicAnIso(Lambda);
+                }
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2ClassicDeWittCubicComplianceAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2ClassicDeWittCubicComplianceAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S12 = TrialET.S12;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
 
         public static bool FitElasticityTensorDeWittCubicStiffness(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
         {
@@ -2109,30 +3589,292 @@ namespace CalScec.Analysis.Fitting
             return Converged;
         }
 
+        public static bool FitElasticityTensorDeWittCubicStiffnessAnIsoTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorDeWittCubicStiffnessTextureAnIso(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.C11 += ParamDelta[0];
+                TrialET.C12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureDeWittCubicStiffnessAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2TextureDeWittCubicStiffnessAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.C11 = ET.C11;
+                        TrialET.C12 = ET.C12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.C11 = TrialET.C11;
+                        ET.C12 = TrialET.C12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.C11 = TrialET.C11;
+                            ET.C12 = TrialET.C12;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorDeWittCubicComplianceAnIsoTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorDeWittCubicComplianceTextureAnIso(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureDeWittCubicComplianceAnIso(TrialET);
+                double Chi2Real = Chi2.Chi2TextureDeWittCubicComplianceAnIso(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S12 = TrialET.S12;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorDeWittCubicStiffnessTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorDeWittCubicStiffnessTexture(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.C11 += ParamDelta[0];
+                TrialET.C12 += ParamDelta[1];
+                TrialET.C44 += ParamDelta[2];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureDeWittCubicStiffness(TrialET);
+                double Chi2Real = Chi2.Chi2TextureDeWittCubicStiffness(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.C11 = ET.C11;
+                        TrialET.C12 = ET.C12;
+                        TrialET.C44 = ET.C44;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.C11 = TrialET.C11;
+                        ET.C12 = TrialET.C12;
+                        ET.C44 = TrialET.C44;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.C11 = TrialET.C11;
+                            ET.C12 = TrialET.C12;
+                            ET.C44 = TrialET.C44;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
+        public static bool FitElasticityTensorDeWittCubicComplianceTexture(Stress.Microsopic.ElasticityTensors ET, bool classicCalculation)
+        {
+            bool Converged = false;
+            double Lambda = LMA._lambda;
+
+            Stress.Microsopic.ElasticityTensors TrialET = ET.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+                ParamDelta = ET.ParameterDeltaVektorDeWittCubicComplianceTexture(Lambda);
+
+                #region Parameter calculations
+
+                TrialET.S11 += ParamDelta[0];
+                TrialET.S12 += ParamDelta[1];
+                TrialET.S44 += ParamDelta[2];
+
+                #endregion
+
+                double Chi2Trial = Chi2.Chi2TextureDeWittCubicCompliance(TrialET);
+                double Chi2Real = Chi2.Chi2TextureDeWittCubicCompliance(ET);
+
+                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+                {
+                    if (Chi2Trial > Chi2Real)
+                    {
+                        TrialET.S11 = ET.S11;
+                        TrialET.S12 = ET.S12;
+                        TrialET.S44 = ET.S44;
+
+                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                    else
+                    {
+                        ET.S11 = TrialET.S11;
+                        ET.S12 = TrialET.S12;
+                        ET.S44 = TrialET.S44;
+
+                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                    }
+                }
+                else
+                {
+                    if (TotalTrials > 3)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        if (Chi2Real > Chi2Trial)
+                        {
+                            ET.S11 = TrialET.S11;
+                            ET.S12 = TrialET.S12;
+                            ET.S44 = TrialET.S44;
+
+                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+                        }
+                    }
+                }
+            }
+
+            return Converged;
+        }
+
         #endregion
 
-        #region With Texture
+        #region With Texture numerical
 
         private static bool CheckTopologie(MathNet.Numerics.LinearAlgebra.Vector<double> paramDelta, double[] paramValue, double chiReal, double chiTrial)
         {
             bool ret = true;
 
-            double deltaFactor = 0;
-
-            for(int n = 0; n < paramDelta.Count; n++)
+            if (CalScec.Properties.Settings.Default.TextureTopologyCheck)
             {
-                deltaFactor += Math.Pow(paramDelta[n] / paramValue[n], 2);
-            }
+                double deltaFactor = 0;
 
-            deltaFactor = Math.Sqrt(deltaFactor);
-            deltaFactor /= paramDelta.Count;
+                for (int n = 0; n < paramDelta.Count; n++)
+                {
+                    deltaFactor += Math.Pow(paramDelta[n] / paramValue[n], 2);
+                }
 
-            double deltaChi = chiTrial / chiReal;
-            deltaChi = 1 - deltaChi;
+                deltaFactor = Math.Sqrt(deltaFactor);
+                deltaFactor /= paramDelta.Count;
 
-            if(deltaFactor > deltaChi)
-            {
-                ret = false;
+                if (deltaFactor > 0.10)
+                {
+                    double deltaChi = Math.Abs(chiTrial - chiReal);
+                    deltaChi = deltaChi / chiReal;
+
+                    if (deltaChi < deltaFactor)
+                    {
+                        ret = false;
+                    }
+                }
             }
 
             return ret;
@@ -2140,26 +3882,26 @@ namespace CalScec.Analysis.Fitting
 
         #region Voigt
 
-        public static bool FitElasticityTensorTextureVoigtCubic(Texture.OrientationDistributionFunction ODF)
+        public static bool FitNElasticityTensorTextureVoigtCubic(Texture.OrientationDistributionFunction ODF)
         {
             bool Converged = false;
             double Lambda = LMA._lambda;
 
             Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
 
-            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            for (ODF.FittingTrial = 0; ODF.FittingTrial < CalScec.Properties.Settings.Default.MaxFittingTrials; ODF.FittingTrial++)
             {
                 MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
 
                 ParamDelta = ODF.ParameterDeltaVektorF33VoigtCubic(Lambda);
 
-                double[] parameterArr = { ODF.BaseTensor.C11, ODF.BaseTensor.C12, ODF.BaseTensor.C44 };
+                double[] parameterArr = { ODF.BaseTensor.S11, ODF.BaseTensor.S12, ODF.BaseTensor.S44 };
 
                 #region Parameter calculations
 
-                TrialODF.BaseTensor.C11 += ParamDelta[0];
-                TrialODF.BaseTensor.C12 += ParamDelta[1];
-                TrialODF.BaseTensor.C44 += ParamDelta[2];
+                TrialODF.BaseTensor.S11 += ParamDelta[0];
+                TrialODF.BaseTensor.S12 += ParamDelta[1];
+                TrialODF.BaseTensor.S44 += ParamDelta[2];
 
                 #endregion
 
@@ -2174,44 +3916,44 @@ namespace CalScec.Analysis.Fitting
                     {
                         if (Chi2Trial > Chi2Real)
                         {
-                            TrialODF.BaseTensor.C11 = ODF.BaseTensor.C11;
-                            TrialODF.BaseTensor.C12 = ODF.BaseTensor.C12;
-                            TrialODF.BaseTensor.C44 = ODF.BaseTensor.C44;
+                            TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+                            TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+                            TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
 
                             Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
                         }
                         else
                         {
-                            ODF.BaseTensor.C11 = TrialODF.BaseTensor.C11;
-                            ODF.BaseTensor.C12 = TrialODF.BaseTensor.C12;
-                            ODF.BaseTensor.C44 = TrialODF.BaseTensor.C44;
+                            ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+                            ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+                            ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
 
                             Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
                         }
                     }
                     else
                     {
-                        TrialODF.BaseTensor.C11 = ODF.BaseTensor.C11;
-                        TrialODF.BaseTensor.C12 = ODF.BaseTensor.C12;
-                        TrialODF.BaseTensor.C44 = ODF.BaseTensor.C44;
+                        TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+                        TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+                        TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
 
                         Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
                     }
                 }
                 else
                 {
-                    if (TotalTrials > 3)
+                    if (ODF.FittingTrial > 3)
                     {
-                        ODF.BaseTensor.CalculateCompliances();
+                        ODF.BaseTensor.CalculateStiffnesses();
                         return true;
                     }
                     else
                     {
                         if (Chi2Real > Chi2Trial)
                         {
-                            ODF.BaseTensor.C11 = TrialODF.BaseTensor.C11;
-                            ODF.BaseTensor.C12 = TrialODF.BaseTensor.C12;
-                            ODF.BaseTensor.C44 = TrialODF.BaseTensor.C44;
+                            ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+                            ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+                            ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
 
                             Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
                         }
@@ -2222,33 +3964,33 @@ namespace CalScec.Analysis.Fitting
             return Converged;
         }
 
-        public static bool FitElasticityTensorTextureVoigtType1(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
+        public static bool FitNElasticityTensorTextureVoigtType1(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
         {
             bool Converged = false;
             double Lambda = LMA._lambda;
 
             Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
 
-            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            for (ODF.FittingTrial = 0; ODF.FittingTrial < CalScec.Properties.Settings.Default.MaxFittingTrials; ODF.FittingTrial++)
             {
                 MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
 
                 ParamDelta = ODF.ParameterDeltaVektorF33VoigtHexagonal(Lambda);
 
-                double[] parameterArr = { ODF.BaseTensor.C11, ODF.BaseTensor.C12, ODF.BaseTensor.C44, ODF.BaseTensor.C13, ODF.BaseTensor.C33 };
+                double[] parameterArr = { ODF.BaseTensor.S11, ODF.BaseTensor.S12, ODF.BaseTensor.S44, ODF.BaseTensor.S13, ODF.BaseTensor.S33 };
 
                 #region Parameter calculations
 
-                TrialODF.BaseTensor.C11 += ParamDelta[0];
-                TrialODF.BaseTensor.C12 += ParamDelta[1];
-                TrialODF.BaseTensor.C44 += ParamDelta[2];
-                TrialODF.BaseTensor.C13 += ParamDelta[3];
-                TrialODF.BaseTensor.C33 += ParamDelta[4];
+                TrialODF.BaseTensor.S11 += ParamDelta[0];
+                TrialODF.BaseTensor.S12 += ParamDelta[1];
+                TrialODF.BaseTensor.S44 += ParamDelta[2];
+                TrialODF.BaseTensor.S13 += ParamDelta[3];
+                TrialODF.BaseTensor.S33 += ParamDelta[4];
 
                 #endregion
 
-                double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
-                double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
+                double Chi2Trial = Chi2.Chi2TextureVoigtType1(TrialODF);
+                double Chi2Real = Chi2.Chi2TextureVoigtType1(ODF);
 
                 if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
                 {
@@ -2256,39 +3998,39 @@ namespace CalScec.Analysis.Fitting
                     {
                         if (Chi2Trial > Chi2Real)
                         {
-                            TrialODF.BaseTensor.C11 = ODF.BaseTensor.C11;
-                            TrialODF.BaseTensor.C33 = ODF.BaseTensor.C33;
-                            TrialODF.BaseTensor.C12 = ODF.BaseTensor.C12;
-                            TrialODF.BaseTensor.C13 = ODF.BaseTensor.C13;
-                            TrialODF.BaseTensor.C44 = ODF.BaseTensor.C44;
+                            TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+                            TrialODF.BaseTensor.S33 = ODF.BaseTensor.S33;
+                            TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+                            TrialODF.BaseTensor.S13 = ODF.BaseTensor.S13;
+                            TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
 
                             Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
                         }
                         else
                         {
-                            ODF.BaseTensor.C11 = TrialODF.BaseTensor.C11;
-                            ODF.BaseTensor.C33 = TrialODF.BaseTensor.C33;
-                            ODF.BaseTensor.C12 = TrialODF.BaseTensor.C12;
-                            ODF.BaseTensor.C13 = TrialODF.BaseTensor.C13;
-                            ODF.BaseTensor.C44 = TrialODF.BaseTensor.C44;
+                            ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+                            ODF.BaseTensor.S33 = TrialODF.BaseTensor.S33;
+                            ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+                            ODF.BaseTensor.S13 = TrialODF.BaseTensor.S13;
+                            ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
 
                             Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
                         }
                     }
                     else
                     {
-                        TrialODF.BaseTensor.C11 = ODF.BaseTensor.C11;
-                        TrialODF.BaseTensor.C33 = ODF.BaseTensor.C33;
-                        TrialODF.BaseTensor.C12 = ODF.BaseTensor.C12;
-                        TrialODF.BaseTensor.C13 = ODF.BaseTensor.C13;
-                        TrialODF.BaseTensor.C44 = ODF.BaseTensor.C44;
+                        TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+                        TrialODF.BaseTensor.S33 = ODF.BaseTensor.S33;
+                        TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+                        TrialODF.BaseTensor.S13 = ODF.BaseTensor.S13;
+                        TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
 
                         Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
                     }
                 }
                 else
                 {
-                    if (TotalTrials > 3)
+                    if (ODF.FittingTrial > 3)
                     {
                         return true;
                     }
@@ -2296,11 +4038,11 @@ namespace CalScec.Analysis.Fitting
                     {
                         if (Chi2Real > Chi2Trial)
                         {
-                            ODF.BaseTensor.C11 = TrialODF.BaseTensor.C11;
-                            ODF.BaseTensor.C33 = TrialODF.BaseTensor.C33;
-                            ODF.BaseTensor.C12 = TrialODF.BaseTensor.C12;
-                            ODF.BaseTensor.C13 = TrialODF.BaseTensor.C13;
-                            ODF.BaseTensor.C44 = TrialODF.BaseTensor.C44;
+                            ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+                            ODF.BaseTensor.S33 = TrialODF.BaseTensor.S33;
+                            ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+                            ODF.BaseTensor.S13 = TrialODF.BaseTensor.S13;
+                            ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
 
                             Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
                         }
@@ -2311,7 +4053,7 @@ namespace CalScec.Analysis.Fitting
             return Converged;
         }
 
-        public static bool FitElasticityTensorTextureVoigtType2(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
+        public static bool FitNElasticityTensorTextureVoigtType2(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
         {
             bool Converged = false;
             double Lambda = LMA._lambda;
@@ -2400,7 +4142,7 @@ namespace CalScec.Analysis.Fitting
             return Converged;
         }
 
-        public static bool FitElasticityTensorTextureVoigtType3(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
+        public static bool FitNElasticityTensorTextureVoigtType3(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
         {
             bool Converged = false;
             double Lambda = LMA._lambda;
@@ -2505,20 +4247,20 @@ namespace CalScec.Analysis.Fitting
 
         #region Reuss
 
-        public static bool FitElasticityTensorTextureReussCubic(Texture.OrientationDistributionFunction ODF)
+        public static bool FitNElasticityTensorTextureReussCubic(Texture.OrientationDistributionFunction ODF)
         {
             bool Converged = false;
             double Lambda = LMA._lambda;
 
             Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
 
-            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            for (ODF.FittingTrial = 0; ODF.FittingTrial < CalScec.Properties.Settings.Default.MaxFittingTrials; ODF.FittingTrial++)
             {
                 MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
 
                 ParamDelta = ODF.ParameterDeltaVektorF33ReussCubic(Lambda);
 
-                double[] parameterArr = { ODF.BaseTensor.C11, ODF.BaseTensor.C12, ODF.BaseTensor.C44 };
+                double[] parameterArr = { ODF.BaseTensor.S11, ODF.BaseTensor.S12, ODF.BaseTensor.S44 };
 
                 #region Parameter calculations
 
@@ -2558,16 +4300,16 @@ namespace CalScec.Analysis.Fitting
                     }
                     else
                     {
-                        TrialODF.BaseTensor.C11 = ODF.BaseTensor.C11;
-                        TrialODF.BaseTensor.C12 = ODF.BaseTensor.C12;
-                        TrialODF.BaseTensor.C44 = ODF.BaseTensor.C44;
+                        TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+                        TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+                        TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
 
                         Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
                     }
                 }
                 else
                 {
-                    if (TotalTrials > 3)
+                    if (ODF.FittingTrial > 3)
                     {
                         ODF.BaseTensor.CalculateStiffnesses();
                         return true;
@@ -2592,20 +4334,20 @@ namespace CalScec.Analysis.Fitting
             return Converged;
         }
 
-        public static bool FitElasticityTensorTextureReussHexagonal(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
+        public static bool FitNElasticityTensorTextureReussHexagonal(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
         {
             bool Converged = false;
             double Lambda = LMA._lambda;
 
             Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
 
-            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+            for (ODF.FittingTrial = 0; ODF.FittingTrial < CalScec.Properties.Settings.Default.MaxFittingTrials; ODF.FittingTrial++)
             {
                 MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
 
                 ParamDelta = ODF.ParameterDeltaVektorF33ReussHexagonal(Lambda);
 
-                double[] parameterArr = { ODF.BaseTensor.C11, ODF.BaseTensor.C12, ODF.BaseTensor.C44, ODF.BaseTensor.C13, ODF.BaseTensor.C33 };
+                double[] parameterArr = { ODF.BaseTensor.S11, ODF.BaseTensor.S12, ODF.BaseTensor.S44, ODF.BaseTensor.S13, ODF.BaseTensor.S33 };
 
                 #region Parameter calculations
 
@@ -2617,8 +4359,8 @@ namespace CalScec.Analysis.Fitting
 
                 #endregion
 
-                double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
-                double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
+                double Chi2Trial = Chi2.Chi2TextureReussHexagonal(TrialODF);
+                double Chi2Real = Chi2.Chi2TextureReussHexagonal(ODF);
 
                 if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
                 {
@@ -2662,7 +4404,7 @@ namespace CalScec.Analysis.Fitting
                 }
                 else
                 {
-                    if (TotalTrials > 3)
+                    if (ODF.FittingTrial > 3)
                     {
                         return true;
                     }
@@ -2689,706 +4431,706 @@ namespace CalScec.Analysis.Fitting
 
         #endregion
 
-        #region Hill
-
-        public static bool FitElasticityTensorTextureHillCubic(Texture.OrientationDistributionFunction ODF)
-        {
-            bool Converged = false;
-            double Lambda = LMA._lambda;
-
-            Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
-
-            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
-
-                ParamDelta = ODF.ParameterDeltaVektorF33HillCubic(Lambda);
-
-                double[] parameterArr = { ODF.BaseTensor.C11, ODF.BaseTensor.C12, ODF.BaseTensor.C44 };
-
-                #region Parameter calculations
-
-                TrialODF.BaseTensor.S11 += ParamDelta[0];
-                TrialODF.BaseTensor.S12 += ParamDelta[1];
-                TrialODF.BaseTensor.S44 += ParamDelta[2];
-
-                #endregion
-
-                //TrialODF.SetTextureTensor();
-
-                double Chi2Trial = Chi2.Chi2TextureVoigtCubic(TrialODF);
-                double Chi2Real = Chi2.Chi2TextureVoigtCubic(ODF);
-
-                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
-                {
-                    if (LMA.CheckTopologie(ParamDelta, parameterArr, Chi2Real, Chi2Trial))
-                    {
-                        if (Chi2Trial > Chi2Real)
-                        {
-                            TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
-                            TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
-                            TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
-
-                            TrialODF.BaseTensor.CalculateStiffnesses();
-
-                            Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                        }
-                        else
-                        {
-                            ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
-                            ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
-                            ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
-
-                            ODF.BaseTensor.CalculateStiffnesses();
-
-                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                        }
-                    }
-                    else
-                    {
-                        TrialODF.BaseTensor.C11 = ODF.BaseTensor.C11;
-                        TrialODF.BaseTensor.C12 = ODF.BaseTensor.C12;
-                        TrialODF.BaseTensor.C44 = ODF.BaseTensor.C44;
-
-                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                }
-                else
-                {
-                    if (TotalTrials > 3)
-                    {
-                        ODF.BaseTensor.CalculateStiffnesses();
-                        return true;
-                    }
-                    else
-                    {
-                        if (Chi2Real > Chi2Trial)
-                        {
-                            ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
-                            ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
-                            ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
-
-                            ODF.BaseTensor.CalculateStiffnesses();
-
-                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                        }
-                    }
-                }
-            }
-            ODF.BaseTensor.CalculateStiffnesses();
-            return Converged;
-        }
-
-        public static bool FitElasticityTensorTextureHillHexagonal(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
-        {
-            bool Converged = false;
-            double Lambda = LMA._lambda;
-
-            Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
-
-            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
-
-                ParamDelta = ODF.ParameterDeltaVektorF33HillHexagonal(Lambda);
-
-                double[] parameterArr = { ODF.BaseTensor.C11, ODF.BaseTensor.C12, ODF.BaseTensor.C44, ODF.BaseTensor.C13, ODF.BaseTensor.C33 };
-
-                #region Parameter calculations
-
-                TrialODF.BaseTensor.S11 += ParamDelta[0];
-                TrialODF.BaseTensor.S33 += ParamDelta[1];
-                TrialODF.BaseTensor.S12 += ParamDelta[2];
-                TrialODF.BaseTensor.S13 += ParamDelta[3];
-                TrialODF.BaseTensor.S44 += ParamDelta[4];
-
-                #endregion
-                
-                double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
-                double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
-
-                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
-                {
-                    if (LMA.CheckTopologie(ParamDelta, parameterArr, Chi2Real, Chi2Trial))
-                    {
-                        if (Chi2Trial > Chi2Real)
-                        {
-                            TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
-                            TrialODF.BaseTensor.S33 = ODF.BaseTensor.S33;
-                            TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
-                            TrialODF.BaseTensor.S13 = ODF.BaseTensor.S13;
-                            TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
-
-                            TrialODF.BaseTensor.CalculateStiffnesses();
-
-                            Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                        }
-                        else
-                        {
-                            ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
-                            ODF.BaseTensor.S33 = TrialODF.BaseTensor.S33;
-                            ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
-                            ODF.BaseTensor.S13 = TrialODF.BaseTensor.S13;
-                            ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
-
-                            ODF.BaseTensor.CalculateStiffnesses();
-
-                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                        }
-                    }
-                    else
-                    {
-                        TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
-                        TrialODF.BaseTensor.S33 = ODF.BaseTensor.S33;
-                        TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
-                        TrialODF.BaseTensor.S13 = ODF.BaseTensor.S13;
-                        TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
-
-                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                }
-                else
-                {
-                    if (TotalTrials > 3)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        if (Chi2Real > Chi2Trial)
-                        {
-                            ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
-                            ODF.BaseTensor.S33 = TrialODF.BaseTensor.S33;
-                            ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
-                            ODF.BaseTensor.S13 = TrialODF.BaseTensor.S13;
-                            ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
-
-                            ODF.BaseTensor.CalculateStiffnesses();
-
-                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                        }
-                    }
-                }
-            }
-
-            return Converged;
-        }
-
-        #endregion
-
-        #region Geometric Hill
-
-        public static bool FitElasticityTensorTextureGeometricHillCubic(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
-        {
-            bool Converged = false;
-            double Lambda = LMA._lambda;
-
-            Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
-
-            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
-
-                if (classicCalculation)
-                {
-                    ODF.SetTextureTensor();
-                    ParamDelta = ODF.TextureTensor.ParameterDeltaVektorGeometricHillCubicClassic(Lambda);
-                }
-                else
-                {
-                    ODF.SetTextureTensor();
-                    ParamDelta = ODF.TextureTensor.ParameterDeltaVektorGeometricHillCubicMacroscopic(Lambda);
-                }
-
-                #region Parameter calculations
-
-                TrialODF.BaseTensor.S11 += ParamDelta[0];
-                TrialODF.BaseTensor.S12 += ParamDelta[1];
-                TrialODF.BaseTensor.S44 += ParamDelta[2];
-
-                #endregion
-
-                TrialODF.BaseTensor.CalculateStiffnesses();
-
-                TrialODF.SetTextureTensor();
-
-                double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
-                double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
-
-                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
-                {
-                    if (Chi2Trial > Chi2Real)
-                    {
-                        TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
-                        TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
-                        TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
-
-                        TrialODF.BaseTensor.CalculateStiffnesses();
-
-                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                    else
-                    {
-                        ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
-                        ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
-                        ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
-
-                        ODF.BaseTensor.CalculateStiffnesses();
-
-                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                }
-                else
-                {
-                    if (TotalTrials > 3)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        if (Chi2Real > Chi2Trial)
-                        {
-                            ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
-                            ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
-                            ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
-
-                            ODF.BaseTensor.CalculateStiffnesses();
-
-                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                        }
-                    }
-                }
-            }
-
-            return Converged;
-        }
-
-        public static bool FitElasticityTensorTextureGeometricHillHexagonal(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
-        {
-            bool Converged = false;
-            double Lambda = LMA._lambda;
-
-            Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
-
-            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
-
-                if (classicCalculation)
-                {
-                    ODF.SetTextureTensor();
-                    ParamDelta = ODF.TextureTensor.ParameterDeltaVektorGeometricHillHexagonalClassic(Lambda);
-                }
-                else
-                {
-                    ODF.SetTextureTensor();
-                    ParamDelta = ODF.TextureTensor.ParameterDeltaVektorGeometricHillHexagonalMacroscopic(Lambda);
-                }
-
-                #region Parameter calculations
-
-                TrialODF.BaseTensor.S11 += ParamDelta[0];
-                TrialODF.BaseTensor.S33 += ParamDelta[1];
-                TrialODF.BaseTensor.S12 += ParamDelta[2];
-                TrialODF.BaseTensor.S13 += ParamDelta[3];
-                TrialODF.BaseTensor.S44 += ParamDelta[4];
-
-                #endregion
-
-                TrialODF.BaseTensor.CalculateStiffnesses();
-
-                TrialODF.SetTextureTensor();
-
-                double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
-                double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
-
-                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
-                {
-                    if (Chi2Trial > Chi2Real)
-                    {
-                        TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
-                        TrialODF.BaseTensor.S33 = ODF.BaseTensor.S33;
-                        TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
-                        TrialODF.BaseTensor.S13 = ODF.BaseTensor.S13;
-                        TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
-
-                        TrialODF.BaseTensor.CalculateStiffnesses();
-
-                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                    else
-                    {
-                        ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
-                        ODF.BaseTensor.S33 = TrialODF.BaseTensor.S33;
-                        ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
-                        ODF.BaseTensor.S13 = TrialODF.BaseTensor.S13;
-                        ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
-
-                        ODF.BaseTensor.CalculateStiffnesses();
-
-                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                }
-                else
-                {
-                    if (TotalTrials > 3)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        if (Chi2Real > Chi2Trial)
-                        {
-                            ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
-                            ODF.BaseTensor.S33 = TrialODF.BaseTensor.S33;
-                            ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
-                            ODF.BaseTensor.S13 = TrialODF.BaseTensor.S13;
-                            ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
-
-                            ODF.BaseTensor.CalculateStiffnesses();
-
-                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                        }
-                    }
-                }
-            }
-
-            return Converged;
-        }
-
-        #endregion
-
-        #region Kroener
-
-        public static bool FitElasticityTensorTextureKroenerCubicStiffness(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
-        {
-            bool Converged = false;
-            double Lambda = LMA._lambda;
-
-            Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
-
-            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
-
-                if (classicCalculation)
-                {
-                    ODF.SetTextureTensor();
-                    ParamDelta = ODF.TextureTensor.ParameterDeltaVektorKroenerCubicStiffnessClassic(Lambda);
-                }
-                else
-                {
-                    ODF.SetTextureTensor();
-                    ParamDelta = ODF.TextureTensor.ParameterDeltaVektorKroenerCubicStiffnessMacroscopic(Lambda);
-                }
-
-                #region Parameter calculations
-
-                TrialODF.BaseTensor.C11 += ParamDelta[0];
-                TrialODF.BaseTensor.C12 += ParamDelta[1];
-                TrialODF.BaseTensor.C44 += ParamDelta[2];
-
-                #endregion
-
-                TrialODF.SetTextureTensor();
-
-                double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
-                double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
-
-                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
-                {
-                    if (Chi2Trial > Chi2Real)
-                    {
-                        TrialODF.BaseTensor.C11 = ODF.BaseTensor.C11;
-                        TrialODF.BaseTensor.C12 = ODF.BaseTensor.C12;
-                        TrialODF.BaseTensor.C44 = ODF.BaseTensor.C44;
-
-                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                    else
-                    {
-                        ODF.BaseTensor.C11 = TrialODF.BaseTensor.C11;
-                        ODF.BaseTensor.C12 = TrialODF.BaseTensor.C12;
-                        ODF.BaseTensor.C44 = TrialODF.BaseTensor.C44;
-
-                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                }
-                else
-                {
-                    if (TotalTrials > 3)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        if (Chi2Real > Chi2Trial)
-                        {
-                            ODF.BaseTensor.C11 = TrialODF.BaseTensor.C11;
-                            ODF.BaseTensor.C12 = TrialODF.BaseTensor.C12;
-                            ODF.BaseTensor.C44 = TrialODF.BaseTensor.C44;
-
-                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                        }
-                    }
-                }
-            }
-
-            return Converged;
-        }
-
-        public static bool FitElasticityTensorTextureKroenerCubicCompliance(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
-        {
-            bool Converged = false;
-            double Lambda = LMA._lambda;
-
-            Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
-
-            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
-
-                if (classicCalculation)
-                {
-                    ODF.SetTextureTensor();
-                    ParamDelta = ODF.TextureTensor.ParameterDeltaVektorKroenerCubicComplianceClassic(Lambda);
-                }
-                else
-                {
-                    ODF.SetTextureTensor();
-                    ParamDelta = ODF.TextureTensor.ParameterDeltaVektorKroenerCubicComplianceMacroscopic(Lambda);
-                }
-
-                #region Parameter calculations
-
-                TrialODF.BaseTensor.S11 += ParamDelta[0];
-                TrialODF.BaseTensor.S12 += ParamDelta[1];
-                TrialODF.BaseTensor.S44 += ParamDelta[2];
-
-                #endregion
-
-                TrialODF.BaseTensor.CalculateStiffnesses();
-
-                TrialODF.SetTextureTensor();
-
-                double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
-                double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
-
-                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
-                {
-                    if (Chi2Trial > Chi2Real)
-                    {
-                        TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
-                        TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
-                        TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
-
-                        TrialODF.BaseTensor.CalculateStiffnesses();
-
-                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                    else
-                    {
-                        ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
-                        ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
-                        ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
-
-                        ODF.BaseTensor.CalculateStiffnesses();
-
-                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                }
-                else
-                {
-                    if (TotalTrials > 3)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        if (Chi2Real > Chi2Trial)
-                        {
-                            ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
-                            ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
-                            ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
-
-                            ODF.BaseTensor.CalculateStiffnesses();
-
-                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                        }
-                    }
-                }
-            }
-
-            return Converged;
-        }
-
-        #endregion
-
-        #region DeWitt
-
-        public static bool FitElasticityTensorTextureDeWittCubicStiffness(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
-        {
-            bool Converged = false;
-            double Lambda = LMA._lambda;
-
-            Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
-
-            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
-
-                if (classicCalculation)
-                {
-                    ODF.SetTextureTensor();
-                    ParamDelta = ODF.TextureTensor.ParameterDeltaVektorDeWittCubicStiffnessClassic(Lambda);
-                }
-                else
-                {
-                    ODF.SetTextureTensor();
-                    ParamDelta = ODF.TextureTensor.ParameterDeltaVektorDeWittCubicStiffnessMacroscopic(Lambda);
-                }
-
-                #region Parameter calculations
-
-                TrialODF.BaseTensor.C11 += ParamDelta[0];
-                TrialODF.BaseTensor.C12 += ParamDelta[1];
-                TrialODF.BaseTensor.C44 += ParamDelta[2];
-
-                #endregion
-
-                TrialODF.SetTextureTensor();
-
-                double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
-                double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
-
-                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
-                {
-                    if (Chi2Trial > Chi2Real)
-                    {
-                        TrialODF.BaseTensor.C11 = ODF.BaseTensor.C11;
-                        TrialODF.BaseTensor.C12 = ODF.BaseTensor.C12;
-                        TrialODF.BaseTensor.C44 = ODF.BaseTensor.C44;
-
-                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                    else
-                    {
-                        ODF.BaseTensor.C11 = TrialODF.BaseTensor.C11;
-                        ODF.BaseTensor.C12 = TrialODF.BaseTensor.C12;
-                        ODF.BaseTensor.C44 = TrialODF.BaseTensor.C44;
-
-                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                }
-                else
-                {
-                    if (TotalTrials > 3)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        if (Chi2Real > Chi2Trial)
-                        {
-                            ODF.BaseTensor.C11 = TrialODF.BaseTensor.C11;
-                            ODF.BaseTensor.C12 = TrialODF.BaseTensor.C12;
-                            ODF.BaseTensor.C44 = TrialODF.BaseTensor.C44;
-
-                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                        }
-                    }
-                }
-            }
-
-            return Converged;
-        }
-
-        public static bool FitElasticityTensorTextureDeWittCubicCompliance(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
-        {
-            bool Converged = false;
-            double Lambda = LMA._lambda;
-
-            Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
-
-            for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
-
-                if (classicCalculation)
-                {
-                    ODF.SetTextureTensor();
-                    ParamDelta = ODF.TextureTensor.ParameterDeltaVektorDeWittCubicComplianceClassic(Lambda);
-                }
-                else
-                {
-                    ODF.SetTextureTensor();
-                    ParamDelta = ODF.TextureTensor.ParameterDeltaVektorDeWittCubicComplianceMacroscopic(Lambda);
-                }
-
-                #region Parameter calculations
-
-                TrialODF.BaseTensor.S11 += ParamDelta[0];
-                TrialODF.BaseTensor.S12 += ParamDelta[1];
-                TrialODF.BaseTensor.S44 += ParamDelta[2];
-
-                #endregion
-
-                TrialODF.BaseTensor.CalculateStiffnesses();
-
-                TrialODF.SetTextureTensor();
-
-                double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
-                double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
-
-                if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
-                {
-                    if (Chi2Trial > Chi2Real)
-                    {
-                        TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
-                        TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
-                        TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
-
-                        TrialODF.BaseTensor.CalculateStiffnesses();
-
-                        Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                    else
-                    {
-                        ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
-                        ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
-                        ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
-
-                        ODF.BaseTensor.CalculateStiffnesses();
-
-                        Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                    }
-                }
-                else
-                {
-                    if (TotalTrials > 3)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        if (Chi2Real > Chi2Trial)
-                        {
-                            ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
-                            ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
-                            ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
-
-                            ODF.BaseTensor.CalculateStiffnesses();
-
-                            Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
-                        }
-                    }
-                }
-            }
-
-            return Converged;
-        }
-
-        #endregion
+        //#region Hill
+
+        //public static bool FitElasticityTensorTextureHillCubic(Texture.OrientationDistributionFunction ODF)
+        //{
+        //    bool Converged = false;
+        //    double Lambda = LMA._lambda;
+
+        //    Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
+
+        //    for (ODF.FittingTrial = 0; ODF.FittingTrial < CalScec.Properties.Settings.Default.MaxFittingTrials; ODF.FittingTrial++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+        //        ParamDelta = ODF.ParameterDeltaVektorF33HillCubic(Lambda);
+
+        //        double[] parameterArr = { ODF.BaseTensor.S11, ODF.BaseTensor.S12, ODF.BaseTensor.S44 };
+
+        //        #region Parameter calculations
+
+        //        TrialODF.BaseTensor.S11 += ParamDelta[0];
+        //        TrialODF.BaseTensor.S12 += ParamDelta[1];
+        //        TrialODF.BaseTensor.S44 += ParamDelta[2];
+
+        //        #endregion
+
+        //        //TrialODF.SetTextureTensor();
+
+        //        double Chi2Trial = Chi2.Chi2TextureVoigtCubic(TrialODF);
+        //        double Chi2Real = Chi2.Chi2TextureVoigtCubic(ODF);
+
+        //        if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+        //        {
+        //            if (LMA.CheckTopologie(ParamDelta, parameterArr, Chi2Real, Chi2Trial))
+        //            {
+        //                if (Chi2Trial > Chi2Real)
+        //                {
+        //                    TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+        //                    TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+        //                    TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
+
+        //                    TrialODF.BaseTensor.CalculateStiffnesses();
+
+        //                    Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //                else
+        //                {
+        //                    ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+        //                    ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+        //                    ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
+
+        //                    ODF.BaseTensor.CalculateStiffnesses();
+
+        //                    Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+        //                TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+        //                TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
+
+        //                Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (ODF.FittingTrial > 3)
+        //            {
+        //                ODF.BaseTensor.CalculateStiffnesses();
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                if (Chi2Real > Chi2Trial)
+        //                {
+        //                    ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+        //                    ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+        //                    ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
+
+        //                    ODF.BaseTensor.CalculateStiffnesses();
+
+        //                    Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    ODF.BaseTensor.CalculateStiffnesses();
+        //    return Converged;
+        //}
+
+        //public static bool FitElasticityTensorTextureHillHexagonal(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
+        //{
+        //    bool Converged = false;
+        //    double Lambda = LMA._lambda;
+
+        //    Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
+
+        //    for (ODF.FittingTrial = 0; ODF.FittingTrial < CalScec.Properties.Settings.Default.MaxFittingTrials; ODF.FittingTrial++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+        //        ParamDelta = ODF.ParameterDeltaVektorF33HillHexagonal(Lambda);
+
+        //        double[] parameterArr = { ODF.BaseTensor.S11, ODF.BaseTensor.S12, ODF.BaseTensor.S44, ODF.BaseTensor.S13, ODF.BaseTensor.S33 };
+
+        //        #region Parameter calculations
+
+        //        TrialODF.BaseTensor.S11 += ParamDelta[0];
+        //        TrialODF.BaseTensor.S33 += ParamDelta[1];
+        //        TrialODF.BaseTensor.S12 += ParamDelta[2];
+        //        TrialODF.BaseTensor.S13 += ParamDelta[3];
+        //        TrialODF.BaseTensor.S44 += ParamDelta[4];
+
+        //        #endregion
+
+        //        double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
+        //        double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
+
+        //        if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+        //        {
+        //            if (LMA.CheckTopologie(ParamDelta, parameterArr, Chi2Real, Chi2Trial))
+        //            {
+        //                if (Chi2Trial > Chi2Real)
+        //                {
+        //                    TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+        //                    TrialODF.BaseTensor.S33 = ODF.BaseTensor.S33;
+        //                    TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+        //                    TrialODF.BaseTensor.S13 = ODF.BaseTensor.S13;
+        //                    TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
+
+        //                    TrialODF.BaseTensor.CalculateStiffnesses();
+
+        //                    Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //                else
+        //                {
+        //                    ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+        //                    ODF.BaseTensor.S33 = TrialODF.BaseTensor.S33;
+        //                    ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+        //                    ODF.BaseTensor.S13 = TrialODF.BaseTensor.S13;
+        //                    ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
+
+        //                    ODF.BaseTensor.CalculateStiffnesses();
+
+        //                    Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+        //                TrialODF.BaseTensor.S33 = ODF.BaseTensor.S33;
+        //                TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+        //                TrialODF.BaseTensor.S13 = ODF.BaseTensor.S13;
+        //                TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
+
+        //                Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (ODF.FittingTrial > 3)
+        //            {
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                if (Chi2Real > Chi2Trial)
+        //                {
+        //                    ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+        //                    ODF.BaseTensor.S33 = TrialODF.BaseTensor.S33;
+        //                    ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+        //                    ODF.BaseTensor.S13 = TrialODF.BaseTensor.S13;
+        //                    ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
+
+        //                    ODF.BaseTensor.CalculateStiffnesses();
+
+        //                    Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return Converged;
+        //}
+
+        //#endregion
+
+        //#region Geometric Hill
+
+        //public static bool FitElasticityTensorTextureGeometricHillCubic(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
+        //{
+        //    bool Converged = false;
+        //    double Lambda = LMA._lambda;
+
+        //    Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
+
+        //    for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+        //        if (classicCalculation)
+        //        {
+        //            ODF.SetTextureTensor();
+        //            ParamDelta = ODF.TextureTensor.ParameterDeltaVektorGeometricHillCubicClassic(Lambda);
+        //        }
+        //        else
+        //        {
+        //            ODF.SetTextureTensor();
+        //            ParamDelta = ODF.TextureTensor.ParameterDeltaVektorGeometricHillCubicMacroscopic(Lambda);
+        //        }
+
+        //        #region Parameter calculations
+
+        //        TrialODF.BaseTensor.S11 += ParamDelta[0];
+        //        TrialODF.BaseTensor.S12 += ParamDelta[1];
+        //        TrialODF.BaseTensor.S44 += ParamDelta[2];
+
+        //        #endregion
+
+        //        TrialODF.BaseTensor.CalculateStiffnesses();
+
+        //        TrialODF.SetTextureTensor();
+
+        //        double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
+        //        double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
+
+        //        if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+        //        {
+        //            if (Chi2Trial > Chi2Real)
+        //            {
+        //                TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+        //                TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+        //                TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
+
+        //                TrialODF.BaseTensor.CalculateStiffnesses();
+
+        //                Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //            else
+        //            {
+        //                ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+        //                ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+        //                ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
+
+        //                ODF.BaseTensor.CalculateStiffnesses();
+
+        //                Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (TotalTrials > 3)
+        //            {
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                if (Chi2Real > Chi2Trial)
+        //                {
+        //                    ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+        //                    ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+        //                    ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
+
+        //                    ODF.BaseTensor.CalculateStiffnesses();
+
+        //                    Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return Converged;
+        //}
+
+        //public static bool FitElasticityTensorTextureGeometricHillHexagonal(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
+        //{
+        //    bool Converged = false;
+        //    double Lambda = LMA._lambda;
+
+        //    Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
+
+        //    for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+        //        if (classicCalculation)
+        //        {
+        //            ODF.SetTextureTensor();
+        //            ParamDelta = ODF.TextureTensor.ParameterDeltaVektorGeometricHillHexagonalClassic(Lambda);
+        //        }
+        //        else
+        //        {
+        //            ODF.SetTextureTensor();
+        //            ParamDelta = ODF.TextureTensor.ParameterDeltaVektorGeometricHillHexagonalMacroscopic(Lambda);
+        //        }
+
+        //        #region Parameter calculations
+
+        //        TrialODF.BaseTensor.S11 += ParamDelta[0];
+        //        TrialODF.BaseTensor.S33 += ParamDelta[1];
+        //        TrialODF.BaseTensor.S12 += ParamDelta[2];
+        //        TrialODF.BaseTensor.S13 += ParamDelta[3];
+        //        TrialODF.BaseTensor.S44 += ParamDelta[4];
+
+        //        #endregion
+
+        //        TrialODF.BaseTensor.CalculateStiffnesses();
+
+        //        TrialODF.SetTextureTensor();
+
+        //        double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
+        //        double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
+
+        //        if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+        //        {
+        //            if (Chi2Trial > Chi2Real)
+        //            {
+        //                TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+        //                TrialODF.BaseTensor.S33 = ODF.BaseTensor.S33;
+        //                TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+        //                TrialODF.BaseTensor.S13 = ODF.BaseTensor.S13;
+        //                TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
+
+        //                TrialODF.BaseTensor.CalculateStiffnesses();
+
+        //                Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //            else
+        //            {
+        //                ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+        //                ODF.BaseTensor.S33 = TrialODF.BaseTensor.S33;
+        //                ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+        //                ODF.BaseTensor.S13 = TrialODF.BaseTensor.S13;
+        //                ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
+
+        //                ODF.BaseTensor.CalculateStiffnesses();
+
+        //                Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (TotalTrials > 3)
+        //            {
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                if (Chi2Real > Chi2Trial)
+        //                {
+        //                    ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+        //                    ODF.BaseTensor.S33 = TrialODF.BaseTensor.S33;
+        //                    ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+        //                    ODF.BaseTensor.S13 = TrialODF.BaseTensor.S13;
+        //                    ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
+
+        //                    ODF.BaseTensor.CalculateStiffnesses();
+
+        //                    Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return Converged;
+        //}
+
+        //#endregion
+
+        //#region Kroener
+
+        //public static bool FitElasticityTensorTextureKroenerCubicStiffness(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
+        //{
+        //    bool Converged = false;
+        //    double Lambda = LMA._lambda;
+
+        //    Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
+
+        //    for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+        //        if (classicCalculation)
+        //        {
+        //            ODF.SetTextureTensor();
+        //            ParamDelta = ODF.TextureTensor.ParameterDeltaVektorKroenerCubicStiffnessClassic(Lambda);
+        //        }
+        //        else
+        //        {
+        //            ODF.SetTextureTensor();
+        //            ParamDelta = ODF.TextureTensor.ParameterDeltaVektorKroenerCubicStiffnessMacroscopic(Lambda);
+        //        }
+
+        //        #region Parameter calculations
+
+        //        TrialODF.BaseTensor.C11 += ParamDelta[0];
+        //        TrialODF.BaseTensor.C12 += ParamDelta[1];
+        //        TrialODF.BaseTensor.C44 += ParamDelta[2];
+
+        //        #endregion
+
+        //        TrialODF.SetTextureTensor();
+
+        //        double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
+        //        double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
+
+        //        if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+        //        {
+        //            if (Chi2Trial > Chi2Real)
+        //            {
+        //                TrialODF.BaseTensor.C11 = ODF.BaseTensor.C11;
+        //                TrialODF.BaseTensor.C12 = ODF.BaseTensor.C12;
+        //                TrialODF.BaseTensor.C44 = ODF.BaseTensor.C44;
+
+        //                Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //            else
+        //            {
+        //                ODF.BaseTensor.C11 = TrialODF.BaseTensor.C11;
+        //                ODF.BaseTensor.C12 = TrialODF.BaseTensor.C12;
+        //                ODF.BaseTensor.C44 = TrialODF.BaseTensor.C44;
+
+        //                Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (TotalTrials > 3)
+        //            {
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                if (Chi2Real > Chi2Trial)
+        //                {
+        //                    ODF.BaseTensor.C11 = TrialODF.BaseTensor.C11;
+        //                    ODF.BaseTensor.C12 = TrialODF.BaseTensor.C12;
+        //                    ODF.BaseTensor.C44 = TrialODF.BaseTensor.C44;
+
+        //                    Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return Converged;
+        //}
+
+        //public static bool FitElasticityTensorTextureKroenerCubicCompliance(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
+        //{
+        //    bool Converged = false;
+        //    double Lambda = LMA._lambda;
+
+        //    Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
+
+        //    for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+        //        if (classicCalculation)
+        //        {
+        //            ODF.SetTextureTensor();
+        //            ParamDelta = ODF.TextureTensor.ParameterDeltaVektorKroenerCubicComplianceClassic(Lambda);
+        //        }
+        //        else
+        //        {
+        //            ODF.SetTextureTensor();
+        //            ParamDelta = ODF.TextureTensor.ParameterDeltaVektorKroenerCubicComplianceMacroscopic(Lambda);
+        //        }
+
+        //        #region Parameter calculations
+
+        //        TrialODF.BaseTensor.S11 += ParamDelta[0];
+        //        TrialODF.BaseTensor.S12 += ParamDelta[1];
+        //        TrialODF.BaseTensor.S44 += ParamDelta[2];
+
+        //        #endregion
+
+        //        TrialODF.BaseTensor.CalculateStiffnesses();
+
+        //        TrialODF.SetTextureTensor();
+
+        //        double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
+        //        double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
+
+        //        if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+        //        {
+        //            if (Chi2Trial > Chi2Real)
+        //            {
+        //                TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+        //                TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+        //                TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
+
+        //                TrialODF.BaseTensor.CalculateStiffnesses();
+
+        //                Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //            else
+        //            {
+        //                ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+        //                ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+        //                ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
+
+        //                ODF.BaseTensor.CalculateStiffnesses();
+
+        //                Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (TotalTrials > 3)
+        //            {
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                if (Chi2Real > Chi2Trial)
+        //                {
+        //                    ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+        //                    ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+        //                    ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
+
+        //                    ODF.BaseTensor.CalculateStiffnesses();
+
+        //                    Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return Converged;
+        //}
+
+        //#endregion
+
+        //#region DeWitt
+
+        //public static bool FitElasticityTensorTextureDeWittCubicStiffness(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
+        //{
+        //    bool Converged = false;
+        //    double Lambda = LMA._lambda;
+
+        //    Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
+
+        //    for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+        //        if (classicCalculation)
+        //        {
+        //            ODF.SetTextureTensor();
+        //            ParamDelta = ODF.TextureTensor.ParameterDeltaVektorDeWittCubicStiffnessClassic(Lambda);
+        //        }
+        //        else
+        //        {
+        //            ODF.SetTextureTensor();
+        //            ParamDelta = ODF.TextureTensor.ParameterDeltaVektorDeWittCubicStiffnessMacroscopic(Lambda);
+        //        }
+
+        //        #region Parameter calculations
+
+        //        TrialODF.BaseTensor.C11 += ParamDelta[0];
+        //        TrialODF.BaseTensor.C12 += ParamDelta[1];
+        //        TrialODF.BaseTensor.C44 += ParamDelta[2];
+
+        //        #endregion
+
+        //        TrialODF.SetTextureTensor();
+
+        //        double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
+        //        double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
+
+        //        if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+        //        {
+        //            if (Chi2Trial > Chi2Real)
+        //            {
+        //                TrialODF.BaseTensor.C11 = ODF.BaseTensor.C11;
+        //                TrialODF.BaseTensor.C12 = ODF.BaseTensor.C12;
+        //                TrialODF.BaseTensor.C44 = ODF.BaseTensor.C44;
+
+        //                Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //            else
+        //            {
+        //                ODF.BaseTensor.C11 = TrialODF.BaseTensor.C11;
+        //                ODF.BaseTensor.C12 = TrialODF.BaseTensor.C12;
+        //                ODF.BaseTensor.C44 = TrialODF.BaseTensor.C44;
+
+        //                Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (TotalTrials > 3)
+        //            {
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                if (Chi2Real > Chi2Trial)
+        //                {
+        //                    ODF.BaseTensor.C11 = TrialODF.BaseTensor.C11;
+        //                    ODF.BaseTensor.C12 = TrialODF.BaseTensor.C12;
+        //                    ODF.BaseTensor.C44 = TrialODF.BaseTensor.C44;
+
+        //                    Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return Converged;
+        //}
+
+        //public static bool FitElasticityTensorTextureDeWittCubicCompliance(Texture.OrientationDistributionFunction ODF, bool classicCalculation)
+        //{
+        //    bool Converged = false;
+        //    double Lambda = LMA._lambda;
+
+        //    Texture.OrientationDistributionFunction TrialODF = ODF.Clone() as Texture.OrientationDistributionFunction;
+
+        //    for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> ParamDelta;
+
+        //        if (classicCalculation)
+        //        {
+        //            ODF.SetTextureTensor();
+        //            ParamDelta = ODF.TextureTensor.ParameterDeltaVektorDeWittCubicComplianceClassic(Lambda);
+        //        }
+        //        else
+        //        {
+        //            ODF.SetTextureTensor();
+        //            ParamDelta = ODF.TextureTensor.ParameterDeltaVektorDeWittCubicComplianceMacroscopic(Lambda);
+        //        }
+
+        //        #region Parameter calculations
+
+        //        TrialODF.BaseTensor.S11 += ParamDelta[0];
+        //        TrialODF.BaseTensor.S12 += ParamDelta[1];
+        //        TrialODF.BaseTensor.S44 += ParamDelta[2];
+
+        //        #endregion
+
+        //        TrialODF.BaseTensor.CalculateStiffnesses();
+
+        //        TrialODF.SetTextureTensor();
+
+        //        double Chi2Trial = Chi2.Chi2ClassicHillCubic(TrialODF.TextureTensor);
+        //        double Chi2Real = Chi2.Chi2ClassicHillCubic(ODF.TextureTensor);
+
+        //        if (Math.Abs(Chi2Trial - Chi2Real) > CalScec.Properties.Settings.Default.FunctionFittingAcuraccy)
+        //        {
+        //            if (Chi2Trial > Chi2Real)
+        //            {
+        //                TrialODF.BaseTensor.S11 = ODF.BaseTensor.S11;
+        //                TrialODF.BaseTensor.S12 = ODF.BaseTensor.S12;
+        //                TrialODF.BaseTensor.S44 = ODF.BaseTensor.S44;
+
+        //                TrialODF.BaseTensor.CalculateStiffnesses();
+
+        //                Lambda *= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //            else
+        //            {
+        //                ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+        //                ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+        //                ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
+
+        //                ODF.BaseTensor.CalculateStiffnesses();
+
+        //                Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (TotalTrials > 3)
+        //            {
+        //                return true;
+        //            }
+        //            else
+        //            {
+        //                if (Chi2Real > Chi2Trial)
+        //                {
+        //                    ODF.BaseTensor.S11 = TrialODF.BaseTensor.S11;
+        //                    ODF.BaseTensor.S12 = TrialODF.BaseTensor.S12;
+        //                    ODF.BaseTensor.S44 = TrialODF.BaseTensor.S44;
+
+        //                    ODF.BaseTensor.CalculateStiffnesses();
+
+        //                    Lambda /= CalScec.Properties.Settings.Default.FittingLambdaMulti;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return Converged;
+        //}
+
+        //#endregion
 
         #endregion
 
