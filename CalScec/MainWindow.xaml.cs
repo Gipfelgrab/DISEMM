@@ -45,6 +45,8 @@ namespace CalScec
         private List<OxyPlot.Annotations.Annotation> PeakManipulationLine = new List<OxyPlot.Annotations.Annotation>();
         double[] _newPeakCharacteristic = { 0.0, 0.0};
 
+        bool _textEventactive = true;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -143,7 +145,7 @@ namespace CalScec
             this.AcceptedDifferenceHKLAssociation.Text = Convert.ToString(CalScec.Properties.Settings.Default.HKLAssociationRangeDeg);
             this.PatternLowerLimitTextBox.Text = Convert.ToString(CalScec.Properties.Settings.Default.PatternLowerLimit);
             this.PatternUpperLimitTextBox.Text = Convert.ToString(CalScec.Properties.Settings.Default.PatternUpperLimit);
-
+            this.WavelengthTextBox.Text = Convert.ToString(CalScec.Properties.Settings.Default.UsedWaveLength);
             if (CalScec.Properties.Settings.Default.PlotHKLOverview)
             {
                 PlotHKLOverviewMenuItem.IsChecked = true;
@@ -181,7 +183,8 @@ namespace CalScec
             DiffractionXAxisLin.Position = OxyPlot.Axes.AxisPosition.Bottom;
             DiffractionXAxisLin.Minimum = 0;
             DiffractionXAxisLin.Maximum = 180;
-            DiffractionXAxisLin.Title = "Angle";
+            DiffractionXAxisLin.Title = "";
+            //DiffractionXAxisLin.Title = "Angle";
 
             DiffractionYAxisLin.Position = OxyPlot.Axes.AxisPosition.Left;
             DiffractionYAxisLin.Minimum = 0;
@@ -519,6 +522,8 @@ namespace CalScec
 
         private void LoadFromSCEC_Click(object sender, RoutedEventArgs e)
         {
+           this._textEventactive = false;
+
             Microsoft.Win32.OpenFileDialog OpenSampleFile = new Microsoft.Win32.OpenFileDialog();
             OpenSampleFile.Multiselect = false;
             OpenSampleFile.DefaultExt = ".scec";
@@ -557,8 +562,15 @@ namespace CalScec
 
                 this.InvestigatedSample.SetYieldExperimentalData();
 
+                this.SampleName.Text = this.InvestigatedSample.Name;
+                this.SampleArea.Text = this.InvestigatedSample.Area.ToString("F3");
+
                 for (int n = 0; n < this.InvestigatedSample.CrystalData.Count; n++)
                 {
+                    ComboBoxItem presentPhase = new ComboBoxItem();
+                    presentPhase.Content = this.InvestigatedSample.CrystalData[n].Name;
+                    this.PhaseSelection.Items.Add(presentPhase);
+
                     this.InvestigatedSample.VoigtTensorData[n].SetAverageParameters(this.InvestigatedSample.VoigtTensorData[n].GetCalculatedDiffractionConstantsVoigt(this.InvestigatedSample.CrystalData[n]));
                     this.InvestigatedSample.ReussTensorData[n].SetAverageParameters(this.InvestigatedSample.ReussTensorData[n].GetCalculatedDiffractionConstantsReuss(this.InvestigatedSample.CrystalData[n]));
                     this.InvestigatedSample.HillTensorData[n].SetAverageParameters(this.InvestigatedSample.HillTensorData[n].GetCalculatedDiffractionConstantsHill(this.InvestigatedSample.CrystalData[n]));
@@ -607,6 +619,10 @@ namespace CalScec
 
                 }
             }
+
+            _textEventactive = true;
+
+            this.PhaseSelection.SelectedIndex = 0;
         }
 
         private void ExportToxlsx_Click(object sender, RoutedEventArgs e)
@@ -980,10 +996,12 @@ namespace CalScec
                 {
                     Analysis.Peaks.Detection.HyperDetection(NewDiffractionPattern);
                     Analysis.Peaks.Detection.AssociateFoundPeaksToHKL(NewDiffractionPattern, this.InvestigatedSample.CrystalData);
+                    NewDiffractionPattern.SetRegions();
                 }
                 else if (CalScec.Properties.Settings.Default.UsedPeakDetectionId == 1)
                 {
                     Analysis.Peaks.Detection.CIFDetection(NewDiffractionPattern, this.InvestigatedSample.CrystalData);
+                    NewDiffractionPattern.SetRegions();
                 }
                 else
                 {
@@ -1005,21 +1023,24 @@ namespace CalScec
                     if(PrevPatterIndex != -1)
                     {
                         Analysis.Peaks.Detection.PrevPatternDetection(NewDiffractionPattern, this.InvestigatedSample.DiffractionPatterns[PrevPatterIndex]);
+                        NewDiffractionPattern.SetRegionsFromPrevious(this.InvestigatedSample.DiffractionPatterns[PrevPatterIndex]);
                     }
                     else
                     {
                         if(this.InvestigatedSample.DiffractionPatterns.Count - 1 != 0)
                         {
                             Analysis.Peaks.Detection.PrevPatternDetection(NewDiffractionPattern, this.InvestigatedSample.DiffractionPatterns[0]);
+                            NewDiffractionPattern.SetRegionsFromPrevious(this.InvestigatedSample.DiffractionPatterns[PrevPatterIndex]);
                         }
                         else
                         {
                             Analysis.Peaks.Detection.CIFDetection(NewDiffractionPattern, this.InvestigatedSample.CrystalData);
+                            NewDiffractionPattern.SetRegions();
                         }
                     }
                 }
 
-                NewDiffractionPattern.SetRegions();
+                //NewDiffractionPattern.SetRegions();
 
                 if(CalScec.Properties.Settings.Default.AutomaticPeakFit)
                 {
@@ -1165,10 +1186,12 @@ namespace CalScec
                         {
                             Analysis.Peaks.Detection.HyperDetection(AddedPatterns[i]);
                             Analysis.Peaks.Detection.AssociateFoundPeaksToHKL(AddedPatterns[i], this.InvestigatedSample.CrystalData);
+                            AddedPatterns[i].SetRegions();
                         }
                         else if (CalScec.Properties.Settings.Default.UsedPeakDetectionId == 1)
                         {
                             Analysis.Peaks.Detection.CIFDetection(AddedPatterns[i], this.InvestigatedSample.CrystalData);
+                            AddedPatterns[i].SetRegions();
                         }
                         else
                         {
@@ -1190,21 +1213,26 @@ namespace CalScec
                             if (PrevPatterIndex != -1)
                             {
                                 Analysis.Peaks.Detection.PrevPatternDetection(AddedPatterns[i], this.InvestigatedSample.DiffractionPatterns[PrevPatterIndex]);
+
+                                AddedPatterns[i].SetRegionsFromPrevious(this.InvestigatedSample.DiffractionPatterns[PrevPatterIndex]);
                             }
                             else
                             {
                                 if (this.InvestigatedSample.DiffractionPatterns.Count - AddedPatterns.Count != 0)
                                 {
                                     Analysis.Peaks.Detection.PrevPatternDetection(AddedPatterns[i], this.InvestigatedSample.DiffractionPatterns[0]);
+
+                                    AddedPatterns[i].SetRegionsFromPrevious(this.InvestigatedSample.DiffractionPatterns[PrevPatterIndex]);
                                 }
                                 else
                                 {
                                     Analysis.Peaks.Detection.CIFDetection(AddedPatterns[i], this.InvestigatedSample.CrystalData);
+                                    AddedPatterns[i].SetRegions();
                                 }
                             }
                         }
 
-                        AddedPatterns[i].SetRegions();
+                        //AddedPatterns[i].SetRegions();
 
                         if (CalScec.Properties.Settings.Default.AutomaticPeakFit)
                         {
@@ -1290,6 +1318,223 @@ namespace CalScec
             Pattern.DiffractionDataWindow DDW = new Pattern.DiffractionDataWindow(this.InvestigatedSample);
 
             DDW.ShowDialog();
+        }
+
+        private void OpenReflexInformationFile_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.InvestigatedSample.CrystalData.Count != 0)
+            {
+                Microsoft.Win32.OpenFileDialog OpenReflexInformationFile = new Microsoft.Win32.OpenFileDialog();
+                OpenReflexInformationFile.Multiselect = false;
+                Nullable<bool> Opened = OpenReflexInformationFile.ShowDialog();
+
+                if (Opened == true)
+                {
+                    BackgroundWorker OpenReflexInformation = new BackgroundWorker();
+
+                    OpenReflexInformation.DoWork += OpenReflexInformationFile_Work;
+                    OpenReflexInformation.ProgressChanged += OpenReflexInformationFile_ProgressChanged;
+                    OpenReflexInformation.RunWorkerCompleted += OpenReflexInformationFile_Completed;
+                    OpenReflexInformation.WorkerReportsProgress = true;
+
+                    OpenReflexInformation.RunWorkerAsync(OpenReflexInformationFile.FileName);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Since I am somehow smart I really would like to help you with finding and assigning peaks! But for that I need the crystallographic data first.\n Please be so kind and load it first", "No crystallographic data", MessageBoxButton.OK, MessageBoxImage.Stop);
+            }
+
+        }
+
+        private void OpenReflexInformationFile_Work(object sender, DoWorkEventArgs e)
+        {
+            BackgroundWorker worker = sender as BackgroundWorker;
+            if (this.PhaseSelection.SelectedIndex != -1)
+            {
+                int selectedPhase = this.PhaseSelection.SelectedIndex;
+
+                string PatternPath = (string)e.Argument;
+                string fileName = System.IO.Path.GetFileName(PatternPath);
+                string[] State = { fileName, "L" };
+                double Progress = 5.0;
+
+                worker.ReportProgress(Convert.ToInt32(Progress), State);
+
+                string FileExt = System.IO.Path.GetExtension(PatternPath);
+                if (FileExt.ToLower() == ".csv" || FileExt.ToLower() == ".txt")
+                {
+                    try
+                    {
+                        //this.PatternCounts = new Counts();
+
+                        string[] PatternFileLines = System.IO.File.ReadLines(PatternPath).ToArray();
+                        int lineIndex = 0;
+
+                        Progress = 5.0;
+                        State[0] = Convert.ToString(PatternFileLines.Count()) + " Peaks found!";
+                        State[1] = "LP";
+
+                        //int hIndex = Convert.ToInt32(fileName[0].ToString());
+                        //int kIndex = Convert.ToInt32(fileName[1].ToString());
+                        //int lIndex = Convert.ToInt32(fileName[2].ToString());
+
+                        foreach (string line in PatternFileLines)
+                        {
+                            if (line[0] != '#' && line[0] != '%')
+                            {
+                                //Peak File structure
+                                //Trennzeichen (;|,| |\t)
+                                //[0]HKL; [1]Position; [2]FWHM; [3]Area; [4]Chi; [5]Omega; [6]Phi; [7]Load as Force; [8] Macroextension;
+                                char[] sepChars = { ';', ',', '\t' };
+
+                                string[] lineData = line.Split(sepChars);
+
+                                try
+                                {
+                                    double areaE = Convert.ToDouble(lineData[5]);
+                                    if (areaE != 0.0)
+                                    {
+                                        Pattern.DiffractionPattern NewDiffractionPattern = new Pattern.DiffractionPattern(this.InvestigatedSample.ActualPatterId);
+                                        string indexString = lineData[0];
+                                        int hIndex = Convert.ToInt32(indexString[0].ToString());
+                                        int kIndex = Convert.ToInt32(indexString[1].ToString());
+                                        int lIndex = Convert.ToInt32(indexString[2].ToString());
+
+                                        NewDiffractionPattern.ChiAngle = Convert.ToDouble(lineData[4]);
+                                        NewDiffractionPattern.OmegaAngle = Convert.ToDouble(lineData[5]);
+                                        NewDiffractionPattern.PhiSampleAngle = Convert.ToDouble(lineData[6]);
+                                        NewDiffractionPattern.Force = Convert.ToDouble(lineData[7]);
+                                        NewDiffractionPattern.Stress = NewDiffractionPattern.Force / this.InvestigatedSample.Area;
+                                        NewDiffractionPattern.MacroExtension = Convert.ToDouble(lineData[8]);
+
+                                        Pattern.Counts FittingCounts = new Pattern.Counts();
+
+                                        double position = Convert.ToDouble(lineData[1]);
+                                        double fWHM = Convert.ToDouble(lineData[2]);
+                                        double area = Convert.ToDouble(lineData[3]);
+
+                                        Analysis.Peaks.DiffractionPeak DPeak = new Analysis.Peaks.DiffractionPeak(0, position, area, 0, FittingCounts);
+
+                                        DPeak.PFunction.Angle = position;
+                                        DPeak.PFunction.FWHM = fWHM;
+                                        DPeak.PFunction.Intensity = area;
+
+                                        string hKLAssociation = "( " + Convert.ToString(hIndex) + " " + Convert.ToString(kIndex) + " " + Convert.ToString(lIndex) + " )"; ;
+
+                                        NewDiffractionPattern.Name = hKLAssociation + " Ext=" + NewDiffractionPattern.MacroExtension.ToString("F3");
+                                        for (int n = 0; n < this.InvestigatedSample.CrystalData[selectedPhase].HKLList.Count; n++)
+                                        {
+                                            if (hKLAssociation == this.InvestigatedSample.CrystalData[selectedPhase].HKLList[n].HKLString)
+                                            {
+                                                DPeak.AddHKLAssociation(this.InvestigatedSample.CrystalData[selectedPhase].HKLList[n], this.InvestigatedSample.CrystalData[selectedPhase]);
+                                                break;
+                                            }
+                                        }
+                                        NewDiffractionPattern.FoundPeaks.Add(DPeak);
+                                        this.InvestigatedSample.DiffractionPatterns.Add(NewDiffractionPattern);
+
+                                        Progress = (0.95 * Convert.ToDouble(lineIndex / PatternFileLines.Count())) + 0.05;
+                                        State[0] = "Peak " + lineIndex.ToString() + " of " + PatternFileLines.Count().ToString();
+                                        State[1] = "LP";
+
+                                        worker.ReportProgress(Convert.ToInt32(Progress), State);
+                                    }
+                                }
+                                catch
+                                {
+                                    Progress = (0.95 * Convert.ToDouble(lineIndex / PatternFileLines.Count())) + 0.05;
+                                    State[0] = "Continue";
+                                    State[1] = "PF";
+
+                                    worker.ReportProgress(Convert.ToInt32(Progress), State);
+                                }
+                            }
+
+                        }
+                    }
+                    catch
+                    {
+                        Progress = 0.0;
+                        State[0] = "Finished";
+                        State[1] = "C2";
+                    }
+                    finally
+                    {
+                        //this.InvestigatedSample.DiffractionPatterns.Sort((a, b) => a.MacroExtension.CompareTo(b.MacroExtension));
+                        for (int n = 0; n < this.InvestigatedSample.DiffractionPatterns.Count; n++)
+                        {
+                            this.InvestigatedSample.DiffractionPatterns[n].MacroStrain = (this.InvestigatedSample.DiffractionPatterns[n].MacroExtension - this.InvestigatedSample.DiffractionPatterns[0].MacroExtension) / CalScec.Properties.Settings.Default.ExstensionBase;
+                        }
+                        worker.ReportProgress(Convert.ToInt32(Progress), State);
+                    }
+
+                }
+                else
+                {
+                    Progress = 0.0;
+                    State[0] = "Finished";
+                    State[1] = "C1";
+
+                    worker.ReportProgress(Convert.ToInt32(Progress), State);
+                }
+
+                Progress = 50.0;
+                State[0] = "All Peaks loaded!";
+                State[1] = "PFF";
+
+                worker.ReportProgress(Convert.ToInt32(Progress), State);
+            }
+        }
+
+        private void OpenReflexInformationFile_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            this.StatusProgress.Value = e.ProgressPercentage;
+            string[] StateString = (string[])e.UserState;
+
+            if (StateString[1] == "L")
+            {
+                this.StatusLog1.Content = "Loading File";
+            }
+            else if (StateString[1] == "C1")
+            {
+                this.ErrorLog1.Content = "Loading not possible";
+                this.ErrorLog2.Content = "Not a .dat file";
+            }
+            else if (StateString[1] == "C2")
+            {
+                this.ErrorLog1.Content = "Loading not possible";
+                this.ErrorLog2.Content = "Wrong File Format";
+            }
+            else if (StateString[1] == "LP")
+            {
+                this.StatusLog1.Content = "Loading peaks";
+            }
+            else if (StateString[1] == "PF")
+            {
+                this.ErrorLog1.Content = "Peak loading failed";
+                this.ErrorLog2.Content = "Wrong data format detected";
+            }
+            else if (StateString[1] == "PFF")
+            {
+                this.StatusLog1.Content = "Loading completted";
+            }
+            else if (StateString[1] == "PFE")
+            {
+                this.ErrorLog1.Content = "Peak search not possible";
+                this.ErrorLog2.Content = "Could not load diffraction pattern";
+            }
+
+            this.StatusLog2.Content = StateString[0];
+        }
+
+        private void OpenReflexInformationFile_Completed(object sender, RunWorkerCompletedEventArgs e)
+        {
+            //this.InvestigatedSample.DiffractionPatterns.Sort((a, b) => (1) * a.Name.CompareTo(b.Name));
+            DiffractionPatternList.Items.Refresh();
+            this.StatusLog1.Foreground = System.Windows.Media.Brushes.DarkGreen;
+            this.StatusLog1.Content = "Loading completed";
+            this.StatusProgress.Value = 100;
         }
 
         #region Peak editing
@@ -1421,6 +1666,9 @@ namespace CalScec
                             this.InvestigatedSample.CrystalData.Add(new DataManagment.CrystalData.CODData(FilePath));
 
                             this.InvestigatedSample.DiffractionConstants.Add(new List<Analysis.Stress.Microsopic.REK>());
+                            this.InvestigatedSample.DiffractionConstantsTexture.Add(new List<Analysis.Stress.Microsopic.REK>());
+
+                            this.InvestigatedSample.StressTransitionFactors.Add(MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(6, 6, 0.0));
 
                             this.InvestigatedSample.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                             this.InvestigatedSample.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
@@ -1432,6 +1680,14 @@ namespace CalScec
                             switch (this.InvestigatedSample.CrystalData[this.InvestigatedSample.CrystalData.Count - 1].SymmetryGroup)
                             {
                                 case "F m -3 m":
+                                    this.InvestigatedSample.VoigtTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.ReussTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.HillTensorData[this.InvestigatedSample.HillTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.KroenerTensorData[this.InvestigatedSample.KroenerTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.DeWittTensorData[this.InvestigatedSample.DeWittTensorData.Count - 1].Symmetry = "cubic";
+                                    this.InvestigatedSample.GeometricHillTensorData[this.InvestigatedSample.GeometricHillTensorData.Count - 1].Symmetry = "cubic";
+                                    break;
+                                case "F d -3 m":
                                     this.InvestigatedSample.VoigtTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "cubic";
                                     this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.ReussTensorData.Count - 1].Symmetry = "cubic";
                                     this.InvestigatedSample.HillTensorData[this.InvestigatedSample.HillTensorData.Count - 1].Symmetry = "cubic";
@@ -1456,6 +1712,13 @@ namespace CalScec
                                     this.InvestigatedSample.GeometricHillTensorData[this.InvestigatedSample.GeometricHillTensorData.Count - 1].Symmetry = "hexagonal";
                                     break;
                             }
+
+
+                            ComboBoxItem presentPhase = new ComboBoxItem();
+                            presentPhase.Content = this.InvestigatedSample.CrystalData[0].Name;
+                            this.PhaseSelection.Items.Add(presentPhase);
+
+                            this.PhaseSelection.SelectedIndex = 0;
                         }
                     }
                 }
@@ -1480,6 +1743,7 @@ namespace CalScec
                                 this.InvestigatedSample.CrystalData.Add(new DataManagment.CrystalData.CODData(FilePath));
 
                                 this.InvestigatedSample.DiffractionConstants.Add(new List<Analysis.Stress.Microsopic.REK>());
+                                this.InvestigatedSample.DiffractionConstantsTexture.Add(new List<Analysis.Stress.Microsopic.REK>());
 
                                 this.InvestigatedSample.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                                 this.InvestigatedSample.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
@@ -1491,6 +1755,14 @@ namespace CalScec
                                 switch (this.InvestigatedSample.CrystalData[this.InvestigatedSample.CrystalData.Count - 1].SymmetryGroup)
                                 {
                                     case "F m -3 m":
+                                        this.InvestigatedSample.VoigtTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.ReussTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.HillTensorData[this.InvestigatedSample.HillTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.KroenerTensorData[this.InvestigatedSample.KroenerTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.DeWittTensorData[this.InvestigatedSample.DeWittTensorData.Count - 1].Symmetry = "cubic";
+                                        this.InvestigatedSample.GeometricHillTensorData[this.InvestigatedSample.GeometricHillTensorData.Count - 1].Symmetry = "cubic";
+                                        break;
+                                    case "F d -3 m":
                                         this.InvestigatedSample.VoigtTensorData[this.InvestigatedSample.VoigtTensorData.Count - 1].Symmetry = "cubic";
                                         this.InvestigatedSample.ReussTensorData[this.InvestigatedSample.ReussTensorData.Count - 1].Symmetry = "cubic";
                                         this.InvestigatedSample.HillTensorData[this.InvestigatedSample.HillTensorData.Count - 1].Symmetry = "cubic";
@@ -1515,6 +1787,11 @@ namespace CalScec
                                         this.InvestigatedSample.GeometricHillTensorData[this.InvestigatedSample.GeometricHillTensorData.Count - 1].Symmetry = "hexagonal";
                                         break;
                                 }
+
+
+                                ComboBoxItem presentPhase = new ComboBoxItem();
+                                presentPhase.Content = this.InvestigatedSample.CrystalData[this.InvestigatedSample.CrystalData.Count - 1].Name;
+                                this.PhaseSelection.Items.Add(presentPhase);
                             }
                         }
                     }
@@ -1534,6 +1811,8 @@ namespace CalScec
                             this.InvestigatedSample.KroenerTensorData.Clear();
                             this.InvestigatedSample.DeWittTensorData.Clear();
                             this.InvestigatedSample.GeometricHillTensorData.Clear();
+
+                            this.PhaseSelection.Items.Clear();
                         }
                     }
                 }
@@ -1563,6 +1842,7 @@ namespace CalScec
                         this.InvestigatedSample.CrystalData.Add(CrystalSelection.SelectedData);
 
                         this.InvestigatedSample.DiffractionConstants.Add(new List<Analysis.Stress.Microsopic.REK>());
+                        this.InvestigatedSample.DiffractionConstantsTexture.Add(new List<Analysis.Stress.Microsopic.REK>());
 
                         this.InvestigatedSample.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                         this.InvestigatedSample.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
@@ -1590,6 +1870,7 @@ namespace CalScec
                             this.InvestigatedSample.CrystalData.Add(CrystalSelection.SelectedData);
 
                             this.InvestigatedSample.DiffractionConstants.Add(new List<Analysis.Stress.Microsopic.REK>());
+                            this.InvestigatedSample.DiffractionConstantsTexture.Add(new List<Analysis.Stress.Microsopic.REK>());
 
                             this.InvestigatedSample.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                             this.InvestigatedSample.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
@@ -1669,6 +1950,7 @@ namespace CalScec
                         this.InvestigatedSample.CrystalData.Add(ManualAddCrystalData.CrystalDataList);
 
                         this.InvestigatedSample.DiffractionConstants.Add(new List<Analysis.Stress.Microsopic.REK>());
+                        this.InvestigatedSample.DiffractionConstantsTexture.Add(new List<Analysis.Stress.Microsopic.REK>());
 
                         this.InvestigatedSample.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                         this.InvestigatedSample.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
@@ -1676,6 +1958,12 @@ namespace CalScec
                         this.InvestigatedSample.KroenerTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                         this.InvestigatedSample.DeWittTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                         this.InvestigatedSample.GeometricHillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+
+                        ComboBoxItem presentPhase = new ComboBoxItem();
+                        presentPhase.Content = ManualAddCrystalData.CrystalDataList.Name;
+                        this.PhaseSelection.Items.Add(presentPhase);
+
+                        this.PhaseSelection.SelectedIndex = 0;
                     }
                 }
                 else
@@ -1691,6 +1979,7 @@ namespace CalScec
                             this.InvestigatedSample.CrystalData.Add(ManualAddCrystalData.CrystalDataList);
 
                             this.InvestigatedSample.DiffractionConstants.Add(new List<Analysis.Stress.Microsopic.REK>());
+                            this.InvestigatedSample.DiffractionConstantsTexture.Add(new List<Analysis.Stress.Microsopic.REK>());
 
                             this.InvestigatedSample.VoigtTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                             this.InvestigatedSample.ReussTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
@@ -1698,6 +1987,12 @@ namespace CalScec
                             this.InvestigatedSample.KroenerTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                             this.InvestigatedSample.DeWittTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
                             this.InvestigatedSample.GeometricHillTensorData.Add(new Analysis.Stress.Microsopic.ElasticityTensors());
+
+                            ComboBoxItem presentPhase = new ComboBoxItem();
+                            presentPhase.Content = ManualAddCrystalData.CrystalDataList.Name;
+                            this.PhaseSelection.Items.Add(presentPhase);
+
+                            this.PhaseSelection.SelectedIndex = 0;
                         }
                     }
                     else
@@ -1716,6 +2011,8 @@ namespace CalScec
                             this.InvestigatedSample.KroenerTensorData.Clear();
                             this.InvestigatedSample.DeWittTensorData.Clear();
                             this.InvestigatedSample.GeometricHillTensorData.Clear();
+
+                            this.PhaseSelection.Items.Clear();
                         }
                     }
                 }
@@ -2496,6 +2793,18 @@ namespace CalScec
             AcceptedDifferenceHKLAssociation.Text = Convert.ToString(CalScec.Properties.Settings.Default.HKLAssociationRangeDeg);
         }
 
+        private void WavelengthTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                CalScec.Properties.Settings.Default.UsedWaveLength = Convert.ToDouble(WavelengthTextBox.Text);
+            }
+            catch
+            {
+
+            }
+        }
+
         private void AcceptedHKLDifference_TextChanged(object sender, TextChangedEventArgs e)
         {
             bool DontChange = false;
@@ -2644,22 +2953,36 @@ namespace CalScec
 
         private void OpenPeakFittingWindowNew_Click(object sender, RoutedEventArgs e)
         {
-            Analysis.Fitting.PeakFittingWindow PFW = new Analysis.Fitting.PeakFittingWindow(this.InvestigatedSample);
-            PFW.Show();
+            if (this.InvestigatedSample.DiffractionPatterns.Count != 0)
+            {
+                if (this.InvestigatedSample.DiffractionPatterns[0].PatternCounts.Count != 0)
+                {
+                    Analysis.Fitting.PeakFittingWindow PFW = new Analysis.Fitting.PeakFittingWindow(this.InvestigatedSample);
+                    PFW.Show();
+                }
+                else
+                {
+                    MessageBox.Show("Only Peak Data Found. No Fitting without data", "No Pattern Data Added", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Only Peak Data Found. Cannot Plot the Pattern", "No Pattern Data Added", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+            }
         }
 
         private void REKCalculation_Click(object sender, RoutedEventArgs e)
         {
             Analysis.Stress.Microsopic.REKAssociationCalculationWindow REKACW = new Analysis.Stress.Microsopic.REKAssociationCalculationWindow(this.InvestigatedSample);
 
-            REKACW.ShowDialog();
+            REKACW.Show();
         }
 
         private void ElasticityTensorCalculation_Click(object sender, RoutedEventArgs e)
         {
             Analysis.Stress.Microsopic.ElasticityCalculationWindow ElCW = new Analysis.Stress.Microsopic.ElasticityCalculationWindow(this.InvestigatedSample);
 
-            ElCW.ShowDialog();
+            ElCW.Show();
         }
 
         private void OpenModelSimulationWindow_Click(object sender, RoutedEventArgs e)
@@ -2676,6 +2999,16 @@ namespace CalScec
         {
             Analysis.Stress.Plasticity.YieldSurfaceWindow YSW = new Analysis.Stress.Plasticity.YieldSurfaceWindow(this.InvestigatedSample);
             YSW.Show();
+        }
+
+        private void LoadTensileTest_Click(object sender, RoutedEventArgs e)
+        {
+            Analysis.Stress.Macroskopic.TensileDataLoad loadingWindow = new Analysis.Stress.Macroskopic.TensileDataLoad();
+            loadingWindow.ShowDialog();
+            if (loadingWindow.newTensileTest != null)
+            {
+                this.InvestigatedSample.TensileTests.Add(loadingWindow.newTensileTest);
+            }
         }
 
         #region Plots
@@ -2807,21 +3140,28 @@ namespace CalScec
 
                 if (ForPlot.Count != 0)
                 {
-                    this.DiffractionXAxisLin.Minimum = 0;
-                    this.DiffractionYAxisLin.Minimum = 0;
-                    this.DiffractionYAxisLog.Minimum = 0;
-                    this.DiffractionXAxisLin.Maximum = Double.MinValue;
-                    this.DiffractionYAxisLin.Maximum = Double.MinValue;
-                    this.DiffractionYAxisLog.Maximum = Double.MinValue;
+                    if (ForPlot[0].PatternCounts.Count != 0)
+                    {
+                        this.DiffractionXAxisLin.Minimum = 0;
+                        this.DiffractionYAxisLin.Minimum = 0;
+                        this.DiffractionYAxisLog.Minimum = 0;
+                        this.DiffractionXAxisLin.Maximum = Double.MinValue;
+                        this.DiffractionYAxisLin.Maximum = Double.MinValue;
+                        this.DiffractionYAxisLog.Maximum = Double.MinValue;
 
-                    BackgroundWorker worker = new BackgroundWorker();
+                        BackgroundWorker worker = new BackgroundWorker();
 
-                    worker.DoWork += PlotMainDiffractionPatterns_Work;
-                    worker.WorkerReportsProgress = true;
-                    worker.ProgressChanged += PlotMainDiffractionPatterns_ProgressChanged;
-                    worker.RunWorkerCompleted += PlotMainDiffractionPatterns_Completed;
+                        worker.DoWork += PlotMainDiffractionPatterns_Work;
+                        worker.WorkerReportsProgress = true;
+                        worker.ProgressChanged += PlotMainDiffractionPatterns_ProgressChanged;
+                        worker.RunWorkerCompleted += PlotMainDiffractionPatterns_Completed;
 
-                    worker.RunWorkerAsync(ForPlot);
+                        worker.RunWorkerAsync(ForPlot);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Only Peak Data Found. Cannot Plot the Pattern", "No Pattern Data Added", MessageBoxButton.OK, MessageBoxImage.Asterisk);
+                    }
                 }
 
             }
@@ -3001,6 +3341,18 @@ namespace CalScec
         private void DiffractionPatternList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             UpdatePeakView();
+
+            if (this._textEventactive && this.DiffractionPatternList.SelectedIndex != -1)
+            {
+                Pattern.DiffractionPattern SelectedPattern = (Pattern.DiffractionPattern)this.DiffractionPatternList.SelectedItem;
+                this.PatternName.Text = SelectedPattern.Name;
+                this.PatternChiAngle.Text = SelectedPattern.ChiAngle.ToString("F3");
+                this.PatternOmegaAngle.Text = SelectedPattern.OmegaAngle.ToString("F3");
+                this.PatternAppliedStress.Text = SelectedPattern.Stress.ToString("F3");
+                this.PatternAppliedForce.Text = SelectedPattern.Force.ToString("F3");
+                this.PatternPhiSampleAngle.Text = SelectedPattern.PhiSampleAngle.ToString("F3");
+                this.PatternMacroStrain.Text = SelectedPattern.MacroStrain.ToString();
+            }
         }
 
         private void UpdatePeakView()
@@ -3021,6 +3373,350 @@ namespace CalScec
                 PropertyGroupDescription PeakGroupDescription = new PropertyGroupDescription("AssociatedPatternName");
                 PeakCollection.GroupDescriptions.Add(PeakGroupDescription);
             }
+        }
+
+
+        private void PatternName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.DiffractionPatternList.SelectedIndex != -1 && this._textEventactive)
+            {
+                Pattern.DiffractionPattern SelectedPattern = (Pattern.DiffractionPattern)this.DiffractionPatternList.SelectedItem;
+
+                SelectedPattern.Name = this.PatternName.Text;
+            }
+        }
+
+        private void PatternChiAngle_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.DiffractionPatternList.SelectedIndex != -1 && this._textEventactive)
+            {
+                Pattern.DiffractionPattern SelectedPattern = (Pattern.DiffractionPattern)this.DiffractionPatternList.SelectedItem;
+
+                try
+                {
+                    double NewValue = Convert.ToDouble(this.PatternChiAngle.Text);
+
+                    SelectedPattern.ChiAngle = NewValue;
+                    this.PatternChiAngle.Foreground = Brushes.DarkGreen;
+                }
+                catch
+                {
+                    this.PatternChiAngle.Foreground = Brushes.DarkRed;
+                }
+            }
+        }
+
+        private void PatternOmegaAngle_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.DiffractionPatternList.SelectedIndex != -1 && this._textEventactive)
+            {
+                Pattern.DiffractionPattern SelectedPattern = (Pattern.DiffractionPattern)this.DiffractionPatternList.SelectedItem;
+
+                try
+                {
+                    double NewValue = Convert.ToDouble(this.PatternOmegaAngle.Text);
+
+                    SelectedPattern.OmegaAngle = NewValue;
+                    this.PatternOmegaAngle.Foreground = Brushes.DarkGreen;
+                }
+                catch
+                {
+                    this.PatternOmegaAngle.Foreground = Brushes.DarkRed;
+                }
+            }
+        }
+
+        private void PatternPhiSampleAngle_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.DiffractionPatternList.SelectedIndex != -1 && this._textEventactive)
+            {
+                Pattern.DiffractionPattern SelectedPattern = (Pattern.DiffractionPattern)this.DiffractionPatternList.SelectedItem;
+
+                try
+                {
+                    double NewValue = Convert.ToDouble(this.PatternPhiSampleAngle.Text);
+
+                    SelectedPattern.PhiSampleAngle = NewValue;
+                    this.PatternPhiSampleAngle.Foreground = Brushes.DarkGreen;
+                }
+                catch
+                {
+                    this.PatternPhiSampleAngle.Foreground = Brushes.DarkRed;
+                }
+            }
+        }
+
+        private void PatternAppliedForce_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this._textEventactive)
+            {
+                if (this.DiffractionPatternList.SelectedIndex != -1)
+                {
+                    Pattern.DiffractionPattern SelectedPattern = (Pattern.DiffractionPattern)this.DiffractionPatternList.SelectedItem;
+
+                    try
+                    {
+                        double NewValue = Convert.ToDouble(this.PatternAppliedForce.Text);
+
+                        SelectedPattern.Force = NewValue;
+                        SelectedPattern.Stress = SelectedPattern.Force / this.InvestigatedSample.Area;
+                        this._textEventactive = false;
+                        this.PatternAppliedStress.Text = SelectedPattern.Stress.ToString("F3");
+                        this._textEventactive = true;
+                        this.PatternAppliedForce.Foreground = Brushes.DarkGreen;
+                        this.PatternAppliedStress.Foreground = Brushes.DarkGreen;
+                    }
+                    catch
+                    {
+                        this.PatternAppliedStress.Foreground = Brushes.DarkRed;
+                        this.PatternAppliedForce.Foreground = Brushes.DarkRed;
+                    }
+                }
+            }
+        }
+
+        private void PatternAppliedStress_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this._textEventactive)
+            {
+                if (this.DiffractionPatternList.SelectedIndex != -1)
+                {
+                    Pattern.DiffractionPattern SelectedPattern = (Pattern.DiffractionPattern)this.DiffractionPatternList.SelectedItem;
+
+                    try
+                    {
+                        double NewValue = Convert.ToDouble(this.PatternAppliedStress.Text);
+
+                        SelectedPattern.Stress = NewValue;
+                        SelectedPattern.Force = SelectedPattern.Stress * this.InvestigatedSample.Area;
+                        this._textEventactive = false;
+                        this.PatternAppliedForce.Text = SelectedPattern.Force.ToString("F3");
+                        this._textEventactive = true;
+                        this.PatternAppliedStress.Foreground = Brushes.DarkGreen;
+                        this.PatternAppliedForce.Foreground = Brushes.DarkGreen;
+                    }
+                    catch
+                    {
+                        this.PatternAppliedStress.Foreground = Brushes.DarkRed;
+                        this.PatternAppliedForce.Foreground = Brushes.DarkRed;
+                    }
+                }
+            }
+        }
+
+        private void PatternMacroStrain_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this._textEventactive)
+            {
+                if (this.DiffractionPatternList.SelectedIndex != -1)
+                {
+                    Pattern.DiffractionPattern SelectedPattern = (Pattern.DiffractionPattern)this.DiffractionPatternList.SelectedItem;
+
+                    try
+                    {
+                        double NewValue = Convert.ToDouble(this.PatternMacroStrain.Text);
+
+                        SelectedPattern.MacroStrain = NewValue;
+                        //this._textEventactive = false;
+                        ////this.PatternMacroStrain.Text = SelectedPattern.MacroStrain.ToString();
+                        //this._textEventactive = true;
+                        this.PatternAppliedStress.Foreground = Brushes.DarkGreen;
+                        this.PatternAppliedForce.Foreground = Brushes.DarkGreen;
+                    }
+                    catch
+                    {
+                        this.PatternAppliedStress.Foreground = Brushes.DarkRed;
+                        this.PatternAppliedForce.Foreground = Brushes.DarkRed;
+                    }
+                }
+            }
+        }
+
+        private void AutofillPattern_Click(object sender, RoutedEventArgs e)
+        {
+            Tools.AutoFillWindow aFW = new Tools.AutoFillWindow();
+
+            aFW.ShowDialog();
+
+            try
+            {
+                double chi1 = Convert.ToDouble(aFW.ChiAngle1.Text);
+                double chi2 = Convert.ToDouble(aFW.ChiAngle2.Text);
+                double chi3 = Convert.ToDouble(aFW.ChiAngle3.Text);
+                bool chiCheck = Convert.ToBoolean(aFW.ChiAngleFileName.IsChecked);
+                double phi1 = Convert.ToDouble(aFW.PhiAngle1.Text);
+                double phi2 = Convert.ToDouble(aFW.PhiAngle2.Text);
+                double phi3 = Convert.ToDouble(aFW.PhiAngle3.Text);
+                bool phiCheck = Convert.ToBoolean(aFW.PhiAngleFileName.IsChecked);
+                double omega1 = Convert.ToDouble(aFW.OmegaAngle1.Text);
+                double omega2 = Convert.ToDouble(aFW.OmegaAngle2.Text);
+                double omega3 = Convert.ToDouble(aFW.OmegaAngle3.Text);
+                bool omegaCheck = Convert.ToBoolean(aFW.OmegaAngleFileName.IsChecked);
+
+                double appliedForce1 = Convert.ToDouble(aFW.AppliedForce1.Text);
+                double appliedForce2 = Convert.ToDouble(aFW.AppliedForce2.Text);
+                double appliedForce3 = Convert.ToDouble(aFW.AppliedForce3.Text);
+                bool appliedForceCheck = Convert.ToBoolean(aFW.AppliedForceFileName.IsChecked);
+                double appliedStress1 = Convert.ToDouble(aFW.AppliedStress1.Text);
+                double appliedStress2 = Convert.ToDouble(aFW.AppliedStress2.Text);
+                double appliedStress3 = Convert.ToDouble(aFW.AppliedStress3.Text);
+                bool appliedStressCheck = Convert.ToBoolean(aFW.AppliedStressFileName.IsChecked);
+                double macroStrain1 = Convert.ToDouble(aFW.MacroStrain1.Text);
+                double macroStrain2 = Convert.ToDouble(aFW.MacroStrain2.Text);
+                double macroStrain3 = Convert.ToDouble(aFW.MacroStrain3.Text);
+                bool macroStrainCheck = Convert.ToBoolean(aFW.MacroStrainFileName.IsChecked);
+
+                for (int n = 0; n < this.InvestigatedSample.DiffractionPatterns.Count; n++)
+                {
+
+                    char[] SepChars = { '.', '-', '_' };
+
+                    if (phi1 != -1)
+                    {
+                        if (chiCheck)
+                        {
+                            try
+                            {
+                                int index = Convert.ToInt32(chi1);
+
+                                string[] sepPatternName = this.InvestigatedSample.DiffractionPatterns[n].Name.Split(SepChars);
+                                double actChiAngle = Convert.ToDouble(sepPatternName[index]);
+                                this.InvestigatedSample.DiffractionPatterns[n].ChiAngle = actChiAngle;
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                        else
+                        {
+
+                        }
+                    }
+
+                    if (phiCheck)
+                    {
+                        try
+                        {
+                            int index = Convert.ToInt32(phi1);
+
+                            string[] sepPatternName = this.InvestigatedSample.DiffractionPatterns[n].Name.Split(SepChars);
+                            double actPhiAngle = Convert.ToDouble(sepPatternName[index]);
+                            this.InvestigatedSample.DiffractionPatterns[n].PhiSampleAngle = actPhiAngle;
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    else
+                    {
+
+                    }
+                    if (omegaCheck)
+                    {
+                        try
+                        {
+                            int index = Convert.ToInt32(omega1);
+
+                            string[] sepPatternName = this.InvestigatedSample.DiffractionPatterns[n].Name.Split(SepChars);
+                            double actOmegaAngle = Convert.ToDouble(sepPatternName[index]);
+                            this.InvestigatedSample.DiffractionPatterns[n].OmegaAngle = actOmegaAngle;
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    else
+                    {
+
+                    }
+                    if (appliedForceCheck)
+                    {
+                        try
+                        {
+                            int index = Convert.ToInt32(appliedForce1);
+
+                            string[] sepPatternName = this.InvestigatedSample.DiffractionPatterns[n].Name.Split(SepChars);
+                            double actAppliedForce = Convert.ToDouble(sepPatternName[index]);
+                            this.InvestigatedSample.DiffractionPatterns[n].Force = actAppliedForce;
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    else
+                    {
+
+                    }
+                    if (macroStrainCheck)
+                    {
+                        try
+                        {
+                            int index = Convert.ToInt32(macroStrain1);
+
+                            string[] sepPatternName = this.InvestigatedSample.DiffractionPatterns[n].Name.Split(SepChars);
+                            double actMacroStrain = Convert.ToDouble(sepPatternName[index]);
+                            this.InvestigatedSample.DiffractionPatterns[n].MacroStrain = actMacroStrain;
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    else
+                    {
+
+                    }
+                    if (appliedStressCheck)
+                    {
+                        try
+                        {
+                            int index = Convert.ToInt32(appliedStress1);
+
+                            string[] sepPatternName = this.InvestigatedSample.DiffractionPatterns[n].Name.Split(SepChars);
+                            double actappliedStress = Convert.ToDouble(sepPatternName[index]);
+                            this.InvestigatedSample.DiffractionPatterns[n].Stress = actappliedStress;
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+            catch
+            {
+
+            }
+
+
+            //for (int n = 0; n < this.InvestigatedSample.DiffractionPatterns.Count; n++)
+            //{
+                
+            //    char[] SepChars = { '.', '-', '_' };
+
+            //    string[] sepPatternName = this.InvestigatedSample.DiffractionPatterns[n].Name.Split(SepChars);
+
+            //    int ActChiAngle = Convert.ToInt32(sepPatternName[2]);
+            //    int patternIndex = Convert.ToInt32(sepPatternName[1]);
+
+            //    this.InvestigatedSample.DiffractionPatterns[n].OmegaAngle = 0.0;
+            //    this.InvestigatedSample.DiffractionPatterns[n].PhiSampleAngle = 0.0;
+            //    this.InvestigatedSample.DiffractionPatterns[n].ChiAngle = (10.0 * ActChiAngle) + 95;
+            //    //this._sample.DiffractionPatterns[n].Force = ((patternIndex - 20.0) * 45.0) + 200;
+
+            //    //if(this._sample.Area != 0.0)
+            //    //{
+            //    //    this._sample.DiffractionPatterns[n].Stress = this._sample.DiffractionPatterns[n].Force / this._sample.Area;
+            //    //}
+            //}
         }
 
         #endregion
@@ -3182,5 +3878,278 @@ namespace CalScec
             this.PeakFitWindow.Close();
             base.OnClosed(e);
         }
+
+        private void SampleName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this._textEventactive)
+            {
+                this.InvestigatedSample.Name = this.SampleName.Text;
+            }
+        }
+
+        private void SampleArea_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this._textEventactive)
+            {
+                try
+                {
+                    double newValue = Convert.ToDouble(this.SampleArea.Text);
+                    this.InvestigatedSample.Area = newValue;
+                    this.SampleArea.Background = Brushes.White;
+                }
+                catch
+                {
+                    this.SampleArea.Background = Brushes.Red;
+                }
+            }
+        }
+
+        #region Sample Composition Display
+
+        private void PhaseSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (PhaseSelection.SelectedIndex != -1)
+            {
+                this._textEventactive = false;
+
+                #region Composition and Phase information
+
+                if (this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].Matrix)
+                {
+                    this.PhaseTypeSelection.SelectedIndex = 0;
+
+                    this.PhaseParameter1Label.Content = "";
+                    this.PhaseParameter2Label.Content = "";
+                    this.PhaseParameter3Label.Content = "";
+
+                    this.PhaseParameter1Text.Visibility = Visibility.Hidden;
+                    this.PhaseParameter2Text.Visibility = Visibility.Hidden;
+                    this.PhaseParameter3Text.Visibility = Visibility.Hidden;
+                }
+                else
+                {
+                    this.PhaseTypeSelection.SelectedIndex = 1;
+                }
+
+                if (this.InclusionTypeSelection.Items.Count > this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].InclusionType)
+                {
+                    this.InclusionTypeSelection.SelectedIndex = this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].InclusionType;
+                }
+
+                this.PhaseFraction.Text = this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].PhaseFraction.ToString();
+
+                if (!this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].Matrix)
+                {
+                    if (this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].InclusionType == 0)
+                    {
+                        this.PhaseParameter1Label.Content = "";
+                        this.PhaseParameter2Label.Content = "";
+                        this.PhaseParameter3Label.Content = "";
+
+                        this.PhaseParameter1Text.Visibility = Visibility.Hidden;
+                        this.PhaseParameter2Text.Visibility = Visibility.Hidden;
+                        this.PhaseParameter3Text.Visibility = Visibility.Hidden;
+                    }
+                    else
+                    {
+                        this.PhaseParameter1Label.Content = "Elliptic A";
+                        this.PhaseParameter2Label.Content = "Elliptic B";
+                        this.PhaseParameter3Label.Content = "Elliptic C";
+
+                        this.PhaseParameter1Text.Visibility = Visibility.Visible;
+                        this.PhaseParameter2Text.Visibility = Visibility.Visible;
+                        this.PhaseParameter3Text.Visibility = Visibility.Visible;
+                    }
+                }
+
+                #endregion
+
+                this.CrystalNameText.Text = this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].Name;
+                this.CellAText.Text = this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].A.ToString();
+                this.CellBText.Text = this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].B.ToString();
+                this.CellCText.Text = this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].C.ToString();
+                this.CellAlphaText.Text = this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].Alpha.ToString();
+                this.CellBetaText.Text = this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].Beta.ToString();
+                this.CellGammaText.Text = this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].Gamma.ToString();
+                this.ElementalCompositionText.Text = this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].ChemicalFormula;
+                this.SymetryBox.Text = this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].SymmetryGroup;
+                
+
+                this._textEventactive = true;
+            }
+        }
+
+        private void PhaseTypeSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (this.PhaseTypeSelection.SelectedIndex != -1 && PhaseSelection.SelectedIndex != -1)
+            {
+                if (this._textEventactive)
+                {
+                    if (PhaseTypeSelection.SelectedIndex == 0)
+                    {
+                        this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].Matrix = true;
+                    }
+                    else
+                    {
+                        this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].Matrix = false;
+                    }
+                }
+
+                this.InclusionTypeSelection.Items.Clear();
+
+                if (this.PhaseTypeSelection.SelectedIndex == 0)
+                {
+                    ComboBoxItem cTmp1 = new ComboBoxItem();
+                    cTmp1.Content = "Equal rank";
+                    this.InclusionTypeSelection.Items.Add(cTmp1);
+
+                    this.PhaseParameter1Label.Content = "";
+                    this.PhaseParameter2Label.Content = "";
+                    this.PhaseParameter3Label.Content = "";
+
+                    this.PhaseParameter1Text.Visibility = Visibility.Hidden;
+                    this.PhaseParameter2Text.Visibility = Visibility.Hidden;
+                    this.PhaseParameter3Text.Visibility = Visibility.Hidden;
+                }
+                else
+                {
+                    ComboBoxItem cTmp1 = new ComboBoxItem();
+                    cTmp1.Content = "Sphere";
+                    this.InclusionTypeSelection.Items.Add(cTmp1);
+
+                    ComboBoxItem cTmp2 = new ComboBoxItem();
+                    cTmp2.Content = "Ellipsoidal";
+                    this.InclusionTypeSelection.Items.Add(cTmp2);
+
+                    if (this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].InclusionType == 0)
+                    {
+                        this.PhaseParameter1Label.Content = "";
+                        this.PhaseParameter2Label.Content = "";
+                        this.PhaseParameter3Label.Content = "";
+
+                        this.PhaseParameter1Text.Visibility = Visibility.Hidden;
+                        this.PhaseParameter2Text.Visibility = Visibility.Hidden;
+                        this.PhaseParameter3Text.Visibility = Visibility.Hidden;
+                    }
+                    else
+                    {
+                        this.PhaseParameter1Label.Content = "Elliptic A";
+                        this.PhaseParameter2Label.Content = "Elliptic B";
+                        this.PhaseParameter3Label.Content = "Elliptic C";
+
+                        this.PhaseParameter1Text.Visibility = Visibility.Visible;
+                        this.PhaseParameter2Text.Visibility = Visibility.Visible;
+                        this.PhaseParameter3Text.Visibility = Visibility.Visible;
+                    }
+                }
+            }
+        }
+
+        private void InclusionTypeSelection_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (this.PhaseSelection.SelectedIndex != -1)
+            {
+                if (this._textEventactive)
+                {
+                    this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].InclusionType = InclusionTypeSelection.SelectedIndex;
+                }
+
+                if (!this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].Matrix)
+                {
+                    if (this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].InclusionType == 0)
+                    {
+                        this.PhaseParameter1Label.Content = "";
+                        this.PhaseParameter2Label.Content = "";
+                        this.PhaseParameter3Label.Content = "";
+
+                        this.PhaseParameter1Text.Visibility = Visibility.Hidden;
+                        this.PhaseParameter2Text.Visibility = Visibility.Hidden;
+                        this.PhaseParameter3Text.Visibility = Visibility.Hidden;
+                    }
+                    else
+                    {
+                        this.PhaseParameter1Label.Content = "Elliptic A";
+                        this.PhaseParameter2Label.Content = "Elliptic B";
+                        this.PhaseParameter3Label.Content = "Elliptic C";
+
+                        this.PhaseParameter1Text.Visibility = Visibility.Visible;
+                        this.PhaseParameter2Text.Visibility = Visibility.Visible;
+                        this.PhaseParameter3Text.Visibility = Visibility.Visible;
+                    }
+                }
+                else
+                {
+                    this.PhaseParameter1Label.Content = "";
+                    this.PhaseParameter2Label.Content = "";
+                    this.PhaseParameter3Label.Content = "";
+
+                    this.PhaseParameter1Text.Visibility = Visibility.Hidden;
+                    this.PhaseParameter2Text.Visibility = Visibility.Hidden;
+                    this.PhaseParameter3Text.Visibility = Visibility.Hidden;
+                }
+            }
+        }
+
+        private void PhaseFraction_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.PhaseSelection.SelectedIndex != -1 && this._textEventactive)
+            {
+                try
+                {
+                    this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].PhaseFraction = Convert.ToDouble(PhaseFraction.Text);
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
+        private void PhaseParameter1Text_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.PhaseSelection.SelectedIndex != -1 && this._textEventactive)
+            {
+                try
+                {
+                    this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].InclusionA = Convert.ToDouble(PhaseParameter1Text.Text);
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
+        private void PhaseParameter2Text_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.PhaseSelection.SelectedIndex != -1 && this._textEventactive)
+            {
+                try
+                {
+                    this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].InclusionB = Convert.ToDouble(PhaseParameter2Text.Text);
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
+        private void PhaseParameter3Text_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.PhaseSelection.SelectedIndex != -1 && this._textEventactive)
+            {
+                try
+                {
+                    this.InvestigatedSample.CrystalData[PhaseSelection.SelectedIndex].InclusionC = Convert.ToDouble(PhaseParameter3Text.Text);
+                }
+                catch
+                {
+
+                }
+            }
+        }
+
+        #endregion
     }
 }

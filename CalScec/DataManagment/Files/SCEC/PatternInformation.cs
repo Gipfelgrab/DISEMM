@@ -63,7 +63,14 @@ namespace CalScec.DataManagment.Files.SCEC
             this.Force = DP.Force;
             this.MarcroStrain = DP.MacroStrain;
 
-            this.PatternCounts = DP.PatternCounts.Clone() as Pattern.Counts;
+            if (DP.PatternCounts != null)
+            {
+                this.PatternCounts = DP.PatternCounts.Clone() as Pattern.Counts;
+            }
+            else
+            {
+                this.PatternCounts = new Pattern.Counts();
+            }
 
             for(int n = 0; n < DP.FoundPeaks.Count; n++)
             {
@@ -97,7 +104,14 @@ namespace CalScec.DataManagment.Files.SCEC
 
             Ret.MacroStrain = this.MarcroStrain;
 
-            Ret.PatternCounts = this.PatternCounts.Clone() as Pattern.Counts;
+            if (this.PatternCounts != null)
+            {
+                Ret.PatternCounts = this.PatternCounts.Clone() as Pattern.Counts;
+            }
+            else
+            {
+                Ret.PatternCounts = new Pattern.Counts();
+            }
 
             for(int n = 0; n < this.FoundPeaks.Count; n++)
             {

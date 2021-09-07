@@ -67,6 +67,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             }
 
             this.PhaseSwitchBox.SelectedIndex = 0;
+            this.DiffractionPatternBox.SelectedIndex = 0;
             this.REKCalculationList.ItemsSource = this.ActSample.DiffractionConstants[0];
 
             //RefreshSampleElasticData();
@@ -77,27 +78,37 @@ namespace CalScec.Analysis.Stress.Microsopic
         {
             MainPlotModel.LegendBorder = OxyPlot.OxyColors.Black;
             MainPlotModel.LegendItemAlignment = OxyPlot.HorizontalAlignment.Left;
-            MainPlotModel.LegendTitle = "REK data";
+            MainPlotModel.LegendTitle = "DEC";
+            MainPlotModel.LegendFontSize = 22;
+            MainPlotModel.LegendTitleFontSize = 24;
 
             MainXAxisLin.Position = OxyPlot.Axes.AxisPosition.Bottom;
             MainXAxisLin.Minimum = 0;
             MainXAxisLin.Maximum = 180;
             MainXAxisLin.Title = "cos^2(Psi)";
+            MainXAxisLin.FontSize = 22;
+            MainXAxisLin.TitleFontSize = 24;
 
             MainYAxisLin.Position = OxyPlot.Axes.AxisPosition.Left;
             MainYAxisLin.Minimum = 0;
             MainYAxisLin.Maximum = 10;
             MainYAxisLin.Title = "Strain / Applied stress";
+            MainYAxisLin.FontSize = 22;
+            MainYAxisLin.TitleFontSize = 24;
 
             ResXAxisLin.Position = OxyPlot.Axes.AxisPosition.Bottom;
             ResXAxisLin.Minimum = 0;
             ResXAxisLin.Maximum = 180;
             ResXAxisLin.Title = "cos^2(Psi)";
+            ResXAxisLin.FontSize = 22;
+            ResXAxisLin.TitleFontSize = 24;
 
             ResYAxisLin.Position = OxyPlot.Axes.AxisPosition.Left;
             ResYAxisLin.Minimum = -3.1;
             ResYAxisLin.Maximum = 3.1;
             ResYAxisLin.Title = "TotalDeviation";
+            ResYAxisLin.FontSize = 22;
+            ResYAxisLin.TitleFontSize = 24;
 
             MainXAxisLin.MajorGridlineStyle = OxyPlot.LineStyle.Dot;
             MainYAxisLin.MajorGridlineStyle = OxyPlot.LineStyle.Dot;
@@ -498,8 +509,8 @@ namespace CalScec.Analysis.Stress.Microsopic
                 MainFitTmp.LineStyle = OxyPlot.LineStyle.Solid;
 
                 MainPointTmp.StrokeThickness = 0;
-                MainPointTmp.MarkerSize = 3;
-                MainFitTmp.StrokeThickness = 2;
+                MainPointTmp.MarkerSize = 8;
+                MainFitTmp.StrokeThickness = 6;
                 MainFitTmp.MarkerSize = 0;
                 ResTmp.StrokeThickness = 0;
                 ResTmp.MarkerSize = 3;
@@ -668,7 +679,17 @@ namespace CalScec.Analysis.Stress.Microsopic
             {
                 for(int n = 0; n < this.ActSample.CrystalData.Count; n++)
                 {
-                    for(int i = 0; i < this.ActSample.CrystalData[n].HKLList.Count; i++)
+
+                    if (this.textureAktivated)
+                    {
+                        this.ActSample.DiffractionConstantsTexture[n].Clear();
+                    }
+                    else
+                    {
+                        this.ActSample.DiffractionConstants[n].Clear();
+                    }
+
+                    for (int i = 0; i < this.ActSample.CrystalData[n].HKLList.Count; i++)
                     {
                         REK ActualREK = new REK(this.ActSample.CrystalData[n], this.ActSample.CrystalData[n].HKLList[i]);
 
@@ -709,6 +730,88 @@ namespace CalScec.Analysis.Stress.Microsopic
                         else
                         {
                             this.ActSample.DiffractionConstants[n].Add(ActualREK);
+                        }
+                    }
+
+                    //Removing empty DEC
+                    bool run = true;
+                    while (run)
+                    {
+                        int deleteIndex = -1;
+                        if (this.textureAktivated)
+                        {
+                            for (int i = 0; i < this.ActSample.DiffractionConstantsTexture[n].Count; i++)
+                            {
+
+                                if (this.ActSample.DiffractionConstantsTexture[n][i].ElasticStressData.Count == 0)
+                                {
+                                    deleteIndex = i;
+                                }
+                                
+                                else if (deleteIndex > -1)
+                                {
+                                    this.ActSample.DiffractionConstantsTexture[n].RemoveAt(deleteIndex);
+                                    break;
+                                }
+                            }
+                            if (deleteIndex == -1)
+                            {
+                                run = false;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            for (int i = 0; i < this.ActSample.DiffractionConstants[n].Count; i++)
+                            {
+
+                                if (this.ActSample.DiffractionConstants[n][i].ElasticStressData.Count == 0)
+                                {
+                                    deleteIndex = i;
+                                }
+                                
+                                if (deleteIndex > -1)
+                                {
+                                    this.ActSample.DiffractionConstants[n].RemoveAt(deleteIndex);
+                                    break;
+                                }
+                            }
+                            if (deleteIndex == -1)
+                            {
+                                run = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (this.textureAktivated)
+                    {
+                        for (int i = 0; i < this.ActSample.DiffractionConstantsTexture[n].Count; i++)
+                        {
+                            if (Convert.ToBoolean(this.StressPartitioningBox.IsChecked))
+                            {
+                                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetMRDValues(this.ActSample.DiffractionConstantsTexture[n][i].ElasticStressData);
+                                this.ActSample.DiffractionConstantsTexture[n][i].FitTexturedPhaseREKFunction();
+                            }
+                            else
+                            {
+                                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetMRDValues(this.ActSample.DiffractionConstantsTexture[n][i].ElasticStressData);
+                                this.ActSample.DiffractionConstantsTexture[n][i].FitTexturedREKFunction();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < this.ActSample.DiffractionConstants[n].Count; i++)
+                        {
+                            if (Convert.ToBoolean(this.StressPartitioningBox.IsChecked))
+                            {
+                                this.ActSample.DiffractionConstants[n][i].FitClassicPhaseREKFunction();
+                            }
+                            else
+                            {
+                                this.ActSample.DiffractionConstants[n][i].FitClassicREKFunction();
+                            }
                         }
                     }
                 }

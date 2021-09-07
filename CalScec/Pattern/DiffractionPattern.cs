@@ -176,7 +176,18 @@ namespace CalScec.Pattern
                 this._macroStrain = value;
             }
         }
-
+        private double _macroExtension;
+        public double MacroExtension
+        {
+            get
+            {
+                return this._macroExtension;
+            }
+            set
+            {
+                this._macroExtension = value;
+            }
+        }
         private double _chiAngle;
         public double ChiAngle
         {
@@ -431,6 +442,40 @@ namespace CalScec.Pattern
             {
                 this.PeakRegions[n].AssociatedPatternName = this.Name;
                 this.PeakRegions[n].PolynomialBackgroundFunction.Constant = this.PeakRegions[n][0].FittingCounts[0][1];
+            }
+        }
+
+        public void SetRegionsFromPrevious(Pattern.DiffractionPattern prevDP)
+        {
+            this.PeakRegions = new List<Analysis.Peaks.Functions.PeakRegionFunction>();
+            FoundPeaks.Sort((A, B) => (1) * (A.PFunction.Angle).CompareTo(B.PFunction.Angle));
+
+            for(int n = 0; n < prevDP.PeakRegions.Count; n++)
+            {
+                List<Analysis.Peaks.Functions.PeakFunction> forAdd = new List<Analysis.Peaks.Functions.PeakFunction>();
+                for(int i = 0; i < prevDP.PeakRegions[n].Count; i++)
+                {
+                    for(int j = 0; j < this.FoundPeaks.Count; j++)
+                    {
+                        if(prevDP.PeakRegions[n][i].Angle == this.FoundPeaks[j].Angle)
+                        {
+                            forAdd.Add(this.FoundPeaks[j].PFunction);
+                            break;
+                        }
+                    }
+                }
+
+                Pattern.Counts fittingData = this.PatternCounts.GetRange(forAdd[0].Angle - (CalScec.Properties.Settings.Default.PeakWidthFWHM * forAdd[0].FWHM), forAdd[forAdd.Count - 1].Angle + (CalScec.Properties.Settings.Default.PeakWidthFWHM * forAdd[forAdd.Count - 1].FWHM));
+
+                Analysis.Peaks.Functions.PeakRegionFunction regionTmp = new Analysis.Peaks.Functions.PeakRegionFunction(prevDP.PeakRegions[n].PolynomialBackgroundFunction.Constant, fittingData, forAdd);
+                regionTmp.PolynomialBackgroundFunction.Aclivity = prevDP.PeakRegions[n].PolynomialBackgroundFunction.Aclivity;
+                regionTmp.PolynomialBackgroundFunction.Center = prevDP.PeakRegions[n].PolynomialBackgroundFunction.Center;
+                this.PeakRegions.Add(regionTmp);
+            }
+
+            for (int n = 0; n < this.PeakRegions.Count; n++)
+            {
+                this.PeakRegions[n].AssociatedPatternName = this.Name;
             }
         }
 

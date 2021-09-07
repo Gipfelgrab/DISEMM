@@ -68,7 +68,7 @@
                         <MenuItem Name="ResidualMinorGridStyleDash" Header="Dash" IsCheckable="True"  Click="ChangeResidualMinorGridLineStyle_Click"/>
                     </MenuItem>
                 </MenuItem>
-                <MenuItem Header="Reflex auto correction active" IsCheckable="True" Name="ReflexAutoCorrection" Click="ReflexAutoCorrection_Click"/>
+                <MenuItem Header="Peak auto correction active" IsCheckable="True" Name="ReflexAutoCorrection" Click="ReflexAutoCorrection_Click"/>
             </MenuItem>
             <Separator Width="35"/>
             <MenuItem Header="Region manipulations">

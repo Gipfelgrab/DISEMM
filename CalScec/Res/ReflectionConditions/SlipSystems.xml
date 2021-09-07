@@ -11,9 +11,193 @@
   <SlipSystem>
     <SpaceGroup>I m -3 m</SpaceGroup>
     <SpaceGroupId>229</SpaceGroupId>
-    <SlipPlain>211</SlipPlain>
+    <SlipPlain>101</SlipPlain>
     <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>011</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>110</SlipPlain>
+    <SlipDirection>1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>1-10</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>01-1</SlipPlain>
+    <SlipDirection>-111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>101</SlipPlain>
+    <SlipDirection>-111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>011</SlipPlain>
+    <SlipDirection>1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>10-1</SlipPlain>
+    <SlipDirection>1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>01-1</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>10-1</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>1-10</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>211</SlipPlain>
+    <SlipDirection>-111</SlipDirection>
     <PlainCount>12</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>2-11</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>2-11</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>-121</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>112</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>12-1</SlipPlain>
+    <SlipDirection>-111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>1-12</SlipPlain>
+    <SlipDirection>-111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>21-1</SlipPlain>
+    <SlipDirection>1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>121</SlipPlain>
+    <SlipDirection>1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>-112</SlipPlain>
+    <SlipDirection>1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>-211</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>1-21</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>11-2</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
     <DirectionCount>1</DirectionCount>
   </SlipSystem>
   <SlipSystem>
@@ -25,6 +209,182 @@
     <DirectionCount>1</DirectionCount>
   </SlipSystem>
   <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>123</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>132</SlipPlain>
+    <SlipDirection>1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>312</SlipPlain>
+    <SlipDirection>-111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>321</SlipPlain>
+    <SlipDirection>-111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>213</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>231</SlipPlain>
+    <SlipDirection>1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>123</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>132</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>312</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>213</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>231</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>123</SlipPlain>
+    <SlipDirection>-111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>132</SlipPlain>
+    <SlipDirection>-111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>312</SlipPlain>
+    <SlipDirection>1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>213</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>231</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>-123</SlipPlain>
+    <SlipDirection>1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>-132</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>3-12</SlipPlain>
+    <SlipDirection>11-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>32-1</SlipPlain>
+    <SlipDirection>1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>2-13</SlipPlain>
+    <SlipDirection>-111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>I m -3 m</SpaceGroup>
+    <SpaceGroupId>229</SpaceGroupId>
+    <SlipPlain>23-1</SlipPlain>
+    <SlipDirection>-111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
     <SpaceGroup>F m -3 m</SpaceGroup>
     <SpaceGroupId>225</SpaceGroupId>
     <SlipPlain>111</SlipPlain>
@@ -33,9 +393,193 @@
     <DirectionCount>3</DirectionCount>
   </SlipSystem>
   <SlipSystem>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <SlipPlain>111</SlipPlain>
+    <SlipDirection>01-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <SlipPlain>111</SlipPlain>
+    <SlipDirection>-101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <SlipPlain>-111</SlipPlain>
+    <SlipDirection>110</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <SlipPlain>-111</SlipPlain>
+    <SlipDirection>101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <SlipPlain>-111</SlipPlain>
+    <SlipDirection>01-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <SlipPlain>1-11</SlipPlain>
+    <SlipDirection>110</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <SlipPlain>1-11</SlipPlain>
+    <SlipDirection>10-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <SlipPlain>1-11</SlipPlain>
+    <SlipDirection>011</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <SlipPlain>11-1</SlipPlain>
+    <SlipDirection>1-10</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <SlipPlain>11-1</SlipPlain>
+    <SlipDirection>101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F m -3 m</SpaceGroup>
+    <SpaceGroupId>225</SpaceGroupId>
+    <SlipPlain>11-1</SlipPlain>
+    <SlipDirection>011</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <SlipPlain>111</SlipPlain>
+    <SlipDirection>1-10</SlipDirection>
+    <PlainCount>4</PlainCount>
+    <DirectionCount>3</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <SlipPlain>111</SlipPlain>
+    <SlipDirection>01-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <SlipPlain>111</SlipPlain>
+    <SlipDirection>-101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <SlipPlain>-111</SlipPlain>
+    <SlipDirection>110</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <SlipPlain>-111</SlipPlain>
+    <SlipDirection>101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <SlipPlain>-111</SlipPlain>
+    <SlipDirection>01-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <SlipPlain>1-11</SlipPlain>
+    <SlipDirection>110</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <SlipPlain>1-11</SlipPlain>
+    <SlipDirection>10-1</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <SlipPlain>1-11</SlipPlain>
+    <SlipDirection>011</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <SlipPlain>11-1</SlipPlain>
+    <SlipDirection>1-10</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <SlipPlain>11-1</SlipPlain>
+    <SlipDirection>101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <SlipPlain>11-1</SlipPlain>
+    <SlipDirection>011</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
     <SpaceGroup>P 63/m m c</SpaceGroup>
     <SpaceGroupId>194</SpaceGroupId>
-    <SlipPlain>002</SlipPlain>
+    <SlipPlain>001</SlipPlain>
     <SlipDirection>110</SlipDirection>
     <PlainCount>1</PlainCount>
     <DirectionCount>3</DirectionCount>
@@ -43,31 +587,103 @@
   <SlipSystem>
     <SpaceGroup>P 63/m m c</SpaceGroup>
     <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>001</SlipPlain>
+    <SlipDirection>0-10</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>001</SlipPlain>
+    <SlipDirection>-100</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>001</SlipPlain>
+    <SlipDirection>210</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>3</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>001</SlipPlain>
+    <SlipDirection>1-10</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>001</SlipPlain>
+    <SlipDirection>120</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
     <SlipPlain>100</SlipPlain>
-    <SlipDirection>-210</SlipDirection>
+    <SlipDirection>0-10</SlipDirection>
     <PlainCount>3</PlainCount>
     <DirectionCount>1</DirectionCount>
   </SlipSystem>
   <SlipSystem>
     <SpaceGroup>P 63/m m c</SpaceGroup>
     <SpaceGroupId>194</SpaceGroupId>
-    <SlipPlain>101</SlipPlain>
-    <SlipDirection>-210</SlipDirection>
+    <SlipPlain>1-10</SlipPlain>
+    <SlipDirection>110</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>010</SlipPlain>
+    <SlipDirection>-100</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>100</SlipPlain>
+    <SlipDirection>001</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>010</SlipPlain>
+    <SlipDirection>001</SlipDirection>
     <PlainCount>6</PlainCount>
     <DirectionCount>1</DirectionCount>
   </SlipSystem>
   <SlipSystem>
     <SpaceGroup>P 63/m m c</SpaceGroup>
     <SpaceGroupId>194</SpaceGroupId>
-    <SlipPlain>102</SlipPlain>
-    <SlipDirection>-210</SlipDirection>
-    <PlainCount>6</PlainCount>
+    <SlipPlain>1-10</SlipPlain>
+    <SlipDirection>001</SlipDirection>
+    <PlainCount>1</PlainCount>
     <DirectionCount>1</DirectionCount>
   </SlipSystem>
   <SlipSystem>
     <SpaceGroup>P 63/m m c</SpaceGroup>
     <SpaceGroupId>194</SpaceGroupId>
-    <SlipPlain>112</SlipPlain>
+    <SlipPlain>1-20</SlipPlain>
+    <SlipDirection>210</SlipDirection>
+    <PlainCount>3</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>110</SlipPlain>
     <SlipDirection>1-10</SlipDirection>
     <PlainCount>6</PlainCount>
     <DirectionCount>1</DirectionCount>
@@ -75,33 +691,489 @@
   <SlipSystem>
     <SpaceGroup>P 63/m m c</SpaceGroup>
     <SpaceGroupId>194</SpaceGroupId>
-    <SlipPlain>100</SlipPlain>
-    <SlipDirection>-213</SlipDirection>
-    <PlainCount>3</PlainCount>
-    <DirectionCount>2</DirectionCount>
+    <SlipPlain>-210</SlipPlain>
+    <SlipDirection>120</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>1-20</SlipPlain>
+    <SlipDirection>001</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>110</SlipPlain>
+    <SlipDirection>001</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-210</SlipPlain>
+    <SlipDirection>001</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>1-20</SlipPlain>
+    <SlipDirection>423</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>110</SlipPlain>
+    <SlipDirection>2-23</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-210</SlipPlain>
+    <SlipDirection>243</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
   </SlipSystem>
   <SlipSystem>
     <SpaceGroup>P 63/m m c</SpaceGroup>
     <SpaceGroupId>194</SpaceGroupId>
     <SlipPlain>101</SlipPlain>
-    <SlipDirection>-213</SlipDirection>
-    <PlainCount>6</PlainCount>
-    <DirectionCount>2</DirectionCount>
+    <SlipDirection>0-10</SlipDirection>
+    <PlainCount>12</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>1-11</SlipPlain>
+    <SlipDirection>110</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>011</SlipPlain>
+    <SlipDirection>-100</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>101</SlipPlain>
+    <SlipDirection>-1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>1-11</SlipPlain>
+    <SlipDirection>011</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>011</SlipPlain>
+    <SlipDirection>-1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>101</SlipPlain>
+    <SlipDirection>-101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-1-11</SlipPlain>
+    <SlipDirection>-101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>011</SlipPlain>
+    <SlipDirection>0-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-101</SlipPlain>
+    <SlipDirection>0-10</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-111</SlipPlain>
+    <SlipDirection>110</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>0-11</SlipPlain>
+    <SlipDirection>-100</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-101</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-111</SlipPlain>
+    <SlipDirection>0-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>0-11</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-101</SlipPlain>
+    <SlipDirection>101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-111</SlipPlain>
+    <SlipDirection>101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>0-11</SlipPlain>
+    <SlipDirection>011</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>1-21</SlipPlain>
+    <SlipDirection>210</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
   </SlipSystem>
   <SlipSystem>
     <SpaceGroup>P 63/m m c</SpaceGroup>
     <SpaceGroupId>194</SpaceGroupId>
     <SlipPlain>111</SlipPlain>
-    <SlipDirection>-213</SlipDirection>
-    <PlainCount>6</PlainCount>
-    <DirectionCount>2</DirectionCount>
+    <SlipDirection>1-10</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-211</SlipPlain>
+    <SlipDirection>120</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>1-21</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>111</SlipPlain>
+    <SlipDirection>-101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-211</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>1-21</SlipPlain>
+    <SlipDirection>-101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>111</SlipPlain>
+    <SlipDirection>0-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-211</SlipPlain>
+    <SlipDirection>0-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-121</SlipPlain>
+    <SlipDirection>210</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-1-11</SlipPlain>
+    <SlipDirection>1-10</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>2-11</SlipPlain>
+    <SlipDirection>120</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-121</SlipPlain>
+    <SlipDirection>101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-1-11</SlipPlain>
+    <SlipDirection>011</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>2-11</SlipPlain>
+    <SlipDirection>011</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-121</SlipPlain>
+    <SlipDirection>-1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-1-11</SlipPlain>
+    <SlipDirection>101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>2-11</SlipPlain>
+    <SlipDirection>-1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>102</SlipPlain>
+    <SlipDirection>0-10</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>1-12</SlipPlain>
+    <SlipDirection>110</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>012</SlipPlain>
+    <SlipDirection>-100</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-102</SlipPlain>
+    <SlipDirection>0-10</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-112</SlipPlain>
+    <SlipDirection>110</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>0-12</SlipPlain>
+    <SlipDirection>-100</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>1-22</SlipPlain>
+    <SlipDirection>210</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
   </SlipSystem>
   <SlipSystem>
     <SpaceGroup>P 63/m m c</SpaceGroup>
     <SpaceGroupId>194</SpaceGroupId>
     <SlipPlain>112</SlipPlain>
-    <SlipDirection>-213</SlipDirection>
-    <PlainCount>6</PlainCount>
-    <DirectionCount>2</DirectionCount>
+    <SlipDirection>1-10</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-212</SlipPlain>
+    <SlipDirection>120</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>1-22</SlipPlain>
+    <SlipDirection>011</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>112</SlipPlain>
+    <SlipDirection>-1-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-212</SlipPlain>
+    <SlipDirection>101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-122</SlipPlain>
+    <SlipDirection>210</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-1-12</SlipPlain>
+    <SlipDirection>1-10</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>2-12</SlipPlain>
+    <SlipDirection>120</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-122</SlipPlain>
+    <SlipDirection>0-11</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>-1-12</SlipPlain>
+    <SlipDirection>111</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
+  </SlipSystem>
+  <SlipSystem>
+    <SpaceGroup>P 63/m m c</SpaceGroup>
+    <SpaceGroupId>194</SpaceGroupId>
+    <SlipPlain>2-12</SlipPlain>
+    <SlipDirection>-101</SlipDirection>
+    <PlainCount>1</PlainCount>
+    <DirectionCount>1</DirectionCount>
   </SlipSystem>
 </SlipSystemTable>

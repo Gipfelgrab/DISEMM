@@ -26,14 +26,14 @@
         <GroupBox Grid.Column="1" Grid.Row="1" Header="Elasticity tensor data">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="0.5*"/>
-                    <RowDefinition Height="0.5*"/>
+                    <RowDefinition Height="0.4*"/>
+                    <RowDefinition Height="0.6*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.70*"/>
                     <ColumnDefinition Width="0.28*"/>
                 </Grid.ColumnDefinitions>
-                <GroupBox Header="Elasticity tensor">
+                <GroupBox Header="Elasticity tensor [MPa]">
                     <Grid ShowGridLines="True">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
@@ -436,7 +436,7 @@
                             <GroupBox Grid.Row="0" Grid.Column="2" Header="Constant type selection">
                                 <ComboBox Name="StiffnessComlplianceSwitchBox" MaxWidth="350" MaxHeight="30" SelectionChanged="SwitchBox_SelectionChanged"/>
                             </GroupBox>
-                            <GroupBox Grid.Row="0" Grid.Column="3" Header="Selected REKs">
+                            <GroupBox Grid.Row="0" Grid.Column="3" Header="Fitting Mode">
                                 <ComboBox Name="REKSwitchBox" MaxWidth="350" MaxHeight="30"/>
                             </GroupBox>
                             <Button Grid.Row="0" Grid.Column="4" Name="RefitConstants" Content="Fit tensor" MaxHeight="30" MaxWidth="150" Click="RefitConstants_Click"/>
@@ -444,10 +444,10 @@
                     </GroupBox>
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="0.5*"/>
-                            <ColumnDefinition Width="0.5*"/>
+                            <ColumnDefinition Width="0.7*"/>
+                            <ColumnDefinition Width="0.3*"/>
                         </Grid.ColumnDefinitions>
-                        <GroupBox Grid.Column="0" Header="Calculated DEKs">
+                        <GroupBox Grid.Column="0" Header="Calculated DECs">
                             <Grid>
                                 <ListView Name="REKMatrixCalculationList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
                                     <ListView.View>
@@ -469,13 +469,18 @@
                         <Grid Grid.Column="1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0.9*"/>
+                                <!--<RowDefinition Height="0.9*"/>
+                                <RowDefinition Height="0.2*"/>-->
+                            </Grid.RowDefinitions>
                             <GroupBox Grid.Column="0" Header="Bulk parameters">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="0.55*"/>
                                         <ColumnDefinition Width="0.45*"/>
+                                        <ColumnDefinition Width="0.15*"/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*"/>
@@ -490,48 +495,53 @@
                                     </Grid.RowDefinitions>
                                     <Label Grid.Column="0" Grid.Row="0" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg E-Modulus:"/>
                                     <Label Grid.Column="1" Grid.Row="0" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AEModulusLabel"/>
+                                    <Label Grid.Column="2" Grid.Row="0" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
                                     <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg nu:"/>
                                     <Label Grid.Column="1" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ANuLabel"/>
                                     <Label Grid.Column="0" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg G-Modulus:"/>
                                     <Label Grid.Column="1" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AShearModulusLabel"/>
+                                    <Label Grid.Column="2" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
                                     <Label Grid.Column="0" Grid.Row="6" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg Bulk-Modulus:"/>
                                     <Label Grid.Column="1" Grid.Row="6" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ABulkModulusLabel"/>
+                                    <Label Grid.Column="2" Grid.Row="6" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
                                     <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg E-Modulus fit:"/>
                                     <Label Grid.Column="1" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AEModulusFitLabel"/>
+                                    <Label Grid.Column="2" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
                                     <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg nu fit:"/>
                                     <Label Grid.Column="1" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ANuFitLabel"/>
                                     <Label Grid.Column="0" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg G-Modulus fit:"/>
                                     <Label Grid.Column="1" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AShearModulusFitLabel"/>
+                                    <Label Grid.Column="2" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
                                     <Label Grid.Column="0" Grid.Row="7" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg Bulk-Modulus fit:"/>
                                     <Label Grid.Column="1" Grid.Row="7" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ABulkModulusFitLabel"/>
+                                    <Label Grid.Column="2" Grid.Row="7" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
                                     <Label Grid.Column="0" Grid.Row="8" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Chi2:"/>
                                     <Label Grid.Column="1" Grid.Row="8" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="Chi2TensorFitLabel"/>
                                 </Grid>
                             </GroupBox>
-                            <GroupBox Grid.Column="1" Header="Texture">
+                            <!--<GroupBox Grid.Column="1" Grid.Row="1" Header="Texture">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="*"/>
-                                        <RowDefinition Height="8*"/>
                                     </Grid.RowDefinitions>
+                                    --><!--<Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        --><!--<CheckBox Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Activate" Name="ActivateTexture" Checked="ActivateTexture_Checked" Unchecked="ActivateTexture_Unchecked"/>-->
+                                        <!--<Button Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Set fitting data" Name="SetTextureTensor" Click="SetTextureTensor_Click"/>--><!--
+                                    </Grid>--><!--
                                     <Grid Grid.Row="0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                        <CheckBox Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Activate" Name="ActivateTexture" Checked="ActivateTexture_Checked" Unchecked="ActivateTexture_Unchecked"/>
-                                        <Button Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Set fitting data" Name="SetTextureTensor" Click="SetTextureTensor_Click"/>
-                                    </Grid>
-                                    <Grid Grid.Row="1">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="0.7*"/>
-                                            <ColumnDefinition Width="0.3*"/>
-                                        </Grid.ColumnDefinitions>
                                         <CheckBox Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Show weighted tensor" Name="ActivateWeightedTensor" Checked="ActivateWeightedTensor_Checked" Unchecked="ActivateWeightedTensor_Unchecked"/>
                                         <Button Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Set weights" Name="SetWeightedTensor" Click="SetTextureTensor_Click"/>
                                     </Grid>
-                                    <GroupBox Grid.Row="2" Header="Texture Fit Queque">
+                                    --><!--<GroupBox Grid.Row="2" Header="Texture Fit Queque">
                                         <Grid>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="*"/>
@@ -548,13 +558,13 @@
                                                 </ListView.View>
                                             </ListView>
                                         </Grid>
-                                    </GroupBox>
+                                    </GroupBox>--><!--
                                 </Grid>
-                            </GroupBox>
+                            </GroupBox>-->
                         </Grid>
                     </Grid>
                 </Grid>
-                <GroupBox Grid.Column="1" Grid.Row="0" Header="List of clssic REKs">
+                <GroupBox Grid.Column="1" Grid.Row="0" Header="List of measured DECs">
                     <ListView Name="REKClassicCalculationList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
                         <ListView.View>
                             <GridView>
@@ -563,10 +573,10 @@
                                 <GridViewColumn Width="100" Header="S1 Error" DisplayMemberBinding="{Binding Path=ClassicS1Error}"/>
                                 <GridViewColumn Width="100" Header="S2" DisplayMemberBinding="{Binding Path=ClassicHS2}"/>
                                 <GridViewColumn Width="100" Header="S2 Error" DisplayMemberBinding="{Binding Path=ClassicHS2Error}"/>
-                                <GridViewColumn Width="120" Header="E(hkl)" DisplayMemberBinding="{Binding Path=ClassicEModulus}"/>
+                                <GridViewColumn Width="120" Header="E(hkl) [MPa]" DisplayMemberBinding="{Binding Path=ClassicEModulus}"/>
                                 <GridViewColumn Width="120" Header="Nu(hkl)" DisplayMemberBinding="{Binding Path=ClassicTransverseContraction}"/>
-                                <GridViewColumn Width="120" Header="G(hkl)" DisplayMemberBinding="{Binding Path=ClassicShearModulus}"/>
-                                <GridViewColumn Width="120" Header="Kappa(hkl)" DisplayMemberBinding="{Binding Path=ClassicBulkModulus}"/>
+                                <GridViewColumn Width="120" Header="G(hkl) [MPa]" DisplayMemberBinding="{Binding Path=ClassicShearModulus}"/>
+                                <GridViewColumn Width="120" Header="Kappa(hkl) [MPa]" DisplayMemberBinding="{Binding Path=ClassicBulkModulus}"/>
                                 <GridViewColumn Width="100" Header="Chi2" DisplayMemberBinding="{Binding Path=ClassicChi2}"/>
                             </GridView>
                         </ListView.View>
@@ -575,8 +585,8 @@
                 <GroupBox Grid.Column="1" Grid.Row="1" Header="Anisotropy parameters">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="0.5*"/>
-                            <RowDefinition Height="0.5*"/>
+                            <RowDefinition Height="0.6*"/>
+                            <RowDefinition Height="0.4*"/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
@@ -591,19 +601,100 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Fixed Anisotropy value:"/>
                             <TextBox Grid.Column="1" Grid.Row="1" Name="FixedAnisotropy" Margin="2,2,2,2" TextChanged="ZehnderAnisotropy_TextChanged" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="15"/>
-                            <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Zehnder Anisotropy:"/>
+                            <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Zener Anisotropy:"/>
                             <Label Grid.Column="1" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ZehnderAnisitropyLabel"/>
                             <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Log-Euk Anisotropy:"/>
                             <Label Grid.Column="1" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="LogEukAnisitropyLabel"/>
                             <Label Grid.Column="0" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Universal Anisotropy:"/>
                             <Label Grid.Column="1" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="UniversalAnisotropyLabel"/>
-                            <Label Grid.Column="0" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Chung Buessem Anisotropy:"/>
-                            <Label Grid.Column="1" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ChungBuessemAnistropyLabel"/>
+                            <Label Grid.Column="0" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Zener Equivalent Anisotropy:"/>
+                            <Label Grid.Column="1" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="EquivalentAnistropyLabel"/>
                             <CheckBox Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Fix Anisotropy" Name="FixAnisotropyCheckBox" Checked="FixAnisotropyCheckBox_Checked" Unchecked="FixAnisotropyCheckBox_Unchecked"/>
-                            <Button Grid.Column="1" Grid.Row="6" Content="Start Analysis" Click="StartAnalysis_Click"></Button>
+                            <Button Grid.Column="1" Grid.Row="0" Content="Start Analysis" Click="StartAnalysis_Click" Margin="3,3,3,3"></Button>
+
+                            <Button Grid.Column="0" Grid.Row="6" Content="Show plot" Margin="3,3,3,3" Click="ShowAnIsoPlot_Click"></Button>
+                            <Button Grid.Column="1" Grid.Row="6" Content="Plot" Margin="3,3,3,3" Click="SetAnIsoPlot_Click"></Button>
+                            <Button Grid.Column="1" Grid.Row="7" Content="Save to clipboard" Margin="3,3,3,3" Click="SaveAnIsoPlotClipboard_Click"></Button>
+                            <Button Grid.Column="1" Grid.Row="8" Content="Reset plot" Margin="3,3,3,3" Click="ReSetAnIsoPlot_Click"></Button>
+                            <ComboBox Grid.Row="7" Grid.ColumnSpan="1" Name="AnIsoPlotDirectionSelection" MaxWidth="350" MaxHeight="30" Margin="3,3,3,3">
+                                <ComboBoxItem Content="[1 0 0] x [0 1 0]"/>
+                                <ComboBoxItem Content="[1 0 0] x [0 0 1]"/>
+                                <ComboBoxItem Content="[0 1 0] x [0 0 1]"/>
+                                <ComboBoxItem Content=""/>
+                                <ComboBoxItem Content="[1 0 0] x [0 1 1]"/>
+                                <ComboBoxItem Content="[0 1 0] x [1 0 1]"/>
+                                <ComboBoxItem Content="[0 0 1] x [1 1 0]"/>
+                                <ComboBoxItem Content=""/>
+                                <ComboBoxItem Content="[1 1 0] x [1 -1 0]"/>
+                                <ComboBoxItem Content="[1 0 1] x [1 0 -1]"/>
+                                <ComboBoxItem Content="[0 1 1] x [0 1 -1]"/>
+                                <ComboBoxItem Content=""/>
+                                <ComboBoxItem Content="[1 1 1] x [1 -1 0]"/>
+                                <ComboBoxItem Content="[1 1 1] x [1 0 -1]"/>
+                                <ComboBoxItem Content="[1 1 1] x [0 1 -1]"/>
+                            </ComboBox>
+                            <!--<Grid Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="0.1*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="0.1*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="1" Text="-" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="-" VerticalAlignment="Center"/>
+
+                                <TextBox Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="AnIso1ViewDirectionC1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  ToolTip="Viewing direction in crystal frame along C1" Margin="5,0,5,0" Text="1"/>
+                                <TextBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="AnIso1ViewDirectionC2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  ToolTip="Viewing direction in crystal frame along C2" Margin="5,0,5,0" Text="0"/>
+                                <TextBox Grid.Row="0" Grid.Column="4" HorizontalAlignment="Stretch" MaxHeight="30" Name="AnIso1ViewDirectionC3" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  ToolTip="Viewing direction in crystal frame along C3" Margin="5,0,5,0" Text="0"/>
+                            </Grid>
+                            <Grid Grid.Row="7" Grid.Column="1" Grid.ColumnSpan="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="0.1*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="0.1*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="1" Text="-" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="-" VerticalAlignment="Center"/>
+
+                                <TextBox Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="AnIso2ViewDirectionC1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" ToolTip="Viewing direction in crystal frame along C1" Margin="5,0,5,0" Text="0"/>
+                                <TextBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="AnIso2ViewDirectionC2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  ToolTip="Viewing direction in crystal frame along C2" Margin="5,0,5,0" Text="1"/>
+                                <TextBox Grid.Row="0" Grid.Column="4" HorizontalAlignment="Stretch" MaxHeight="30" Name="AnIso2ViewDirectionC3" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"  ToolTip="Viewing direction in crystal frame along C3" Margin="5,0,5,0" Text="0"/>
+                            </Grid>-->
+                            <ComboBox Grid.Row="8" Name="AnIsoParamSelector" MaxWidth="350" MaxHeight="30" Margin="3,3,3,3">
+                                <ComboBoxItem Content="Elastic modulus"/>
+                                <ComboBoxItem Content="Shear modulus"/>
+                                <ComboBoxItem Content="Poisson ratio"/>
+                                <ComboBoxItem Content="Bulk ratio"/>
+                            </ComboBox>
+                            <ComboBox Grid.Row="9" Name="AnIsoModelSelector" MaxWidth="350" MaxHeight="30" Margin="3,3,3,3">
+                                <ComboBoxItem Content="Voigt"/>
+                                <ComboBoxItem Content="Reuss"/>
+                                <ComboBoxItem Content="Hill"/>
+                                <ComboBoxItem Content="Kroener"/>
+                                <ComboBoxItem Content="DeWit"/>
+                                <ComboBoxItem Content="Matthies"/>
+                            </ComboBox>
+                            <ComboBox Grid.Row="9" Grid.Column="1" Name="AnIsoColorSelector" MaxWidth="350" MaxHeight="30" Margin="3,3,3,3">
+                                <ComboBoxItem Content="Black"/>
+                                <ComboBoxItem Content="DarkGrey"/>
+                                <ComboBoxItem Content="DarkBlue"/>
+                                <ComboBoxItem Content="Blue"/>
+                                <ComboBoxItem Content="DarkGreen"/>
+                                <ComboBoxItem Content="Green"/>
+                                <ComboBoxItem Content="DarkRed"/>
+                                <ComboBoxItem Content="Red"/>
+                                <ComboBoxItem Content="Orange"/>
+                                <ComboBoxItem Content="Yellow"/>
+                            </ComboBox>
                         </Grid>
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
@@ -634,8 +725,8 @@
                                 </Grid.RowDefinitions>
                                 <Button Grid.Column="0" Grid.Row="0" Content="Reset Stress" MaxHeight="32" Margin="5,5,5,5" Click="ResetPhaseStresses_Click"></Button>
                                 <Button Grid.Column="1" Grid.Row="0" Content="Refit DEC" MaxHeight="32" Margin="5,5,5,5" Click="RefitAllDEC_Click"></Button>
-
                                 <Button Grid.Column="2" Grid.Row="0" Content="Set transition factors" MaxHeight="32" Margin="5,5,5,5" Click="SetTransitionFactors_Click"></Button>
+                                <Button Grid.Column="2" Grid.Row="1" Content="Self Consistent Fit" MaxHeight="32" Margin="5,5,5,5" Click="SetTransitionFactors_Click"></Button>
                             </Grid>
                         </Grid>
                     </Grid>

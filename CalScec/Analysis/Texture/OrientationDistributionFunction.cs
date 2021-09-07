@@ -1306,6 +1306,1047 @@ namespace CalScec.Analysis.Texture
 
         }
 
+        public void SetTextureTensorIso()
+        {
+            switch (BaseTensor.Symmetry)
+            {
+                case "cubic":
+                    this.SetTextureTensorCubicIso();
+                    break;
+                case "hexagonal":
+                    this.SetTextureTensorHexagonalIso();
+                    break;
+                case "tetragonal type 1":
+                    this.SetTextureTensorTetragonalType1Iso();
+                    break;
+                case "tetragonal type 2":
+
+                    break;
+                case "trigonal type 1":
+
+                    break;
+                case "trigonal type 2":
+
+                    break;
+                case "rhombic":
+                    this.SetTextureTensorRhombicIso();
+                    break;
+                case "monoclinic":
+
+                    break;
+                case "triclinic":
+
+                    break;
+                default:
+
+                    break;
+            }
+
+            this.TextureTensor.CalculateCompliances();
+        }
+        public void SetTextureTensorIso(Stress.Microsopic.ElasticityTensors averagingTensor)
+        {
+            switch (BaseTensor.Symmetry)
+            {
+                case "cubic":
+                    this.SetTextureTensorCubicIso(averagingTensor);
+                    break;
+                case "hexagonal":
+                    this.SetTextureTensorHexagonalIso(averagingTensor);
+                    break;
+                case "tetragonal type 1":
+                    this.SetTextureTensorTetragonalType1Iso(averagingTensor);
+                    break;
+                case "tetragonal type 2":
+
+                    break;
+                case "trigonal type 1":
+
+                    break;
+                case "trigonal type 2":
+
+                    break;
+                case "rhombic":
+                    this.SetTextureTensorRhombicIso(averagingTensor);
+                    break;
+                case "monoclinic":
+
+                    break;
+                case "triclinic":
+
+                    break;
+                default:
+
+                    break;
+            }
+
+            this.TextureTensor.CalculateCompliances();
+        }
+
+        private void SetTextureTensorCubicIso()
+        {
+            double TC11 = 0;
+            double TC12 = 0;
+            double TC44 = 0;
+
+            double normFactor = 0.0;
+
+            for(double phi1 = 0.0; phi1 < 360.0; phi1 += 5.0)
+            {
+                for (double psi1 = 0.0; psi1 < 360.0; psi1 += 5.0)
+                {
+                    for (double phi2 = 0.0; phi2 < 360.0; phi2 += 5.0)
+                    {
+                        normFactor += Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += Math.Pow(SCTM11(phi1, psi1, phi2), 4) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM12(phi1, psi1, phi2), 4) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM13(phi1, psi1, phi2), 4) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 4 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM23(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                    }
+                }
+            }
+
+            this.TextureTensor.C11 = (TC11 / normFactor);
+            this.TextureTensor.C12 = (TC12 / normFactor);
+            this.TextureTensor.C44 = (TC44 / normFactor);
+        }
+
+        private void SetTextureTensorHexagonalIso()
+        {
+            double TC11 = 0;
+            double TC33 = 0;
+            double TC12 = 0;
+            double TC13 = 0;
+            double TC44 = 0;
+
+            double normFactor = 0.0;
+
+            for (double phi1 = 0.0; phi1 < 360.0; phi1 += 5.0)
+            {
+                for (double psi1 = 0.0; psi1 < 360.0; psi1 += 5.0)
+                {
+                    for (double phi2 = 0.0; phi2 < 360.0; phi2 += 5.0)
+                    {
+                        normFactor += Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += Math.Pow(SCTM11(phi1, psi1, phi2), 4) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM12(phi1, psi1, phi2), 4) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM13(phi1, psi1, phi2), 4) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 4 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += Math.Pow(SCTM31(phi1, psi1, phi2), 4) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += Math.Pow(SCTM32(phi1, psi1, phi2), 4) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += Math.Pow(SCTM33(phi1, psi1, phi2), 4) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += 2 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 2 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 2 * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += 4 * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 4 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 4 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM23(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                    }
+                }
+            }
+
+            normFactor *= 8.0 * Math.Pow(Math.PI, 2);
+
+            this.TextureTensor.C11 = TC11 / normFactor;
+            this.TextureTensor.C33 = TC33 / normFactor;
+            this.TextureTensor.C12 = TC12 / normFactor;
+            this.TextureTensor.C13 = TC13 / normFactor;
+            this.TextureTensor.C44 = TC44 / normFactor;
+
+        }
+
+        private void SetTextureTensorTetragonalType1Iso()
+        {
+            double TC11 = 0;
+            double TC33 = 0;
+            double TC12 = 0;
+            double TC13 = 0;
+            double TC44 = 0;
+            double TC66 = 0;
+
+            double normFactor = 0.0;
+
+            for (double phi1 = 0.0; phi1 < 360.0; phi1 += 5.0)
+            {
+                for (double psi1 = 0.0; psi1 < 360.0; psi1 += 5.0)
+                {
+                    for (double phi2 = 0.0; phi2 < 360.0; phi2 += 5.0)
+                    {
+                        normFactor += Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += Math.Pow(SCTM11(phi1, psi1, phi2), 4) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM12(phi1, psi1, phi2), 4) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM13(phi1, psi1, phi2), 4) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 4 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += Math.Pow(SCTM31(phi1, psi1, phi2), 4) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += Math.Pow(SCTM32(phi1, psi1, phi2), 4) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += Math.Pow(SCTM33(phi1, psi1, phi2), 4) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += 2 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 2 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 2 * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += 4 * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 4 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 4 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM23(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM12(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM13(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                    }
+                }
+            }
+
+            normFactor /= 8.0 * Math.PI;
+
+            this.TextureTensor.C11 = TC11 / normFactor;
+            this.TextureTensor.C33 = TC33 / normFactor;
+            this.TextureTensor.C12 = TC12 / normFactor;
+            this.TextureTensor.C13 = TC13 / normFactor;
+            this.TextureTensor.C44 = TC44 / normFactor;
+            this.TextureTensor.C66 = TC66 / normFactor;
+
+        }
+
+        private void SetTextureTensorRhombicIso()
+        {
+            double TC11 = 0;
+            double TC22 = 0;
+            double TC33 = 0;
+            double TC12 = 0;
+            double TC13 = 0;
+            double TC23 = 0;
+            double TC44 = 0;
+            double TC55 = 0;
+            double TC66 = 0;
+
+            double normFactor = 0.0;
+
+            for (double phi1 = 0.0; phi1 < 360.0; phi1 += 5.0)
+            {
+                for (double psi1 = 0.0; psi1 < 360.0; psi1 += 5.0)
+                {
+                    for (double phi2 = 0.0; phi2 < 360.0; phi2 += 5.0)
+                    {
+                        normFactor += Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += Math.Pow(SCTM11(phi1, psi1, phi2), 4) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM12(phi1, psi1, phi2), 4) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM13(phi1, psi1, phi2), 4) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 4 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC22 += Math.Pow(SCTM21(phi1, psi1, phi2), 4) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC22 += Math.Pow(SCTM22(phi1, psi1, phi2), 4) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC22 += Math.Pow(SCTM23(phi1, psi1, phi2), 4) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC22 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC22 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC22 += 2 * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC22 += 4 * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC22 += 4 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC22 += 4 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += Math.Pow(SCTM31(phi1, psi1, phi2), 4) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += Math.Pow(SCTM32(phi1, psi1, phi2), 4) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += Math.Pow(SCTM33(phi1, psi1, phi2), 4) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += 2 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 2 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 2 * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += 4 * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 4 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 4 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC23 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC23 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC23 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC23 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC23 += 4 * SCTM22(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += 4 * SCTM21(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += 4 * SCTM21(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM23(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC55 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC55 += 2 * SCTM11(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += 2 * SCTM11(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += 2 * SCTM12(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC55 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += 2 * SCTM13(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC55 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += 2 * SCTM11(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC55 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += 2 * SCTM11(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * this.BaseTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * this.BaseTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM12(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM13(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * this.BaseTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * this.BaseTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * this.BaseTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                    }
+                }
+            }
+
+            normFactor /= 8.0 * Math.PI;
+
+            this.TextureTensor.C11 = TC11 / normFactor;
+            this.TextureTensor.C22 = TC22 / normFactor;
+            this.TextureTensor.C33 = TC33 / normFactor;
+            this.TextureTensor.C12 = TC12 / normFactor;
+            this.TextureTensor.C13 = TC13 / normFactor;
+            this.TextureTensor.C23 = TC23 / normFactor;
+            this.TextureTensor.C44 = TC44 / normFactor;
+            this.TextureTensor.C55 = TC55 / normFactor;
+            this.TextureTensor.C66 = TC66 / normFactor;
+
+        }
+
+        private void SetTextureTensorCubicIso(Stress.Microsopic.ElasticityTensors averagingTensor)
+        {
+            double TC11 = 0;
+            double TC12 = 0;
+            double TC44 = 0;
+
+            double normFactor = 0.0;
+
+            for (double phi1 = 0.0; phi1 < 360.0; phi1 += 5.0)
+            {
+                for (double psi1 = 0.0; psi1 < 360.0; psi1 += 5.0)
+                {
+                    for (double phi2 = 0.0; phi2 < 360.0; phi2 += 5.0)
+                    {
+                        normFactor += Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += Math.Pow(SCTM11(phi1, psi1, phi2), 4) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM12(phi1, psi1, phi2), 4) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM13(phi1, psi1, phi2), 4) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 4 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM23(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                    }
+                }
+            }
+
+            this.TextureTensor.C11 = (TC11 / normFactor);
+            this.TextureTensor.C12 = (TC12 / normFactor);
+            this.TextureTensor.C44 = (TC44 / normFactor);
+        }
+
+        private void SetTextureTensorHexagonalIso(Stress.Microsopic.ElasticityTensors averagingTensor)
+        {
+            double TC11 = 0;
+            double TC33 = 0;
+            double TC12 = 0;
+            double TC13 = 0;
+            double TC44 = 0;
+
+            double normFactor = 0.0;
+
+            for (double phi1 = 0.0; phi1 < 360.0; phi1 += 5.0)
+            {
+                for (double psi1 = 0.0; psi1 < 360.0; psi1 += 5.0)
+                {
+                    for (double phi2 = 0.0; phi2 < 360.0; phi2 += 5.0)
+                    {
+                        normFactor += Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += Math.Pow(SCTM11(phi1, psi1, phi2), 4) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM12(phi1, psi1, phi2), 4) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM13(phi1, psi1, phi2), 4) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 4 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += Math.Pow(SCTM31(phi1, psi1, phi2), 4) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += Math.Pow(SCTM32(phi1, psi1, phi2), 4) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += Math.Pow(SCTM33(phi1, psi1, phi2), 4) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += 2 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 2 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 2 * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += 4 * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 4 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 4 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM23(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                    }
+                }
+            }
+
+            normFactor *= 8.0 * Math.Pow(Math.PI, 2);
+
+            this.TextureTensor.C11 = TC11 / normFactor;
+            this.TextureTensor.C33 = TC33 / normFactor;
+            this.TextureTensor.C12 = TC12 / normFactor;
+            this.TextureTensor.C13 = TC13 / normFactor;
+            this.TextureTensor.C44 = TC44 / normFactor;
+
+        }
+
+        private void SetTextureTensorTetragonalType1Iso(Stress.Microsopic.ElasticityTensors averagingTensor)
+        {
+            double TC11 = 0;
+            double TC33 = 0;
+            double TC12 = 0;
+            double TC13 = 0;
+            double TC44 = 0;
+            double TC66 = 0;
+
+            double normFactor = 0.0;
+
+            for (double phi1 = 0.0; phi1 < 360.0; phi1 += 5.0)
+            {
+                for (double psi1 = 0.0; psi1 < 360.0; psi1 += 5.0)
+                {
+                    for (double phi2 = 0.0; phi2 < 360.0; phi2 += 5.0)
+                    {
+                        normFactor += Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += Math.Pow(SCTM11(phi1, psi1, phi2), 4) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM12(phi1, psi1, phi2), 4) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM13(phi1, psi1, phi2), 4) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 4 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += Math.Pow(SCTM31(phi1, psi1, phi2), 4) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += Math.Pow(SCTM32(phi1, psi1, phi2), 4) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += Math.Pow(SCTM33(phi1, psi1, phi2), 4) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += 2 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 2 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 2 * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += 4 * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 4 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 4 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM23(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM12(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM13(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                    }
+                }
+            }
+
+            normFactor /= 8.0 * Math.PI;
+
+            this.TextureTensor.C11 = TC11 / normFactor;
+            this.TextureTensor.C33 = TC33 / normFactor;
+            this.TextureTensor.C12 = TC12 / normFactor;
+            this.TextureTensor.C13 = TC13 / normFactor;
+            this.TextureTensor.C44 = TC44 / normFactor;
+            this.TextureTensor.C66 = TC66 / normFactor;
+
+        }
+
+        private void SetTextureTensorRhombicIso(Stress.Microsopic.ElasticityTensors averagingTensor)
+        {
+            double TC11 = 0;
+            double TC22 = 0;
+            double TC33 = 0;
+            double TC12 = 0;
+            double TC13 = 0;
+            double TC23 = 0;
+            double TC44 = 0;
+            double TC55 = 0;
+            double TC66 = 0;
+
+            double normFactor = 0.0;
+
+            for (double phi1 = 0.0; phi1 < 360.0; phi1 += 5.0)
+            {
+                for (double psi1 = 0.0; psi1 < 360.0; psi1 += 5.0)
+                {
+                    for (double phi2 = 0.0; phi2 < 360.0; phi2 += 5.0)
+                    {
+                        normFactor += Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += Math.Pow(SCTM11(phi1, psi1, phi2), 4) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM12(phi1, psi1, phi2), 4) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += Math.Pow(SCTM13(phi1, psi1, phi2), 4) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC11 += 4 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC11 += 4 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC22 += Math.Pow(SCTM21(phi1, psi1, phi2), 4) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC22 += Math.Pow(SCTM22(phi1, psi1, phi2), 4) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC22 += Math.Pow(SCTM23(phi1, psi1, phi2), 4) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC22 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC22 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC22 += 2 * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC22 += 4 * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC22 += 4 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC22 += 4 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += Math.Pow(SCTM31(phi1, psi1, phi2), 4) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += Math.Pow(SCTM32(phi1, psi1, phi2), 4) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += Math.Pow(SCTM33(phi1, psi1, phi2), 4) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += 2 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 2 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 2 * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC33 += 4 * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 4 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC33 += 4 * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC12 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC12 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC13 += 4 * SCTM12(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += 4 * SCTM11(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC13 += 4 * SCTM11(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC23 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C33 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC23 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC23 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC23 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC23 += 4 * SCTM22(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += 4 * SCTM21(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC23 += 4 * SCTM21(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += Math.Pow(SCTM23(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM22(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM23(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC44 += 2 * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC44 += 2 * SCTM21(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC55 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC55 += 2 * SCTM11(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += 2 * SCTM11(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += 2 * SCTM12(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC55 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += 2 * SCTM13(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC55 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += 2 * SCTM11(phi1, psi1, phi2) * SCTM33(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC55 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC55 += 2 * SCTM11(phi1, psi1, phi2) * SCTM32(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM31(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C11 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += Math.Pow(SCTM13(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C22 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * averagingTensor.C12 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C13 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM12(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C23 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * Math.Pow(SCTM12(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM13(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * averagingTensor.C44 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM23(phi1, psi1, phi2) * SCTM13(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * averagingTensor.C55 * Math.Sin((psi1 * Math.PI) / 180.0);
+
+                        TC66 += 2 * Math.Pow(SCTM11(phi1, psi1, phi2), 2) * Math.Pow(SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                        TC66 += 2 * SCTM11(phi1, psi1, phi2) * SCTM22(phi1, psi1, phi2) * SCTM12(phi1, psi1, phi2) * SCTM21(phi1, psi1, phi2) * averagingTensor.C66 * Math.Sin((psi1 * Math.PI) / 180.0);
+                    }
+                }
+            }
+
+            normFactor /= 8.0 * Math.PI;
+
+            this.TextureTensor.C11 = TC11 / normFactor;
+            this.TextureTensor.C22 = TC22 / normFactor;
+            this.TextureTensor.C33 = TC33 / normFactor;
+            this.TextureTensor.C12 = TC12 / normFactor;
+            this.TextureTensor.C13 = TC13 / normFactor;
+            this.TextureTensor.C23 = TC23 / normFactor;
+            this.TextureTensor.C44 = TC44 / normFactor;
+            this.TextureTensor.C55 = TC55 / normFactor;
+            this.TextureTensor.C66 = TC66 / normFactor;
+
+        }
+
         #endregion
 
         #region StressFactors
@@ -10605,24 +11646,24 @@ namespace CalScec.Analysis.Texture
 
         #region Sample-Crystal-System transormation Matrix
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> GetSCTM(double varPhi1, double phi, double varPhi2)
+        public static MathNet.Numerics.LinearAlgebra.Matrix<double> GetSCTM(double varPhi1, double phi, double varPhi2)
         {
             MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
 
-            ret[0, 0] += this.SCTM11(varPhi1, phi, varPhi2);
-            ret[0, 1] += this.SCTM12(varPhi1, phi, varPhi2);
-            ret[0, 2] += this.SCTM13(varPhi1, phi, varPhi2);
-            ret[1, 0] += this.SCTM21(varPhi1, phi, varPhi2);
-            ret[1, 1] += this.SCTM22(varPhi1, phi, varPhi2);
-            ret[1, 2] += this.SCTM23(varPhi1, phi, varPhi2);
-            ret[2, 0] += this.SCTM31(varPhi1, phi, varPhi2);
-            ret[2, 1] += this.SCTM32(varPhi1, phi, varPhi2);
-            ret[2, 2] += this.SCTM33(varPhi1, phi, varPhi2);
+            ret[0, 0] += SCTM11(varPhi1, phi, varPhi2);
+            ret[0, 1] += SCTM12(varPhi1, phi, varPhi2);
+            ret[0, 2] += SCTM13(varPhi1, phi, varPhi2);
+            ret[1, 0] += SCTM21(varPhi1, phi, varPhi2);
+            ret[1, 1] += SCTM22(varPhi1, phi, varPhi2);
+            ret[1, 2] += SCTM23(varPhi1, phi, varPhi2);
+            ret[2, 0] += SCTM31(varPhi1, phi, varPhi2);
+            ret[2, 1] += SCTM32(varPhi1, phi, varPhi2);
+            ret[2, 2] += SCTM33(varPhi1, phi, varPhi2);
 
             return ret;
         }
 
-        public double SCTM11(double varPhi1, double phi, double varPhi2)
+        public static double SCTM11(double varPhi1, double phi, double varPhi2)
         {
             double Ret = Math.Cos((varPhi1 * Math.PI) / 180.0) * Math.Cos((varPhi2 * Math.PI) / 180.0);
             Ret -= Math.Sin((varPhi1 * Math.PI) / 180.0) * Math.Sin((varPhi2 * Math.PI) / 180.0) * Math.Cos((phi * Math.PI) / 180.0);
@@ -10630,7 +11671,7 @@ namespace CalScec.Analysis.Texture
             return Ret;
         }
 
-        public double SCTM12(double varPhi1, double phi, double varPhi2)
+        public static double SCTM12(double varPhi1, double phi, double varPhi2)
         {
             double Ret = Math.Sin((varPhi1 * Math.PI) / 180.0) * Math.Cos((varPhi2 * Math.PI) / 180.0);
             Ret += Math.Cos((varPhi1 * Math.PI) / 180.0) * Math.Sin((varPhi2 * Math.PI) / 180.0) * Math.Cos((phi * Math.PI) / 180.0);
@@ -10638,14 +11679,14 @@ namespace CalScec.Analysis.Texture
             return Ret;
         }
 
-        public double SCTM13(double varPhi1, double phi, double varPhi2)
+        public static double SCTM13(double varPhi1, double phi, double varPhi2)
         {
             double Ret = Math.Sin((varPhi2 * Math.PI) / 180.0) * Math.Sin((phi * Math.PI) / 180.0);
 
             return Ret;
         }
 
-        public double SCTM21(double varPhi1, double phi, double varPhi2)
+        public static double SCTM21(double varPhi1, double phi, double varPhi2)
         {
             double Ret = -1 * Math.Cos((varPhi1 * Math.PI) / 180.0) * Math.Sin((varPhi2 * Math.PI) / 180.0);
             Ret -= Math.Sin((varPhi1 * Math.PI) / 180.0) * Math.Cos((varPhi2 * Math.PI) / 180.0) * Math.Cos((phi * Math.PI) / 180.0);
@@ -10653,7 +11694,7 @@ namespace CalScec.Analysis.Texture
             return Ret;
         }
 
-        public double SCTM22(double varPhi1, double phi, double varPhi2)
+        public static double SCTM22(double varPhi1, double phi, double varPhi2)
         {
             double Ret = -1 * Math.Sin((varPhi1 * Math.PI) / 180.0) * Math.Sin((varPhi2 * Math.PI) / 180.0);
             Ret += Math.Cos((varPhi1 * Math.PI) / 180.0) * Math.Cos((varPhi2 * Math.PI) / 180.0) * Math.Cos((phi * Math.PI) / 180.0);
@@ -10661,28 +11702,28 @@ namespace CalScec.Analysis.Texture
             return Ret;
         }
 
-        public double SCTM23(double varPhi1, double phi, double varPhi2)
+        public static double SCTM23(double varPhi1, double phi, double varPhi2)
         {
             double Ret = Math.Cos((varPhi2 * Math.PI) / 180.0) * Math.Sin((phi * Math.PI) / 180.0);
 
             return Ret;
         }
 
-        public double SCTM31(double varPhi1, double phi, double varPhi2)
+        public static double SCTM31(double varPhi1, double phi, double varPhi2)
         {
             double Ret = Math.Sin((varPhi1 * Math.PI) / 180.0) * Math.Sin((phi * Math.PI) / 180.0);
 
             return Ret;
         }
 
-        public double SCTM32(double varPhi1, double phi, double varPhi2)
+        public static double SCTM32(double varPhi1, double phi, double varPhi2)
         {
             double Ret = -1 * Math.Cos((varPhi1 * Math.PI) / 180.0) * Math.Sin((phi * Math.PI) / 180.0);
 
             return Ret;
         }
 
-        public double SCTM33(double varPhi1, double phi, double varPhi2)
+        public static double SCTM33(double varPhi1, double phi, double varPhi2)
         {
             double Ret = Math.Cos((phi * Math.PI) / 180.0);
 

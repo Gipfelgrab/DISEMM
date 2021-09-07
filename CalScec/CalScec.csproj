@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,6 +33,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>DISEMM-Full-1.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Google.ProtocolBuffers">
@@ -106,6 +110,10 @@
     <Compile Include="Analysis\Stress\Macroskopic\SinPsyWindow.xaml.cs">
       <DependentUpon>SinPsyWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Analysis\Stress\Macroskopic\TensileDataLoad.xaml.cs">
+      <DependentUpon>TensileDataLoad.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Analysis\Stress\Macroskopic\TensileTest.cs" />
     <Compile Include="Analysis\Stress\Microsopic\ElasticityCalculationWindow.xaml.cs">
       <DependentUpon>ElasticityCalculationWindow.xaml</DependentUpon>
     </Compile>
@@ -154,9 +162,16 @@
     <Compile Include="DataManagment\Files\SCEC\PlasticityTensorInformation.cs" />
     <Compile Include="DataManagment\Files\SCEC\ReflexYieldInformation.cs" />
     <Compile Include="DataManagment\Files\SCEC\REKInformation.cs" />
+    <Compile Include="DataManagment\Files\SCEC\SimulatedExperimentInformation.cs" />
     <Compile Include="DataManagment\Files\SCEC\YieldSurfaceInformation.cs" />
+    <Compile Include="DataManagment\Files\Simulation\SimBody.cs" />
+    <Compile Include="DataManagment\Files\Simulation\SimHeader.cs" />
+    <Compile Include="DataManagment\Files\Simulation\SimSystems.cs" />
     <Compile Include="Pattern\DiffractionDataWindow.xaml.cs">
       <DependentUpon>DiffractionDataWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\AutoFillWindow.xaml.cs">
+      <DependentUpon>AutoFillWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\Calculation.cs" />
     <Compile Include="Tools\FourthRankTensor.cs" />
@@ -167,6 +182,9 @@
     <Compile Include="Tools\TextureFitInformation.cs" />
     <Compile Include="Tools\ValueSelection.xaml.cs">
       <DependentUpon>ValueSelection.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\YieldSurfacePlotSettings.xaml.cs">
+      <DependentUpon>YieldSurfacePlotSettings.xaml</DependentUpon>
     </Compile>
     <Page Include="Analysis\Fitting\PeakFittingWindow.xaml">
       <SubType>Designer</SubType>
@@ -185,6 +203,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Analysis\Stress\Macroskopic\SinPsyWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Analysis\Stress\Macroskopic\TensileDataLoad.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -251,11 +273,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Tools\AutoFillWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Tools\PlottingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Tools\ValueSelection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Tools\YieldSurfacePlotSettings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -357,6 +387,18 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\Logo-Icon\Entwurf-1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="DISEMM-Full-1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\Logo-Icon\DISEMM-Icon-1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\Logo-Icon\DISEMM-Full-1.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

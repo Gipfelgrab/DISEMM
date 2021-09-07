@@ -15,12 +15,12 @@ using System.Windows.Shapes;
 namespace CalScec.Tools
 {
     /// <summary>
-    /// Interaktionslogik für PlottingWindow.xaml
+    /// Interaktionslogik für YieldSurfacePlotSettings.xaml
     /// </summary>
-    public partial class PlottingWindow : Window
+    public partial class YieldSurfacePlotSettings : Window
     {
         public bool PreventClosing = true;
-        public PlottingWindow()
+        public YieldSurfacePlotSettings()
         {
             InitializeComponent();
         }

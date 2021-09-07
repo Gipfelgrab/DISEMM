@@ -29,20 +29,20 @@ namespace CalScec.DataManagment.Files.SCEC
 
         public PlasticityTensorInformation(Analysis.Stress.Plasticity.PlasticityTensor pT)
         {
-            this._hardenningTensor = pT._hardenningTensor;
-            this._isotropicHardenningTensor = pT._isotropicHardenningTensor;
-            this._independentHardenningTensor = pT._independentHardenningTensor;
-            this._kinematicHardenningTensor = pT._kinematicHardenningTensor;
+            //this._hardenningTensor = pT._hardenningTensor;
+            //this._isotropicHardenningTensor = pT._isotropicHardenningTensor;
+            //this._independentHardenningTensor = pT._independentHardenningTensor;
+            //this._kinematicHardenningTensor = pT._kinematicHardenningTensor;
 
-            this._plasticStrainRate = pT._plasticStrainRate;
-            this.appliedCrystalStress = pT.appliedCrystalStress;
+            //this._plasticStrainRate = pT._plasticStrainRate;
+            //this.appliedCrystalStress = pT.appliedCrystalStress;
 
-            this._phaseStrainRate = pT._phaseStrainRate;
+            //this._phaseStrainRate = pT._phaseStrainRate;
 
 
-            this._phaseHardeningRate = pT.PhaseHardeningRate;
-            this._phaseYieldStrength = pT.PhaseYieldStrength;
-            this.PhaseActYieldStrength = pT.PhaseActYieldStrength;
+            //this._phaseHardeningRate = pT.PhaseHardeningRate;
+            //this._phaseYieldStrength = pT.PhaseYieldStrength;
+            //this.PhaseActYieldStrength = pT.PhaseActYieldStrength;
 
             this._symmetry = pT._symmetry;
 
@@ -53,20 +53,20 @@ namespace CalScec.DataManagment.Files.SCEC
         {
             Analysis.Stress.Plasticity.PlasticityTensor ret = new Analysis.Stress.Plasticity.PlasticityTensor();
 
-            ret._hardenningTensor = this._hardenningTensor;
-            ret._isotropicHardenningTensor = this._isotropicHardenningTensor;
-            ret._independentHardenningTensor = this._independentHardenningTensor;
-            ret._kinematicHardenningTensor = this._kinematicHardenningTensor;
+            //ret._hardenningTensor = this._hardenningTensor;
+            //ret._isotropicHardenningTensor = this._isotropicHardenningTensor;
+            //ret._independentHardenningTensor = this._independentHardenningTensor;
+            //ret._kinematicHardenningTensor = this._kinematicHardenningTensor;
 
-            ret._plasticStrainRate = this._plasticStrainRate;
-            ret.appliedCrystalStress = this.appliedCrystalStress;
+            //ret._plasticStrainRate = this._plasticStrainRate;
+            //ret.appliedCrystalStress = this.appliedCrystalStress;
 
-            ret._phaseStrainRate = this._phaseStrainRate;
+            //ret._phaseStrainRate = this._phaseStrainRate;
 
 
-            ret.PhaseHardeningRate = this._phaseHardeningRate;
-            ret.PhaseYieldStrength = this._phaseYieldStrength;
-            ret.PhaseActYieldStrength = this.PhaseActYieldStrength;
+            //ret.PhaseHardeningRate = this._phaseHardeningRate;
+            //ret.PhaseYieldStrength = this._phaseYieldStrength;
+            //ret.PhaseActYieldStrength = this.PhaseActYieldStrength;
 
             ret._symmetry = this._symmetry;
 

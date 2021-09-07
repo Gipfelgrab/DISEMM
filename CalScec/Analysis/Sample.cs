@@ -50,6 +50,8 @@ namespace CalScec.Analysis
 
         #region Macro elastic calculations
 
+        public List<Stress.Macroskopic.TensileTest> TensileTests = new List<Stress.Macroskopic.TensileTest>();
+
         public List<Stress.Macroskopic.Elasticity> MacroElasticData = new List<Stress.Macroskopic.Elasticity>();
 
         public List<Tools.BulkElasticPhaseEvaluations> AveragedEModulStandard()
@@ -405,47 +407,47 @@ namespace CalScec.Analysis
 
             for (int n = 0; n < this.CrystalData.Count; n++)
             {
-                ret[0, 0] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[0, 0];
-                ret[0, 1] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[0, 1];
-                ret[0, 2] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[0, 2];
-                ret[0, 3] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[0, 3];
-                ret[0, 4] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[0, 4];
-                ret[0, 5] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[0, 5];
+                ret[0, 0] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[0, 0];
+                ret[0, 1] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[0, 1];
+                ret[0, 2] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[0, 2];
+                ret[0, 3] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[0, 3];
+                ret[0, 4] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[0, 4];
+                ret[0, 5] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[0, 5];
 
-                ret[1, 0] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[1, 0];
-                ret[1, 1] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[1, 1];
-                ret[1, 2] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[1, 2];
-                ret[1, 3] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[1, 3];
-                ret[1, 4] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[1, 4];
-                ret[1, 5] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[1, 5];
+                ret[1, 0] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[1, 0];
+                ret[1, 1] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[1, 1];
+                ret[1, 2] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[1, 2];
+                ret[1, 3] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[1, 3];
+                ret[1, 4] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[1, 4];
+                ret[1, 5] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[1, 5];
 
-                ret[2, 0] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[2, 0];
-                ret[2, 1] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[2, 1];
-                ret[2, 2] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[2, 2];
-                ret[2, 3] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[2, 3];
-                ret[2, 4] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[2, 4];
-                ret[2, 5] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[2, 5];
+                ret[2, 0] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[2, 0];
+                ret[2, 1] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[2, 1];
+                ret[2, 2] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[2, 2];
+                ret[2, 3] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[2, 3];
+                ret[2, 4] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[2, 4];
+                ret[2, 5] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[2, 5];
 
-                ret[3, 0] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[3, 0];
-                ret[3, 1] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[3, 1];
-                ret[3, 2] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[3, 2];
-                ret[3, 3] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[3, 3];
-                ret[3, 4] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[3, 4];
-                ret[3, 5] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[3, 5];
+                ret[3, 0] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[3, 0];
+                ret[3, 1] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[3, 1];
+                ret[3, 2] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[3, 2];
+                ret[3, 3] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[3, 3];
+                ret[3, 4] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[3, 4];
+                ret[3, 5] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[3, 5];
 
-                ret[4, 0] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[4, 0];
-                ret[4, 1] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[4, 1];
-                ret[4, 2] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[4, 2];
-                ret[4, 3] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[4, 3];
-                ret[4, 4] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[4, 4];
-                ret[4, 5] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[4, 5];
+                ret[4, 0] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[4, 0];
+                ret[4, 1] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[4, 1];
+                ret[4, 2] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[4, 2];
+                ret[4, 3] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[4, 3];
+                ret[4, 4] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[4, 4];
+                ret[4, 5] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[4, 5];
 
-                ret[5, 0] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[5, 0];
-                ret[5, 1] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[5, 1];
-                ret[5, 2] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[5, 2];
-                ret[5, 3] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[5, 3];
-                ret[5, 4] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[5, 4];
-                ret[5, 5] += this.CrystalData[n].PhaseFraction * this.HillTensorData[n]._complianceTensor[5, 5];
+                ret[5, 0] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[5, 0];
+                ret[5, 1] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[5, 1];
+                ret[5, 2] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[5, 2];
+                ret[5, 3] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[5, 3];
+                ret[5, 4] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[5, 4];
+                ret[5, 5] += this.CrystalData[n].PhaseFraction * this.ReussTensorData[n]._complianceTensor[5, 5];
 
             }
 
@@ -505,6 +507,7 @@ namespace CalScec.Analysis
             {
                 eshelbyTensor = this.GetEshelbyTensorSpherical(matrix);
             }
+
             MathNet.Numerics.LinearAlgebra.Matrix<double> sampleCompliances = this.GetOverallCompliances();
             MathNet.Numerics.LinearAlgebra.Matrix<double> sampleStiffnesses = sampleCompliances.Inverse();
             MathNet.Numerics.LinearAlgebra.Matrix<double> unity = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
@@ -514,14 +517,36 @@ namespace CalScec.Analysis
             unity[3, 3] = 1.0;
             unity[4, 4] = 1.0;
             unity[5, 5] = 1.0;
-            
+
             MathNet.Numerics.LinearAlgebra.Matrix<double> first = -1 * sampleStiffnesses * (eshelbyTensor - unity);
-            MathNet.Numerics.LinearAlgebra.Matrix<double> second = (this.HillTensorData[inclusion]._stiffnessTensor - sampleStiffnesses) * eshelbyTensor;
+            MathNet.Numerics.LinearAlgebra.Matrix<double> second = (this.ReussTensorData[inclusion]._stiffnessTensor - sampleStiffnesses) * eshelbyTensor;
             second += sampleStiffnesses;
-            MathNet.Numerics.LinearAlgebra.Matrix<double> third = (this.HillTensorData[inclusion]._stiffnessTensor - sampleStiffnesses) * sampleCompliances;
+            MathNet.Numerics.LinearAlgebra.Matrix<double> third = (this.ReussTensorData[inclusion]._stiffnessTensor - sampleStiffnesses) * sampleCompliances;
 
             MathNet.Numerics.LinearAlgebra.Matrix<double> ret1 = first * second.Inverse() * third;
             ret1 += unity;
+
+            Tools.FourthRankTensor eshelbyTensorFR = new Tools.FourthRankTensor(eshelbyTensor);
+            Tools.FourthRankTensor sampleCompliancesFR = new Tools.FourthRankTensor(sampleCompliances);
+            Tools.FourthRankTensor sampleStiffnessesFR = new Tools.FourthRankTensor(sampleStiffnesses);
+            Tools.FourthRankTensor unityFR = Tools.FourthRankTensor.GetUnityTensor();
+            Tools.FourthRankTensor phaseStiffnessesFR = new Tools.FourthRankTensor(this.ReussTensorData[inclusion]._stiffnessTensor);
+
+            Tools.FourthRankTensor firstFR = -1.0 * sampleStiffnessesFR * (eshelbyTensorFR - unityFR);
+            Tools.FourthRankTensor secondFR = (phaseStiffnessesFR - sampleStiffnessesFR) * eshelbyTensorFR;
+            secondFR += sampleStiffnessesFR;
+            Tools.FourthRankTensor thirdFR = (phaseStiffnessesFR - sampleStiffnessesFR) * sampleCompliancesFR;
+
+            MathNet.Numerics.LinearAlgebra.Matrix<double> firstComp = firstFR.GetVoigtTensor();
+            MathNet.Numerics.LinearAlgebra.Matrix<double> secondComp = secondFR.GetVoigtTensor();
+            MathNet.Numerics.LinearAlgebra.Matrix<double> thirdComp = thirdFR.GetVoigtTensor();
+
+            Tools.FourthRankTensor secondInverseFR = new Tools.FourthRankTensor(secondComp.Inverse());
+
+            Tools.FourthRankTensor ret1FR = firstFR * secondInverseFR * thirdFR;
+            ret1FR += unityFR;
+
+            MathNet.Numerics.LinearAlgebra.Matrix<double> ret1Comp = ret1FR.GetVoigtTensor();
 
             MathNet.Numerics.LinearAlgebra.Matrix<double> ret2 = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
 
@@ -588,14 +613,14 @@ namespace CalScec.Analysis
         {
             MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
 
-            double e11 = 7 - (5 * this.ReussTensorData[matrix].AveragedNu);
-            e11 /= 15 * (1 - this.ReussTensorData[matrix].AveragedNu);
+            double e11 = 7 - (5 * this.HillTensorData[matrix].AveragedNu);
+            e11 /= 15 * (1 - this.HillTensorData[matrix].AveragedNu);
 
-            double e12 = -1 + (5 * this.ReussTensorData[matrix].AveragedNu);
-            e12 /= 15 * (1 - this.ReussTensorData[matrix].AveragedNu);
+            double e12 = -1 + (5 * this.HillTensorData[matrix].AveragedNu);
+            e12 /= 15 * (1 - this.HillTensorData[matrix].AveragedNu);
 
-            double e66 = 4 - (5 * this.ReussTensorData[matrix].AveragedNu);
-            e66 /= 15 * (1 - this.ReussTensorData[matrix].AveragedNu);
+            double e66 = 4 - (5 * this.HillTensorData[matrix].AveragedNu);
+            e66 /= 15 * (1 - this.HillTensorData[matrix].AveragedNu);
 
             ret[0, 0] = e11;
             ret[1, 1] = e11;
@@ -1070,13 +1095,196 @@ namespace CalScec.Analysis
 
         #region Elasto plastic self consistent
 
+        #region Simulation Multi threading
+
+        #region Simulation using Multi Threading
+
+        public System.Threading.ManualResetEvent _doneEvent;
+
+        public event System.ComponentModel.PropertyChangedEventHandler FitFinished;
+        public event System.ComponentModel.PropertyChangedEventHandler FitStarted;
+
+        protected void OnElastoPlasticSimulationStarted()
+        {
+            System.ComponentModel.PropertyChangedEventHandler handler = FitStarted;
+            if (handler != null)
+            {
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs("Simulation Started"));
+            }
+        }
+
+        protected void OnElastoPlasticSimulationFinished()
+        {
+            this._doneEvent.Set();
+
+            System.ComponentModel.PropertyChangedEventHandler handler = FitFinished;
+            if (handler != null)
+            {
+                handler(this, new System.ComponentModel.PropertyChangedEventArgs("Simulation Finished"));
+            }
+        }
+
+        // Wrapper method for use with thread pool. 
+        public void FitRegionCallback(Object threadContext)
+        {
+            OnElastoPlasticSimulationStarted();
+
+
+
+            OnElastoPlasticSimulationFinished();
+        }
+
+        public void SetResetEvent(System.Threading.ManualResetEvent DoneEvent)
+        {
+            this._doneEvent = DoneEvent;
+        }
+
+
+        #endregion
+
+        #endregion
+
         #region Parameter
+
+        /// <summary>
+        /// Alle experimentellen Reflexe sortiert nach [Phase][Orientierung (z.B.100)][Psi Orientierung][gemessener Reflex]
+        /// </summary>
+        public List<List<List<List<Stress.Macroskopic.PeakStressAssociation>>>> SortedExperimentalPeakData = new List<List<List<List<Stress.Macroskopic.PeakStressAssociation>>>>();
+
+        public void SetExperimentalData()
+        {
+            List<List<Stress.Microsopic.REK>> preDEC = new List<List<Stress.Microsopic.REK>>();
+            for (int n = 0; n < this.CrystalData.Count; n++)
+            {
+                List<Stress.Microsopic.REK> phaseDEC = new List<Stress.Microsopic.REK>();
+
+                for (int i = 0; i < this.CrystalData[n].HKLList.Count; i++)
+                {
+                    Stress.Microsopic.REK ActualREK = new Stress.Microsopic.REK(this.CrystalData[n], this.CrystalData[n].HKLList[i]);
+
+                    for (int j = 0; j < this.DiffractionPatterns.Count; j++)
+                    {
+                        for (int k = 0; k < this.DiffractionPatterns[j].FoundPeaks.Count; k++)
+                        {
+                            if (this.DiffractionPatterns[j].FoundPeaks[k].AssociatedCrystalData.SymmetryGroupID == this.CrystalData[n].SymmetryGroupID)
+                            {
+                                if (this.DiffractionPatterns[j].FoundPeaks[k].AssociatedHKLReflex.HKLString == this.CrystalData[n].HKLList[i].HKLString)
+                                {
+                                    Stress.Macroskopic.PeakStressAssociation NewAssociation = new Stress.Macroskopic.PeakStressAssociation(this.DiffractionPatterns[j].Stress, this.DiffractionPatterns[j].PsiAngle(this.DiffractionPatterns[j].FoundPeaks[k].Angle), this.DiffractionPatterns[j].FoundPeaks[k], this.DiffractionPatterns[j].PhiAngle(this.DiffractionPatterns[j].FoundPeaks[k].Angle));
+                                    NewAssociation._macroskopicStrain = this.DiffractionPatterns[j].MacroStrain;
+                                    ActualREK.ElasticStressData.Add(NewAssociation);
+                                }
+                            }
+                        }
+                    }
+                    if (ActualREK.ElasticStressData.Count != 0)
+                    {
+                        phaseDEC.Add(ActualREK);
+                    }
+                }
+
+                preDEC.Add(phaseDEC);
+            }
+
+            SortedExperimentalPeakData.Clear();
+
+            for (int phase = 0; phase < CrystalData.Count; phase++)
+            {
+                List<List<List<Stress.Macroskopic.PeakStressAssociation>>> sortedData = new List<List<List<Stress.Macroskopic.PeakStressAssociation>>>();
+
+                for (int n = 0; n < preDEC[phase].Count; n++)
+                {
+                    List<List<Stress.Macroskopic.PeakStressAssociation>> orientationPre = new List<List<Stress.Macroskopic.PeakStressAssociation>>();
+
+                    for (int i = 0; i < preDEC[phase][n].ElasticStressData.Count; i++)
+                    {
+                        bool newPsyAngle = true;
+                        for (int j = 0; j < orientationPre.Count; j++)
+                        {
+                            if (Math.Abs(orientationPre[j][0].PsiAngle - preDEC[phase][n].ElasticStressData[i].PsiAngle) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
+                            {
+                                orientationPre[j].Add(preDEC[phase][n].ElasticStressData[i]);
+                                newPsyAngle = false;
+                                break;
+                            }
+                        }
+
+                        if (newPsyAngle)
+                        {
+                            List<Stress.Macroskopic.PeakStressAssociation> tmp = new List<Stress.Macroskopic.PeakStressAssociation>();
+                            tmp.Add(preDEC[phase][n].ElasticStressData[i]);
+                            orientationPre.Add(tmp);
+                        }
+                    }
+
+                    sortedData.Add(orientationPre);
+
+                }
+
+                SortedExperimentalPeakData.Add(sortedData);
+            }
+
+            #region OldStuff
+            //for (int phase = 0; phase < CrystalData.Count; phase++)
+            //{
+            //    List<List<List<Stress.Macroskopic.PeakStressAssociation>>> sortedData = new List<List<List<Stress.Macroskopic.PeakStressAssociation>>>();
+
+            //    for(int n = 0; n < this.DiffractionConstants[phase].Count; n++)
+            //    {
+            //        List<List<Stress.Macroskopic.PeakStressAssociation>> orientationPre = new List<List<Stress.Macroskopic.PeakStressAssociation>>();
+
+            //        for(int i = 0; i < this.DiffractionConstants[phase][n].ElasticStressData.Count; i++)
+            //        {
+            //            bool newPsyAngle = true;
+            //            for(int j = 0; j < orientationPre.Count; j++)
+            //            {
+            //                if(Math.Abs(orientationPre[j][0].PsiAngle - this.DiffractionConstants[phase][n].ElasticStressData[i].PsiAngle) < CalScec.Properties.Settings.Default.PsyAcceptanceAngle)
+            //                {
+            //                    orientationPre[j].Add(this.DiffractionConstants[phase][n].ElasticStressData[i]);
+            //                    newPsyAngle = false;
+            //                    break;
+            //                }
+            //            }
+
+            //            if(newPsyAngle)
+            //            {
+            //                List<Stress.Macroskopic.PeakStressAssociation> tmp = new List<Stress.Macroskopic.PeakStressAssociation>();
+            //                tmp.Add(this.DiffractionConstants[phase][n].ElasticStressData[i]);
+            //                orientationPre.Add(tmp);
+            //            }
+            //        }
+
+            //        sortedData.Add(orientationPre);
+
+            //    }
+
+            //    SortedExperimentalPeakData.Add(sortedData);
+            //}
+
+            #endregion
+        }
+
+        public void SetExperimentalStrainData()
+        {
+            for (int phase = 0; phase < CrystalData.Count; phase++)
+            {
+                for(int n = 0; n < SortedExperimentalPeakData[phase].Count; n++)
+                {
+                    for (int i = 0; i < SortedExperimentalPeakData[phase][n].Count; i++)
+                    {
+                        for (int j = 0; j < SortedExperimentalPeakData[phase][n][i].Count; j++)
+                        {
+                            SortedExperimentalPeakData[phase][n][i][j].Strain = (SortedExperimentalPeakData[phase][n][i][j].DifPeak.LatticeDistance - SortedExperimentalPeakData[phase][n][i][0].DifPeak.LatticeDistance) / SortedExperimentalPeakData[phase][n][i][0].DifPeak.LatticeDistance;
+                        }
+                    }
+                }
+            }
+        }
 
         public List<Stress.Plasticity.ElastoPlasticExperiment> SimulationData = new List<Stress.Plasticity.ElastoPlasticExperiment>();
 
-        public List<MathNet.Numerics.LinearAlgebra.Matrix<double>> appliedSampleStressHistory = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
-
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> StrainRate = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        //public List<MathNet.Numerics.LinearAlgebra.Matrix<double>> appliedSampleStressHistory = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> StrainRate = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
         
         public List<Stress.Plasticity.PlasticityTensor> PlasticTensor = new List<Stress.Plasticity.PlasticityTensor>();
 
@@ -1105,970 +1313,1035 @@ namespace CalScec.Analysis
             }
         }
 
-        #endregion
-
-        #region Data display
-
-        public Pattern.Counts SampleStrainOverSampleStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
+        public Tools.FourthRankTensor GetSampleCompliances(bool textureActive)
         {
-            Pattern.Counts ret = new Pattern.Counts();
+            List<Tools.FourthRankTensor> phaseOCompliances = new List<Tools.FourthRankTensor>();
+
+            for(int n = 0; n < this.ODFList.Count; n++)
+            {
+                if (textureActive)
+                {
+                    //this.ODFList[n].SetTextureTensor();
+                }
+                else
+                {
+                    phaseOCompliances.Add(this.SetTextureTensorIso(this.HillTensorData[n]).GetFourtRankStiffnesses());
+                }
+            }
+
+            Tools.FourthRankTensor ret = new Tools.FourthRankTensor();
+
+            for (int n = 0; n < this.CrystalData.Count; n++)
+            {
+                ret += this.CrystalData[n].PhaseFraction * phaseOCompliances[n];
+            }
+
+            //ret /= phaseOCompliances.Count;
+
+            return ret;
+        }
+
+        public Tools.FourthRankTensor GetSampleCompliances(int grainModel)
+        {
+            List<Tools.FourthRankTensor> phaseCompliances = new List<Tools.FourthRankTensor>();
+            for (int n = 0; n < this.CrystalData.Count; n++)
+            {
+                switch (grainModel)
+                {
+                    case 0:
+                        phaseCompliances.Add(this.SetTextureTensorIso(this.ReussTensorData[n]).GetFourtRankCompliances());
+                        break;
+                    case 1:
+                        phaseCompliances.Add(this.SetTextureTensorIso(this.HillTensorData[n]).GetFourtRankCompliances());
+                        break;
+                    case 2:
+                        phaseCompliances.Add(this.SetTextureTensorIso(this.KroenerTensorData[n]).GetFourtRankCompliances());
+                        break;
+                    case 3:
+                        phaseCompliances.Add(this.SetTextureTensorIso(this.DeWittTensorData[n]).GetFourtRankCompliances());
+                        break;
+                    case 4:
+                        phaseCompliances.Add(this.SetTextureTensorIso(this.GeometricHillTensorData[n]).GetFourtRankCompliances());
+                        break;
+                    default:
+                        phaseCompliances.Add(this.SetTextureTensorIso(this.HillTensorData[n]).GetFourtRankCompliances());
+                        break;
+                }
+            }
+            Tools.FourthRankTensor ret = new Tools.FourthRankTensor();
+            for (int n = 0; n < this.CrystalData.Count; n++)
+            {
+                ret += this.CrystalData[n].PhaseFraction * phaseCompliances[n];
+            }
+
+            return ret;
+        }
+
+        public Tools.FourthRankTensor GetSampleStiffnesses(bool textureActive)
+        {
+            List<Tools.FourthRankTensor> phaseOStiffnesses = new List<Tools.FourthRankTensor>();
             
-            for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
+            for (int n = 0; n < this.HillTensorData.Count; n++)
             {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * direction1.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction2.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
+                if (textureActive)
+                {
+                    //this.ODFList[n].SetTextureTensor();
+                }
+                else
+                {
+                    phaseOStiffnesses.Add(this.SetTextureTensorIso(this.HillTensorData[n]).GetFourtRankStiffnesses());
+                }
             }
+            
+            Tools.FourthRankTensor ret = new Tools.FourthRankTensor();
+
+            for (int n = 0; n < phaseOStiffnesses.Count; n++)
+            {
+                ret += this.CrystalData[n].PhaseFraction * phaseOStiffnesses[n];
+            }
+
+            ret /= phaseOStiffnesses.Count;
 
             return ret;
         }
-        public Pattern.Counts SampleStrainOverGrainStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        public Tools.FourthRankTensor GetSampleStiffnesses(bool textureActive, List<Analysis.Stress.Microsopic.ElasticityTensors> tensorData)
         {
-            Pattern.Counts ret = new Pattern.Counts();
+            List<Tools.FourthRankTensor> phaseOStiffnesses = new List<Tools.FourthRankTensor>();
 
-            for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
+            for (int n = 0; n < tensorData.Count; n++)
             {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * direction2.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction1.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
+                if (textureActive)
+                {
+                    //this.ODFList[n].SetTextureTensor();
+                }
+                else
+                {
+                    phaseOStiffnesses.Add(this.SetTextureTensorIso(tensorData[n]).GetFourtRankStiffnesses());
+                }
             }
 
-            return ret;
-        }
-        public Pattern.Counts SampleStrainOverSampleStressData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+            Tools.FourthRankTensor ret = new Tools.FourthRankTensor();
 
-            for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
+            for (int n = 0; n < phaseOStiffnesses.Count; n++)
             {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * direction2.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction1.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
+                ret += phaseOStiffnesses[n];
             }
 
-            return ret;
-        }
-        public Pattern.Counts SampleStrainOverGrainStressData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * direction2.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction1.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStrainOverGrainShearStressData(DataManagment.CrystalData.HKLReflex direction1, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
-            {
-                double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction1.Direction;
-
-                double[] tmp = { directionValueX, directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStrainOverSampleShearStresData(DataManagment.CrystalData.HKLReflex direction1, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
-            {
-                double directionValueX = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction1.Direction;
-
-                double[] tmp = { directionValueX, directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStrainOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * direction1.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction2.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStrainOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * direction2.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction1.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
+            ret /= phaseOStiffnesses.Count;
 
             return ret;
         }
 
-        public Pattern.Counts GrainStrainOverSampleStrainData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        #region Averaging
+
+        public Stress.Microsopic.ElasticityTensors SetTextureTensorIso(Stress.Microsopic.ElasticityTensors averagingTensor)
         {
-            Pattern.Counts ret = new Pattern.Counts();
+            Stress.Microsopic.ElasticityTensors ret = averagingTensor.Clone() as Stress.Microsopic.ElasticityTensors;
 
-            for (int n = 0; n < SimulationData[experiment].StrainCFHistory[phase].Count; n++)
+            switch (averagingTensor.Symmetry)
             {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * macroDirection.Direction;
+                case "cubic":
+                    ret = this.SetTextureTensorCubicIso(averagingTensor);
+                    break;
+                case "hexagonal":
+                    ret = this.SetTextureTensorHexagonalIso(averagingTensor);
+                    break;
+                case "tetragonal type 1":
+                    ret = this.SetTextureTensorTetragonalType1Iso(averagingTensor);
+                    break;
+                case "tetragonal type 2":
 
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
+                    break;
+                case "trigonal type 1":
+
+                    break;
+                case "trigonal type 2":
+
+                    break;
+                case "rhombic":
+                    ret = this.SetTextureTensorRhombicIso(averagingTensor);
+                    break;
+                case "monoclinic":
+
+                    break;
+                case "triclinic":
+
+                    break;
+                default:
+
+                    break;
             }
 
-            return ret;
-        }
-        public Pattern.Counts GrainStrainOverGrainStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * direction1.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * direction2.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStrainOverSampleStressData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStrainOverGrainStressData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * direction2.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * direction1.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStrainOverGrainShearStressData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
-                double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-
-                double[] tmp = { directionValueX, directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStrainOverSampleShearStressData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
-                double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-
-                double[] tmp = { directionValueX, directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStrainOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStrainOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * direction1.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * direction2.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-
-        public Pattern.Counts SampleStressOverSampleStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * direction2.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * direction1.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStressOverGrainStrainData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStressOverSampleStressData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * direction1.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * direction2.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStressOverGrainStressData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStressOverGrainShearStressData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX, directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStressOverSampleShearStressData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX, directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStressOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex direction, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * direction.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * direction.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStressOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-
-        public Pattern.Counts GrainStressOverSampleStrainData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStressOverGrainStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * direction2.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStressOverSampleStressData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStressOverGrainStressData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * direction2.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStressOverGrainShearStressData(DataManagment.CrystalData.HKLReflex direction1, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
-                double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-
-                double[] tmp = { directionValueX, directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStressOverSampleShearStressData(DataManagment.CrystalData.HKLReflex direction1, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
-                double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-
-                double[] tmp = { directionValueX, directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStressOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStressOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-
-        public Pattern.Counts GrainShearStressOverSampleStrainData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainShearStressOverGrainStrainData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
-                double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainShearStressOverSampleStressData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainShearStressOverGrainStressData(DataManagment.CrystalData.HKLReflex direction1, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
-                double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainShearStressOverGrainShearStressData(int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                double directionValue = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-
-                double[] tmp = { directionValue, directionValue };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainShearStressOverSampleShearStressData(int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-                double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-
-                double[] tmp = { directionValueX, directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainShearStressOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainShearStressOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
-                double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-
-        public Pattern.Counts SampleShearStressOverSampleStrainData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                double directionValueY = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleShearStressOverGrainStrainData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
-                double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleShearStressOverSampleStressData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                double directionValueY = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleShearStressOverGrainStressData(DataManagment.CrystalData.HKLReflex direction1, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
-                double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleShearStressOverGrainShearStressData(int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                double directionValue = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-
-                double[] tmp = { directionValue, directionValue };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleShearStressOverSampleShearStressData(int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                double directionValue = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-
-                double[] tmp = { directionValue, directionValue };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleShearStressOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                double directionValueY = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleShearStressOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
-                double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-
-        public Pattern.Counts SampleStrainRateOverSampleStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * direction1.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * direction2.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStrainRateOverGrainStrainData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStrainRateOverSampleStressData(DataManagment.CrystalData.HKLReflex direction, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * direction.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * direction.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStrainRateOverGrainStressData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStrainRateOverGrainShearStressData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
-            {
-                double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX, directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStrainRateOverSampleShearStressData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
-            {
-                double directionValueX = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX, directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStrainRateOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * direction1.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * direction2.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts SampleStrainRateOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
+            ret.CalculateCompliances();
 
             return ret;
         }
         
-        public Pattern.Counts GrainStrainRateOverSampleStrainData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        public Stress.Microsopic.ElasticityTensors SetTextureTensorCubicIso(Stress.Microsopic.ElasticityTensors averagingTensor)
+        {
+            double TC11 = 0;
+            double TC12 = 0;
+            double TC44 = 0;
+
+            double normFactor = 0.0;
+
+            for (double phi1 = 0.0; phi1 < 360.0; phi1 += 5.0)
+            {
+                for (double psi1 = 0.0; psi1 < 360.0; psi1 += 5.0)
+                {
+                    for (double phi2 = 0.0; phi2 < 360.0; phi2 += 5.0)
+                    {
+                        normFactor++;
+
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 4) * averagingTensor.C11;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 4) * averagingTensor.C22;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 4) * averagingTensor.C33;
+
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C66;
+                        //TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        //TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        //TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        //TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        //TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        //TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C66;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C33;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C12;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C13;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C23;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC12 += Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C44;
+                        TC12 += Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C55;
+                        TC12 += Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * averagingTensor.C66;
+                        //TC12 += 4 * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C44;
+                        //TC12 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C55;
+                        //TC12 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * averagingTensor.C66;
+
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C33;
+
+                        TC44 += Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * averagingTensor.C12;
+                        TC44 += Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C13;
+                        TC44 += Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C23;
+                        //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * averagingTensor.C12;
+                        //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C13;
+                        //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C23;
+
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC44 += Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C44;
+                        //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C44;
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C44;
+
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC44 += Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C55;
+                        //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C55;
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55;
+
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66;
+                        TC44 += Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C66;
+                        //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C66;
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C66;
+
+                    }
+                }
+            }
+            
+            Stress.Microsopic.ElasticityTensors ret = averagingTensor.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            ret.C11 = (TC11 / normFactor);
+            ret.C12 = (TC12 / normFactor);
+            ret.C44 = (TC44 / normFactor);
+
+            return ret;
+        }
+
+        private Stress.Microsopic.ElasticityTensors SetTextureTensorHexagonalIso(Stress.Microsopic.ElasticityTensors averagingTensor)
+        {
+            double TC11 = 0;
+            double TC33 = 0;
+            double TC12 = 0;
+            double TC13 = 0;
+            double TC44 = 0;
+
+            double normFactor = 0.0;
+
+            for (double phi1 = 0.0; phi1 < 360.0; phi1 += 5.0)
+            {
+                for (double psi1 = 0.0; psi1 < 360.0; psi1 += 5.0)
+                {
+                    for (double phi2 = 0.0; phi2 < 360.0; phi2 += 5.0)
+                    {
+                        normFactor++;
+
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 4) * averagingTensor.C11;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 4) * averagingTensor.C22;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 4) * averagingTensor.C33;
+
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C23;
+                        //TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        //TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        //TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C66;
+                        //TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        //TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        //TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C66;
+
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 4) * averagingTensor.C11;
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 4) * averagingTensor.C22;
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 4) * averagingTensor.C33;
+
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23;
+                        //TC33 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        //TC33 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        //TC33 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66;
+                        //TC33 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        //TC33 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        //TC33 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C33;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C12;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C13;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C23;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC12 += Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C44;
+                        TC12 += Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C55;
+                        TC12 += Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * averagingTensor.C66;
+                        //TC12 += 4 * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C44;
+                        //TC12 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C55;
+                        //TC12 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * averagingTensor.C66;
+
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C33;
+
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C12;
+
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C13;
+
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC13 += Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C44;
+                        TC13 += Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C55;
+                        TC13 += Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * averagingTensor.C66;
+                        //TC13 += 4 * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C44;
+                        //TC13 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C55;
+                        //TC13 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * averagingTensor.C66;
+
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C22;
+
+                        TC44 += Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * averagingTensor.C12;
+                        TC44 += Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C13;
+                        TC44 += Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C23;
+
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC44 += Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C44;
+
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC44 += Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C55;
+
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66;
+                        TC44 += Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C66;
+                        //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * averagingTensor.C12;
+                        //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C13;
+                        //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C23;
+
+                        //TC44 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C44;
+
+                        //TC44 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C55;
+
+                        //TC44 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66;
+                        //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C66;
+                    }
+                }
+            }
+
+            Stress.Microsopic.ElasticityTensors ret = averagingTensor.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            ret.C11 = TC11 / normFactor;
+            ret.C33 = TC33 / normFactor;
+            ret.C12 = TC12 / normFactor;
+            ret.C13 = TC13 / normFactor;
+            ret.C44 = TC44 / normFactor;
+
+            return ret;
+        }
+
+        private Stress.Microsopic.ElasticityTensors SetTextureTensorTetragonalType1Iso(Stress.Microsopic.ElasticityTensors averagingTensor)
+        {
+            double TC11 = 0;
+            double TC33 = 0;
+            double TC12 = 0;
+            double TC13 = 0;
+            double TC44 = 0;
+            double TC66 = 0;
+
+            double normFactor = 0.0;
+
+            for (double phi1 = 0.0; phi1 < 360.0; phi1 += 5.0)
+            {
+                for (double psi1 = 0.0; psi1 < 360.0; psi1 += 5.0)
+                {
+                    for (double phi2 = 0.0; phi2 < 360.0; phi2 += 5.0)
+                    {
+                        normFactor++;
+
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 4) * averagingTensor.C11;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 4) * averagingTensor.C22;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 4) * averagingTensor.C33;
+
+                        TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C66;
+
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 4) * averagingTensor.C11;
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 4) * averagingTensor.C22;
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 4) * averagingTensor.C33;
+
+                        TC33 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC33 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC33 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC33 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC33 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC33 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C33;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C12;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C13;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C23;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC12 += 4 * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C44;
+                        TC12 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C55;
+                        TC12 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * averagingTensor.C66;
+
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C33;
+
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C12;
+
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C13;
+
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC13 += 4 * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C44;
+                        TC13 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C55;
+                        TC13 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * averagingTensor.C66;
+
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C22;
+
+                        TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * averagingTensor.C12;
+                        TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C13;
+                        TC44 += 2 * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C23;
+
+                        TC44 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC44 += 2 * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C44;
+
+                        TC44 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C55;
+
+                        TC44 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66;
+                        TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C66;
+
+                        TC66 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC66 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC66 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C22;
+
+                        TC66 += 2 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * averagingTensor.C12;
+                        TC66 += 2 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C13;
+                        TC66 += 2 * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C23;
+
+                        TC66 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC66 += 2 * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C44;
+
+                        TC66 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC66 += 2 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * averagingTensor.C55;
+
+                        TC66 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C66;
+                        TC66 += 2 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * averagingTensor.C66;
+                    }
+                }
+            }
+
+            Stress.Microsopic.ElasticityTensors ret = averagingTensor.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            ret.C11 = TC11 / normFactor;
+            ret.C33 = TC33 / normFactor;
+            ret.C12 = TC12 / normFactor;
+            ret.C13 = TC13 / normFactor;
+            ret.C44 = TC44 / normFactor;
+            ret.C66 = TC66 / normFactor;
+
+            return ret;
+        }
+
+        private Stress.Microsopic.ElasticityTensors SetTextureTensorRhombicIso(Stress.Microsopic.ElasticityTensors averagingTensor)
+        {
+            double TC11 = 0;
+            double TC22 = 0;
+            double TC33 = 0;
+            double TC12 = 0;
+            double TC13 = 0;
+            double TC23 = 0;
+            double TC44 = 0;
+            double TC55 = 0;
+            double TC66 = 0;
+
+            double normFactor = 0.0;
+
+            for (double phi1 = 0.0; phi1 < 360.0; phi1 += 5.0)
+            {
+                for (double psi1 = 0.0; psi1 < 360.0; psi1 += 5.0)
+                {
+                    for (double phi2 = 0.0; phi2 < 360.0; phi2 += 5.0)
+                    {
+                        normFactor++;
+
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 4) * averagingTensor.C11;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 4) * averagingTensor.C22;
+                        TC11 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 4) * averagingTensor.C33;
+
+                        TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * averagingTensor.C66;
+
+                        TC22 += Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 4) * averagingTensor.C11;
+                        TC22 += Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 4) * averagingTensor.C22;
+                        TC22 += Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 4) * averagingTensor.C33;
+
+                        TC22 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC22 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC22 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC22 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC22 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC22 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C66;
+
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 4) * averagingTensor.C11;
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 4) * averagingTensor.C22;
+                        TC33 += Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 4) * averagingTensor.C33;
+
+                        TC33 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC33 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC33 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC33 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC33 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC33 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C33;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C12;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C13;
+
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C23;
+                        TC12 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC12 += 4 * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C44;
+                        TC12 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C55;
+                        TC12 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * averagingTensor.C66;
+
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C33;
+
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C12;
+
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C13;
+
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23;
+                        TC13 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC13 += 4 * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C44;
+                        TC13 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C55;
+                        TC13 += 4 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * averagingTensor.C66;
+
+                        TC23 += Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC23 += Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC23 += Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C33;
+
+                        TC23 += Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C12;
+                        TC23 += Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C12;
+
+                        TC23 += Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C13;
+                        TC23 += Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C13;
+
+                        TC23 += Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C23;
+                        TC23 += Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C23;
+
+                        TC23 += 4 * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C44;
+                        TC23 += 4 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C55;
+                        TC23 += 4 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * averagingTensor.C66;
+
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C22;
+
+                        TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * averagingTensor.C12;
+                        TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C13;
+                        TC44 += 2 * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C23;
+
+                        TC44 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC44 += 2 * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C44;
+
+                        TC44 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C55;
+
+                        TC44 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66;
+                        TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C66;
+
+                        TC55 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC55 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC55 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C22;
+
+                        TC55 += 2 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * averagingTensor.C12;
+                        TC55 += 2 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C13;
+                        TC55 += 2 * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C23;
+
+                        TC55 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC55 += 2 * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * averagingTensor.C44;
+
+                        TC55 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC55 += 2 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM33(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C55;
+
+                        TC55 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2), 2) * averagingTensor.C66;
+                        TC55 += 2 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM32(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM31(phi1, psi1, phi2) * averagingTensor.C66;
+
+                        TC66 += Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2), 2) * averagingTensor.C11;
+                        TC66 += Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C22;
+                        TC66 += Math.Pow(Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C22;
+
+                        TC66 += 2 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * averagingTensor.C12;
+                        TC66 += 2 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C13;
+                        TC66 += 2 * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C23;
+
+                        TC66 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C44;
+                        TC66 += 2 * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * averagingTensor.C44;
+
+                        TC66 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2), 2) * averagingTensor.C55;
+                        TC66 += 2 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM23(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM13(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * averagingTensor.C55;
+
+                        TC66 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2), 2) * averagingTensor.C66;
+                        TC66 += 2 * Texture.OrientationDistributionFunction.SCTM11(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM22(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM12(phi1, psi1, phi2) * Texture.OrientationDistributionFunction.SCTM21(phi1, psi1, phi2) * averagingTensor.C66;
+                    }
+                }
+            }
+
+            Stress.Microsopic.ElasticityTensors ret = averagingTensor.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            ret.C11 = TC11 / normFactor;
+            ret.C22 = TC22 / normFactor;
+            ret.C33 = TC33 / normFactor;
+            ret.C12 = TC12 / normFactor;
+            ret.C13 = TC13 / normFactor;
+            ret.C23 = TC23 / normFactor;
+            ret.C44 = TC44 / normFactor;
+            ret.C55 = TC55 / normFactor;
+            ret.C66 = TC66 / normFactor;
+
+            return ret;
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Data display
+
+        public Pattern.Counts SimulationDataDisplay(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, List<MathNet.Numerics.LinearAlgebra.Matrix<double>> xData, List<MathNet.Numerics.LinearAlgebra.Matrix<double>> yData)
         {
             Pattern.Counts ret = new Pattern.Counts();
 
-            for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+            if(xData.Count == yData.Count)
             {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * macroDirection.Direction;
+                for (int n = 0; n < yData.Count; n++)
+                {
+                    MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = xData[n] * direction1.Direction;
+                    MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = yData[n] * direction2.Direction;
 
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
+                    double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+                    ret.Add(tmp);
+                }
+            }
+            else
+            {
+                if (xData.Count > yData.Count)
+                {
+                    for (int n = 0; n < yData.Count; n++)
+                    {
+                        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = xData[n] * direction1.Direction;
+                        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = yData[n] * direction2.Direction;
+
+                        double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+                        ret.Add(tmp);
+                    }
+                }
+                else
+                {
+                    for (int n = 0; n < xData.Count; n++)
+                    {
+                        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = xData[n] * direction1.Direction;
+                        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = yData[n] * direction2.Direction;
+
+                        double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+                        ret.Add(tmp);
+                    }
+                }
             }
 
             return ret;
         }
-        public Pattern.Counts GrainStrainRateOverGrainStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+
+        public Pattern.Counts SimulationDataDisplay(int[] xIndex, int[] yIndex, List<MathNet.Numerics.LinearAlgebra.Matrix<double>> xData, List<MathNet.Numerics.LinearAlgebra.Matrix<double>> yData)
         {
             Pattern.Counts ret = new Pattern.Counts();
 
-            for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+            if (xData.Count == yData.Count)
             {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * direction1.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * direction2.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
+                for (int n = 0; n < yData.Count; n++)
+                {
+                    double[] tmp = { xData[n][xIndex[0], xIndex[1]], yData[n][yIndex[0], yIndex[1]] };
+                    ret.Add(tmp);
+                }
+            }
+            else
+            {
+                if(xData.Count > yData.Count)
+                {
+                    for (int n = 0; n < yData.Count; n++)
+                    {
+                        double[] tmp = { xData[n][xIndex[0], xIndex[1]], yData[n][yIndex[0], yIndex[1]] };
+                        ret.Add(tmp);
+                    }
+                }
+                else
+                {
+                    for (int n = 0; n < xData.Count; n++)
+                    {
+                        double[] tmp = { xData[n][xIndex[0], xIndex[1]], yData[n][yIndex[0], yIndex[1]] };
+                        ret.Add(tmp);
+                    }
+                }
             }
 
             return ret;
         }
-        public Pattern.Counts GrainStrainRateOverSampleStressData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+
+        public Pattern.Counts SimulationDataDisplay(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, List<MathNet.Numerics.LinearAlgebra.Matrix<double>> xData, List<MathNet.Numerics.LinearAlgebra.Matrix<double>> yData, bool xSum, bool ySum)
         {
             Pattern.Counts ret = new Pattern.Counts();
 
-            for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+            if (xData.Count == yData.Count)
             {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
+                double sumXValue = 0.0;
+                double sumYValue = 0.0;
+                for (int n = 0; n < yData.Count; n++)
+                {
+                    MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = xData[n] * direction1.DirectionNorm;
+                    MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = yData[n] * direction2.DirectionNorm;
+                    if(xSum)
+                    {
+                        sumXValue += direction1.DirectionNorm * directionValueX;
+                        if (ySum)
+                        {
+                            sumYValue += direction2.DirectionNorm * directionValueY;
+                            double[] tmp = { sumXValue, sumYValue };
+                            ret.Add(tmp);
+                        }
+                        else
+                        {
+                            double[] tmp = { sumXValue, direction2.DirectionNorm * directionValueY };
+                            ret.Add(tmp);
+                        }
+                    }
+                    else
+                    {
+                        if (ySum)
+                        {
+                            sumYValue += direction2.DirectionNorm * directionValueY;
+                            double[] tmp = { direction1.DirectionNorm * directionValueX, sumYValue };
+                            ret.Add(tmp);
+                        }
+                        else
+                        {
+                            double[] tmp = { direction1.DirectionNorm * directionValueX, direction2.DirectionNorm * directionValueY };
+                            ret.Add(tmp);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (xData.Count > yData.Count)
+                {
+                    double sumXValue = 0.0;
+                    double sumYValue = 0.0;
+                    for (int n = 0; n < yData.Count; n++)
+                    {
+                        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = xData[n] * direction1.DirectionNorm;
+                        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = yData[n] * direction2.DirectionNorm;
+                        if (xSum)
+                        {
+                            sumXValue += direction1.DirectionNorm * directionValueX;
+                            if (ySum)
+                            {
+                                sumYValue += direction2.DirectionNorm * directionValueY;
+                                double[] tmp = { sumXValue, sumYValue };
+                                ret.Add(tmp);
+                            }
+                            else
+                            {
+                                double[] tmp = { sumXValue, direction2.DirectionNorm * directionValueY };
+                                ret.Add(tmp);
+                            }
+                        }
+                        else
+                        {
+                            if (ySum)
+                            {
+                                sumYValue += direction2.DirectionNorm * directionValueY;
+                                double[] tmp = { direction1.DirectionNorm * directionValueX, sumYValue };
+                                ret.Add(tmp);
+                            }
+                            else
+                            {
+                                double[] tmp = { direction1.DirectionNorm * directionValueX, direction2.DirectionNorm * directionValueY };
+                                ret.Add(tmp);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    double sumXValue = 0.0;
+                    double sumYValue = 0.0;
+                    for (int n = 0; n < xData.Count; n++)
+                    {
+                        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = xData[n] * direction1.DirectionNorm;
+                        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = yData[n] * direction2.DirectionNorm;
+                        if (xSum)
+                        {
+                            sumXValue += direction1.DirectionNorm * directionValueX;
+                            if (ySum)
+                            {
+                                sumYValue += direction2.DirectionNorm * directionValueY;
+                                double[] tmp = { sumXValue, sumYValue };
+                                ret.Add(tmp);
+                            }
+                            else
+                            {
+                                double[] tmp = { sumXValue, direction2.DirectionNorm * directionValueY };
+                                ret.Add(tmp);
+                            }
+                        }
+                        else
+                        {
+                            if (ySum)
+                            {
+                                sumYValue += direction2.DirectionNorm * directionValueY;
+                                double[] tmp = { direction1.DirectionNorm * directionValueX, sumYValue };
+                                ret.Add(tmp);
+                            }
+                            else
+                            {
+                                double[] tmp = { direction1.DirectionNorm * directionValueX, direction2.DirectionNorm * directionValueY };
+                                ret.Add(tmp);
+                            }
+                        }
+                    }
+                }
             }
 
             return ret;
         }
-        public Pattern.Counts GrainStrainRateOverGrainStressData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+
+        public Pattern.Counts SimulationDataDisplay(int[] xIndex, int[] yIndex, List<MathNet.Numerics.LinearAlgebra.Matrix<double>> xData, List<MathNet.Numerics.LinearAlgebra.Matrix<double>> yData, bool xSum, bool ySum)
         {
             Pattern.Counts ret = new Pattern.Counts();
 
-            for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+            if (xData.Count == yData.Count)
             {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
+                double sumXValue = 0.0;
+                double sumYValue = 0.0;
+                for (int n = 0; n < yData.Count; n++)
+                {
+                    if (xSum)
+                    {
+                        sumXValue += xData[n][xIndex[0], xIndex[1]];
+                        if (ySum)
+                        {
+                            sumYValue += yData[n][yIndex[0], yIndex[1]];
+                            double[] tmp = { sumXValue, sumYValue };
+                            ret.Add(tmp);
+                        }
+                        else
+                        {
+                            double[] tmp = { sumXValue, yData[n][yIndex[0], yIndex[1]] };
+                            ret.Add(tmp);
+                        }
+                    }
+                    else
+                    {
+                        if (ySum)
+                        {
+                            sumYValue += yData[n][yIndex[0], yIndex[1]];
+                            double[] tmp = { xData[n][xIndex[0], xIndex[1]], sumYValue };
+                            ret.Add(tmp);
+                        }
+                        else
+                        {
+                            double[] tmp = { xData[n][xIndex[0], xIndex[1]], yData[n][yIndex[0], yIndex[1]] };
+                            ret.Add(tmp);
+                        }
+                    }
+                }
             }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStrainRateOverGrainShearStressData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+            else
             {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
-                double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
-
-                double[] tmp = { directionValueX, directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStrainRateOverSampleShearStressData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
-                double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
-
-                double[] tmp = { directionValueX, directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStrainRateOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
-            }
-
-            return ret;
-        }
-        public Pattern.Counts GrainStrainRateOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-
-            for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
-            {
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * direction1.Direction;
-                MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * direction2.Direction;
-
-                double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
-                ret.Add(tmp);
+                if (xData.Count > yData.Count)
+                {
+                    double sumXValue = 0.0;
+                    double sumYValue = 0.0;
+                    for (int n = 0; n < yData.Count; n++)
+                    {
+                        if (xSum)
+                        {
+                            sumXValue += xData[n][xIndex[0], xIndex[1]];
+                            if (ySum)
+                            {
+                                sumYValue += yData[n][yIndex[0], yIndex[1]];
+                                double[] tmp = { sumXValue, sumYValue };
+                                ret.Add(tmp);
+                            }
+                            else
+                            {
+                                double[] tmp = { sumXValue, yData[n][yIndex[0], yIndex[1]] };
+                                ret.Add(tmp);
+                            }
+                        }
+                        else
+                        {
+                            if (ySum)
+                            {
+                                sumYValue += yData[n][yIndex[0], yIndex[1]];
+                                double[] tmp = { xData[n][xIndex[0], xIndex[1]], sumYValue };
+                                ret.Add(tmp);
+                            }
+                            else
+                            {
+                                double[] tmp = { xData[n][xIndex[0], xIndex[1]], yData[n][yIndex[0], yIndex[1]] };
+                                ret.Add(tmp);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    double sumXValue = 0.0;
+                    double sumYValue = 0.0;
+                    for (int n = 0; n < xData.Count; n++)
+                    {
+                        if (xSum)
+                        {
+                            sumXValue += xData[n][xIndex[0], xIndex[1]];
+                            if (ySum)
+                            {
+                                sumYValue += yData[n][yIndex[0], yIndex[1]];
+                                double[] tmp = { sumXValue, sumYValue };
+                                ret.Add(tmp);
+                            }
+                            else
+                            {
+                                double[] tmp = { sumXValue, yData[n][yIndex[0], yIndex[1]] };
+                                ret.Add(tmp);
+                            }
+                        }
+                        else
+                        {
+                            if (ySum)
+                            {
+                                sumYValue += yData[n][yIndex[0], yIndex[1]];
+                                double[] tmp = { xData[n][xIndex[0], xIndex[1]], sumYValue };
+                                ret.Add(tmp);
+                            }
+                            else
+                            {
+                                double[] tmp = { xData[n][xIndex[0], xIndex[1]], yData[n][yIndex[0], yIndex[1]] };
+                                ret.Add(tmp);
+                            }
+                        }
+                    }
+                }
             }
 
             return ret;
@@ -2076,379 +2349,1347 @@ namespace CalScec.Analysis
 
         #region OldStuff
 
-        public Pattern.Counts MacroStrainOverMacroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //public Pattern.Counts SampleStrainOverSampleStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            List<double[]> plottingData = Stress.Plasticity.EPModeling.GetPhaseStrainLD(eT, pT, this.appliedSampleStressHistory);
+        //    for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction2.Direction;
 
-            for(int n = 0; n < plottingData.Count; n++)
-            {
-                double[] tmp = { plottingData[n][1], plottingData[n][1] };
-                ret.Add(plottingData[n]);
-            }
+        //        double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            return ret;
-        }
-        public Pattern.Counts MacroStrainOverMicroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainOverGrainStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
-            List<double[]> plottingData2 = Stress.Plasticity.EPModeling.GetPhaseStrainLD(eT, pT, this.appliedSampleStressHistory);
+        //    for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction2.Direction;
 
-            for (int n = 0; n < plottingData1.Count; n++)
-            {
-                double[] tmp = { plottingData1[n][1], plottingData2[n][1] };
-                ret.Add(tmp);
-            }
+        //        double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            return ret;
-        }
-        public Pattern.Counts MacroStrainDataOverStressRD(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainOverSampleStressData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            List<double[]> plottingData = Stress.Plasticity.EPModeling.GetPhaseStrainLD(eT, pT, this.appliedSampleStressHistory);
+        //    for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction2.Direction;
 
-            for (int n = 0; n < plottingData.Count; n++)
-            {
-                double[] tmp = { this.appliedSampleStressHistory[n][2, 2], plottingData[n][1] };
-                ret.Add(tmp);
-            }
+        //        double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            return ret;
-        }
-        public Pattern.Counts MacroStrainDataOverPlainAdjustedStress(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainOverGrainStressData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            List<double[]> plottingData = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //    for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction2.Direction;
 
-            for (int n = 0; n < plottingData.Count; n++)
-            {
-                ret.Add(plottingData[n]);
-            }
+        //        double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            return ret;
-        }
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainOverGrainShearStressData(DataManagment.CrystalData.HKLReflex direction1, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-        public Pattern.Counts MicroStrainOverMacroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
+        //    {
+        //        double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction1.Direction;
 
-            List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
-            List<double[]> plottingData2 = Stress.Plasticity.EPModeling.GetPhaseStrainLD(eT, pT, this.appliedSampleStressHistory);
+        //        double[] tmp = { directionValueX, direction1.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            for (int n = 0; n < plottingData1.Count; n++)
-            {
-                double[] tmp = { plottingData2[n][1], plottingData1[n][1] };
-                ret.Add(tmp);
-            }
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainOverSampleShearStresData(DataManagment.CrystalData.HKLReflex direction1, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            return ret;
-        }
-        public Pattern.Counts MicroStrainOverMicroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
+        //    {
+        //        double directionValueX = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction1.Direction;
 
-            List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //        double[] tmp = { directionValueX, direction1.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            for (int n = 0; n < plottingData1.Count; n++)
-            {
-                double[] tmp = { plottingData1[n][1], plottingData1[n][1] };
-                ret.Add(tmp);
-            }
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            return ret;
-        }
-        public Pattern.Counts MicroStrainDataOverStressRD(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction2.Direction;
 
-            List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //        double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            for (int n = 0; n < plottingData1.Count; n++)
-            {
-                double[] tmp = { this.appliedSampleStressHistory[n][2, 2], plottingData1[n][1] };
-                ret.Add(tmp);
-            }
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            return ret;
-        }
-        public Pattern.Counts MicroStrainDataOverPlainAdjustedStress(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    for (int n = 0; n < SimulationData[experiment].StrainSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainSFHistory[n] * direction2.Direction;
 
-            List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //        double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            for (int n = 0; n < plottingData1.Count; n++)
-            {
-                double[] tmp = { plottingData1[n][0], plottingData1[n][1] };
-                ret.Add(tmp);
-            }
+        //    return ret;
+        //}
 
-            return ret;
-        }
+        //public Pattern.Counts GrainStrainOverSampleStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-        public Pattern.Counts StressRDOverMacroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-            
-            List<double[]> plottingData2 = Stress.Plasticity.EPModeling.GetPhaseStrainLD(eT, pT, this.appliedSampleStressHistory);
+        //    for (int n = 0; n < SimulationData[experiment].StrainCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * direction2.Direction;
 
-            for (int n = 0; n < plottingData2.Count; n++)
-            {
-                double[] tmp = { plottingData2[n][1], this.appliedSampleStressHistory[n][2, 2] };
-                ret.Add(tmp);
-            }
+        //        double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            return ret;
-        }
-        public Pattern.Counts StressRDOverMicroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainOverGrainStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //    for (int n = 0; n < SimulationData[experiment].StrainCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * direction2.Direction;
 
-            for (int n = 0; n < plottingData1.Count; n++)
-            {
-                double[] tmp = { plottingData1[n][1], this.appliedSampleStressHistory[n][2, 2] };
-                ret.Add(tmp);
-            }
+        //        double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            return ret;
-        }
-        public Pattern.Counts StressRDOverStressData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainOverSampleStressData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * direction2.Direction;
 
-            for (int n = 0; n < plottingData1.Count; n++)
-            {
-                double[] tmp = { this.appliedSampleStressHistory[n][2, 2], this.appliedSampleStressHistory[n][2, 2] };
-                ret.Add(tmp);
-            }
+        //        double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            return ret;
-        }
-        public Pattern.Counts StressRDOverPlainAdjustedStressData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainOverGrainStressData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * direction2.Direction;
 
-            for (int n = 0; n < plottingData1.Count; n++)
-            {
-                double[] tmp = { plottingData1[n][0], this.appliedSampleStressHistory[n][2, 2] };
-                ret.Add(tmp);
-            }
+        //        double[] tmp = { direction1.Direction * directionValueX, direction2.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            return ret;
-        }
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainOverGrainShearStressData(DataManagment.CrystalData.HKLReflex direction1, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-        public Pattern.Counts PlainAdjustedStressOverMacroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * direction1.Direction;
+        //        double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
 
-            List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
-            List<double[]> plottingData2 = Stress.Plasticity.EPModeling.GetPhaseStrainLD(eT, pT, this.appliedSampleStressHistory);
+        //        double[] tmp = { directionValueX, direction1.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            for (int n = 0; n < plottingData2.Count; n++)
-            {
-                double[] tmp = { plottingData2[n][1], plottingData1[n][0] };
-                ret.Add(tmp);
-            }
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainOverSampleShearStressData(DataManagment.CrystalData.HKLReflex direction1, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            return ret;
-        }
-        public Pattern.Counts PlainAdjustedStressOverMicroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * direction1.Direction;
+        //        double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
 
-            List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //        double[] tmp = { directionValueX, direction1.Direction * directionValueY };
+        //        ret.Add(tmp);
+        //    }
 
-            for (int n = 0; n < plottingData1.Count; n++)
-            {
-                double[] tmp = { plottingData1[n][1], plottingData1[n][0] };
-                ret.Add(tmp);
-            }
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            return ret;
-        }
-        public Pattern.Counts PlainAdjustedStressOverStressRDData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
 
-            List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
 
-            for (int n = 0; n < plottingData1.Count; n++)
-            {
-                double[] tmp = { this.appliedSampleStressHistory[n][2, 2], plottingData1[n][0] };
-                ret.Add(tmp);
-            }
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
 
-            return ret;
-        }
-        public Pattern.Counts PlainAdjustedStressOverPlainAdjustedStressData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * direction2.Direction;
 
-            List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
 
-            for (int n = 0; n < plottingData1.Count; n++)
-            {
-                double[] tmp = { plottingData1[n][0], plottingData1[n][0] };
-                ret.Add(tmp);
-            }
+        //    return ret;
+        //}
 
-            return ret;
-        }
+        //public Pattern.Counts SampleStressOverSampleStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * direction2.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * direction1.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStressOverGrainStrainData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStressOverSampleStressData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * direction2.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStressOverGrainStressData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStressOverGrainShearStressData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX, directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStressOverSampleShearStressData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX, directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStressOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex direction, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * direction.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * direction.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStressOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+
+        //public Pattern.Counts GrainStressOverSampleStrainData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStressOverGrainStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * direction2.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStressOverSampleStressData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStressOverGrainStressData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * direction2.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStressOverGrainShearStressData(DataManagment.CrystalData.HKLReflex direction1, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
+        //        double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+
+        //        double[] tmp = { directionValueX, directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStressOverSampleShearStressData(DataManagment.CrystalData.HKLReflex direction1, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
+        //        double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+
+        //        double[] tmp = { directionValueX, directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStressOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStressOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+
+        //public Pattern.Counts GrainShearStressOverSampleStrainData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainShearStressOverGrainStrainData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
+        //        double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainShearStressOverSampleStressData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainShearStressOverGrainStressData(DataManagment.CrystalData.HKLReflex direction1, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
+        //        double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainShearStressOverGrainShearStressData(int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        double directionValue = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+
+        //        double[] tmp = { directionValue, directionValue };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainShearStressOverSampleShearStressData(int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+        //        double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+
+        //        double[] tmp = { directionValueX, directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainShearStressOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainShearStressOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
+        //        double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+
+        //public Pattern.Counts SampleShearStressOverSampleStrainData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        double directionValueY = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleShearStressOverGrainStrainData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
+        //        double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleShearStressOverSampleStressData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        double directionValueY = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleShearStressOverGrainStressData(DataManagment.CrystalData.HKLReflex direction1, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * direction1.Direction;
+        //        double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleShearStressOverGrainShearStressData(int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        double directionValue = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+
+        //        double[] tmp = { directionValue, directionValue };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleShearStressOverSampleShearStressData(int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        double directionValue = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+
+        //        double[] tmp = { directionValue, directionValue };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleShearStressOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        double directionValueY = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleShearStressOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StressSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
+        //        double directionValueY = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+
+        //public Pattern.Counts SampleStrainRateOverSampleStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * direction2.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainRateOverGrainStrainData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainRateOverSampleStressData(DataManagment.CrystalData.HKLReflex direction, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * direction.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * direction.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainRateOverGrainStressData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainRateOverGrainShearStressData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
+        //    {
+        //        double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX, directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainRateOverSampleShearStressData(DataManagment.CrystalData.HKLReflex macroDirection, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
+        //    {
+        //        double directionValueX = this.PlasticTensor[0].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX, directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainRateOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * direction2.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts SampleStrainRateOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateSFHistory.Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+
+        //public Pattern.Counts GrainStrainRateOverSampleStrainData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainRateOverGrainStrainData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainCFHistory[phase][n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * direction2.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainRateOverSampleStressData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainRateOverGrainStressData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StressCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainRateOverGrainShearStressData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
+        //        double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressCFHistory[phase][n]);
+
+        //        double[] tmp = { directionValueX, directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainRateOverSampleShearStressData(DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
+        //        double directionValueX = this.PlasticTensor[phase].YieldSurfaceData.Shearforce(SimulationData[experiment].StressSFHistory[n]);
+
+        //        double[] tmp = { directionValueX, directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainRateOverSampleStrainRateData(DataManagment.CrystalData.HKLReflex macroDirection, DataManagment.CrystalData.HKLReflex microDirection, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * microDirection.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateSFHistory[n] * macroDirection.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts GrainStrainRateOverGrainStrainRateData(DataManagment.CrystalData.HKLReflex direction1, DataManagment.CrystalData.HKLReflex direction2, int experiment, int phase)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    for (int n = 0; n < SimulationData[experiment].StrainRateCFHistory[phase].Count; n++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueX = SimulationData[experiment].StrainRateCFHistory[phase][n] * direction1.Direction;
+        //        MathNet.Numerics.LinearAlgebra.Vector<double> directionValueY = SimulationData[experiment].StrainRateCFHistory[phase][n] * direction2.Direction;
+
+        //        double[] tmp = { directionValueX.L2Norm(), directionValueY.L2Norm() };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+
+
+
+        //public Pattern.Counts MacroStrainOverMacroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData = Stress.Plasticity.EPModeling.GetPhaseStrainLD(eT, pT, this.appliedSampleStressHistory);
+
+        //    for(int n = 0; n < plottingData.Count; n++)
+        //    {
+        //        double[] tmp = { plottingData[n][1], plottingData[n][1] };
+        //        ret.Add(plottingData[n]);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts MacroStrainOverMicroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //    List<double[]> plottingData2 = Stress.Plasticity.EPModeling.GetPhaseStrainLD(eT, pT, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData1.Count; n++)
+        //    {
+        //        double[] tmp = { plottingData1[n][1], plottingData2[n][1] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts MacroStrainDataOverStressRD(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData = Stress.Plasticity.EPModeling.GetPhaseStrainLD(eT, pT, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData.Count; n++)
+        //    {
+        //        double[] tmp = { this.appliedSampleStressHistory[n][2, 2], plottingData[n][1] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts MacroStrainDataOverPlainAdjustedStress(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData.Count; n++)
+        //    {
+        //        ret.Add(plottingData[n]);
+        //    }
+
+        //    return ret;
+        //}
+
+        //public Pattern.Counts MicroStrainOverMacroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //    List<double[]> plottingData2 = Stress.Plasticity.EPModeling.GetPhaseStrainLD(eT, pT, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData1.Count; n++)
+        //    {
+        //        double[] tmp = { plottingData2[n][1], plottingData1[n][1] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts MicroStrainOverMicroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData1.Count; n++)
+        //    {
+        //        double[] tmp = { plottingData1[n][1], plottingData1[n][1] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts MicroStrainDataOverStressRD(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData1.Count; n++)
+        //    {
+        //        double[] tmp = { this.appliedSampleStressHistory[n][2, 2], plottingData1[n][1] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts MicroStrainDataOverPlainAdjustedStress(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData1.Count; n++)
+        //    {
+        //        double[] tmp = { plottingData1[n][0], plottingData1[n][1] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+
+        //public Pattern.Counts StressRDOverMacroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData2 = Stress.Plasticity.EPModeling.GetPhaseStrainLD(eT, pT, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData2.Count; n++)
+        //    {
+        //        double[] tmp = { plottingData2[n][1], this.appliedSampleStressHistory[n][2, 2] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts StressRDOverMicroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData1.Count; n++)
+        //    {
+        //        double[] tmp = { plottingData1[n][1], this.appliedSampleStressHistory[n][2, 2] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts StressRDOverStressData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData1.Count; n++)
+        //    {
+        //        double[] tmp = { this.appliedSampleStressHistory[n][2, 2], this.appliedSampleStressHistory[n][2, 2] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts StressRDOverPlainAdjustedStressData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData1.Count; n++)
+        //    {
+        //        double[] tmp = { plottingData1[n][0], this.appliedSampleStressHistory[n][2, 2] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+
+        //public Pattern.Counts PlainAdjustedStressOverMacroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+        //    List<double[]> plottingData2 = Stress.Plasticity.EPModeling.GetPhaseStrainLD(eT, pT, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData2.Count; n++)
+        //    {
+        //        double[] tmp = { plottingData2[n][1], plottingData1[n][0] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts PlainAdjustedStressOverMicroStrainData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData1.Count; n++)
+        //    {
+        //        double[] tmp = { plottingData1[n][1], plottingData1[n][0] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts PlainAdjustedStressOverStressRDData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData1.Count; n++)
+        //    {
+        //        double[] tmp = { this.appliedSampleStressHistory[n][2, 2], plottingData1[n][0] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
+        //public Pattern.Counts PlainAdjustedStressOverPlainAdjustedStressData(Stress.Microsopic.ElasticityTensors eT, Stress.Plasticity.PlasticityTensor pT, Stress.Plasticity.ReflexYield rY)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+
+        //    List<double[]> plottingData1 = Stress.Plasticity.EPModeling.GetLatticeStrains(eT, pT, rY, this.appliedSampleStressHistory);
+
+        //    for (int n = 0; n < plottingData1.Count; n++)
+        //    {
+        //        double[] tmp = { plottingData1[n][0], plottingData1[n][0] };
+        //        ret.Add(tmp);
+        //    }
+
+        //    return ret;
+        //}
 
         #endregion
 
-        #region To Experimet
+        #region To Experiment
 
-        /// <summary>
-        /// return the macroscopic stress strain curve in LOAD DIRECTION
-        /// </summary>
-        /// <param name="elasticModel"></param>
-        /// <param name="phase"></param>
-        /// <returns></returns>
-        public Pattern.Counts GetMacroStressStrainCurveLD(int elasticModel, int phase, double totalYieldStrength, List<Stress.Macroskopic.PeakStressAssociation> stressStrainData)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-            double eMod = 0.0;
-            stressStrainData.Sort((a, b) => a.MacroskopicStrain.CompareTo(b.MacroskopicStrain));
+        ///// <summary>
+        ///// return the macroscopic stress strain curve in LOAD DIRECTION
+        ///// </summary>
+        ///// <param name="elasticModel"></param>
+        ///// <param name="phase"></param>
+        ///// <returns></returns>
+        //public Pattern.Counts GetMacroStressStrainCurveLD(int elasticModel, int phase, double totalYieldStrength, List<Stress.Macroskopic.PeakStressAssociation> stressStrainData)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+        //    double eMod = 0.0;
+        //    stressStrainData.Sort((a, b) => a.MacroskopicStrain.CompareTo(b.MacroskopicStrain));
 
-            switch (elasticModel)
-            {
-                case 0:
-                    eMod = this.VoigtTensorData[phase].AveragedEModul;
-                    break;
-                case 1:
-                    eMod = this.ReussTensorData[phase].AveragedEModul;
-                    break;
-                case 2:
-                    eMod = this.HillTensorData[phase].AveragedEModul;
-                    break;
-                case 3:
-                    eMod = this.KroenerTensorData[phase].AveragedEModul;
-                    break;
-                case 4:
-                    eMod = this.DeWittTensorData[phase].AveragedEModul;
-                    break;
-                case 5:
-                    eMod = this.GeometricHillTensorData[phase].AveragedEModul;
-                    break;
-                default:
-                    eMod = this.HillTensorData[phase].AveragedEModul;
-                    break;
-            }
+        //    switch (elasticModel)
+        //    {
+        //        case 0:
+        //            eMod = this.VoigtTensorData[phase].AveragedEModul;
+        //            break;
+        //        case 1:
+        //            eMod = this.ReussTensorData[phase].AveragedEModul;
+        //            break;
+        //        case 2:
+        //            eMod = this.HillTensorData[phase].AveragedEModul;
+        //            break;
+        //        case 3:
+        //            eMod = this.KroenerTensorData[phase].AveragedEModul;
+        //            break;
+        //        case 4:
+        //            eMod = this.DeWittTensorData[phase].AveragedEModul;
+        //            break;
+        //        case 5:
+        //            eMod = this.GeometricHillTensorData[phase].AveragedEModul;
+        //            break;
+        //        default:
+        //            eMod = this.HillTensorData[phase].AveragedEModul;
+        //            break;
+        //    }
 
-            double plasticStrainRate = 0.0;
-            int rateCounter = 0;
+        //    double plasticStrainRate = 0.0;
+        //    int rateCounter = 0;
 
-            for (int n = 0; n < stressStrainData.Count; n++)
-            {
-                if (stressStrainData[n].Stress > totalYieldStrength)
-                {
-                    plasticStrainRate += stressStrainData[n].MacroskopicStrain - stressStrainData[n - 1].MacroskopicStrain;
-                    rateCounter++;
-                }
-            }
+        //    for (int n = 0; n < stressStrainData.Count; n++)
+        //    {
+        //        if (stressStrainData[n].Stress > totalYieldStrength)
+        //        {
+        //            plasticStrainRate += stressStrainData[n].MacroskopicStrain - stressStrainData[n - 1].MacroskopicStrain;
+        //            rateCounter++;
+        //        }
+        //    }
 
-            plasticStrainRate /= rateCounter;
+        //    plasticStrainRate /= rateCounter;
 
-            double plasticStrain = 0.0;
+        //    double plasticStrain = 0.0;
 
-            for (int n = 0; n < stressStrainData.Count; n++)
-            {
-                if (stressStrainData[n].Stress > totalYieldStrength)
-                {
-                    plasticStrain += plasticStrainRate;
-                }
+        //    for (int n = 0; n < stressStrainData.Count; n++)
+        //    {
+        //        if (stressStrainData[n].Stress > totalYieldStrength)
+        //        {
+        //            plasticStrain += plasticStrainRate;
+        //        }
 
-                double[] dataTmp = { stressStrainData[n].Stress, ((1 / eMod) * stressStrainData[n].Stress) + plasticStrain };
+        //        double[] dataTmp = { stressStrainData[n].Stress, ((1 / eMod) * stressStrainData[n].Stress) + plasticStrain };
 
-                ret.Add(dataTmp);
-            }
+        //        ret.Add(dataTmp);
+        //    }
 
-            return ret;
-        }
-        /// <summary>
-        /// return the macroscopic stress strain curve in LOAD DIRECTION
-        /// </summary>
-        /// <param name="elasticModel"></param>
-        /// <param name="phase"></param>
-        /// <returns></returns>
-        public Pattern.Counts GetMacroStrainLatticeStrainCurveLD(int elasticModel, int phase, double totalYieldStrength, List<Stress.Macroskopic.PeakStressAssociation> stressStrainData)
-        {
-            Pattern.Counts ret = new Pattern.Counts();
-            double eMod = 0.0;
-            stressStrainData.Sort((a, b) => a.MacroskopicStrain.CompareTo(b.MacroskopicStrain));
+        //    return ret;
+        //}
 
-            switch (elasticModel)
-            {
-                case 0:
-                    eMod = this.VoigtTensorData[phase].AveragedEModul;
-                    break;
-                case 1:
-                    eMod = this.ReussTensorData[phase].AveragedEModul;
-                    break;
-                case 2:
-                    eMod = this.HillTensorData[phase].AveragedEModul;
-                    break;
-                case 3:
-                    eMod = this.KroenerTensorData[phase].AveragedEModul;
-                    break;
-                case 4:
-                    eMod = this.DeWittTensorData[phase].AveragedEModul;
-                    break;
-                case 5:
-                    eMod = this.GeometricHillTensorData[phase].AveragedEModul;
-                    break;
-                default:
-                    eMod = this.HillTensorData[phase].AveragedEModul;
-                    break;
-            }
+        ///// <summary>
+        ///// return the macroscopic stress strain curve in LOAD DIRECTION
+        ///// </summary>
+        ///// <param name="elasticModel"></param>
+        ///// <param name="phase"></param>
+        ///// <returns></returns>
+        //public Pattern.Counts GetMacroStrainLatticeStrainCurveLD(int elasticModel, int phase, double totalYieldStrength, List<Stress.Macroskopic.PeakStressAssociation> stressStrainData)
+        //{
+        //    Pattern.Counts ret = new Pattern.Counts();
+        //    double eMod = 0.0;
+        //    stressStrainData.Sort((a, b) => a.MacroskopicStrain.CompareTo(b.MacroskopicStrain));
 
-            double plasticStrainRate = 0.0;
-            int rateCounter = 0;
+        //    switch (elasticModel)
+        //    {
+        //        case 0:
+        //            eMod = this.VoigtTensorData[phase].AveragedEModul;
+        //            break;
+        //        case 1:
+        //            eMod = this.ReussTensorData[phase].AveragedEModul;
+        //            break;
+        //        case 2:
+        //            eMod = this.HillTensorData[phase].AveragedEModul;
+        //            break;
+        //        case 3:
+        //            eMod = this.KroenerTensorData[phase].AveragedEModul;
+        //            break;
+        //        case 4:
+        //            eMod = this.DeWittTensorData[phase].AveragedEModul;
+        //            break;
+        //        case 5:
+        //            eMod = this.GeometricHillTensorData[phase].AveragedEModul;
+        //            break;
+        //        default:
+        //            eMod = this.HillTensorData[phase].AveragedEModul;
+        //            break;
+        //    }
 
-            for (int n = 0; n < stressStrainData.Count; n++)
-            {
-                if (stressStrainData[n].Stress > totalYieldStrength)
-                {
-                    plasticStrainRate += stressStrainData[n].MacroskopicStrain - stressStrainData[n - 1].MacroskopicStrain;
-                    rateCounter++;
-                }
-            }
+        //    double plasticStrainRate = 0.0;
+        //    int rateCounter = 0;
 
-            plasticStrainRate /= rateCounter;
+        //    for (int n = 0; n < stressStrainData.Count; n++)
+        //    {
+        //        if (stressStrainData[n].Stress > totalYieldStrength)
+        //        {
+        //            plasticStrainRate += stressStrainData[n].MacroskopicStrain - stressStrainData[n - 1].MacroskopicStrain;
+        //            rateCounter++;
+        //        }
+        //    }
 
-            double plasticStrain = 0.0;
+        //    plasticStrainRate /= rateCounter;
 
-            for (int n = 0; n < stressStrainData.Count; n++)
-            {
-                if (stressStrainData[n].Stress > totalYieldStrength)
-                {
-                    plasticStrain += plasticStrainRate;
-                }
+        //    double plasticStrain = 0.0;
 
-                double[] dataTmp = { stressStrainData[n].Strain, ((1 / eMod) * stressStrainData[n].Stress) + plasticStrain };
+        //    for (int n = 0; n < stressStrainData.Count; n++)
+        //    {
+        //        if (stressStrainData[n].Stress > totalYieldStrength)
+        //        {
+        //            plasticStrain += plasticStrainRate;
+        //        }
 
-                ret.Add(dataTmp);
-            }
+        //        double[] dataTmp = { stressStrainData[n].Strain, ((1 / eMod) * stressStrainData[n].Stress) + plasticStrain };
 
-            return ret;
-        }
+        //        ret.Add(dataTmp);
+        //    }
+
+        //    return ret;
+        //}
 
         #endregion
 
         #endregion
-        
+
         #endregion
 
         #region Anisotropy

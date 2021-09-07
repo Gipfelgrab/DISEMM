@@ -700,7 +700,8 @@ namespace CalScec.Analysis.Stress.Microsopic
         {
             get
             {
-                return this.S44 / (2 * (this.S11 - this.S12));
+                double ret = this.S44 / (2 * (this.S11 - this.S12));
+                return 1.0 / ret;
             }
         }
 
@@ -727,6 +728,141 @@ namespace CalScec.Analysis.Stress.Microsopic
                 this.DiffractionConstantsTexture[n].ActivateWeigthedMRD = false;
             }
         }
+
+        #region Anisotropy
+
+        public double OrientationParameterH(int h, int k, int l)
+        {
+            double ret = l;
+
+            double nenner = 4.0 / 3.0;
+
+            nenner *= Math.Pow(this.GetPhaseInformation.A / this.GetPhaseInformation.C, 2);
+            nenner *= Math.Pow(h, 2) + Math.Pow(k, 2) + (h * k);
+            nenner += Math.Pow(l, 2);
+
+            return ret / Math.Sqrt(nenner);
+        }
+
+        private double OrientationParameterGamma(int h, int k, int l)
+        {
+            DataManagment.CrystalData.HKLReflex tmp = new DataManagment.CrystalData.HKLReflex(h, k, l, 1);
+
+            return this.CubicGamma(tmp);
+        }
+
+        public double KVoigt()
+        {
+            double ret = 2 * this.C11;
+            ret += this.C33;
+            ret += 4 * this.C13;
+            ret += 2 * this.C12;
+
+            return ret / 9.0;
+        }
+
+        public double GVoigt()
+        {
+            double ret = 3.5 * this.C11;
+            ret += this.C33;
+            ret += -2 * this.C13;
+            ret += -2.5 * this.C12;
+            ret += 6 * this.C44;
+
+            return ret / 15.0;
+        }
+
+        public double EVoigt()
+        {
+            double ret = KVoigt() * GVoigt();
+
+            double n = 4.5 * this.C11;
+            n += 2.0 * this.C23;
+            n += 6.0 * this.C13;
+            n += 2.5 * this.C12;
+            n += 2.0 * this.C44;
+            n *= 3.0;
+
+            return ret / n;
+        }
+
+        public double KReuss()
+        {
+            double alpha = this.S11 + this.S22 + this.S33;
+            double beta = this.S23 + this.S13 + this.S12;
+
+            double ret = alpha + (2.0 * beta);
+
+            return 1 / ret;
+        }
+
+        public double GReuss()
+        {
+            double alpha = this.S11 + this.S22 + this.S33;
+            double beta = this.S23 + this.S13 + this.S12;
+            double lambda = this.S44 + this.S55 + this.S66;
+
+            double ret = (4.0 / 3.0) * alpha;
+            ret += -1 * (4.0 / 3.0) * beta;
+            ret += lambda;
+
+            return 5.0 / ret;
+        }
+
+        public double EReuss()
+        {
+            double k = this.KReuss();
+            double g = this.GReuss();
+
+            double ret = 9.0 * k * g;
+            ret /= (3.0 * k) + g;
+
+            return ret;
+        }
+
+        public double GetUniversalAnisotropy()
+        {
+            double ret = 5.0 * (GVoigt() / GReuss());
+            ret += KVoigt() / KReuss();
+
+            ret -= 6.0;
+
+            return ret;
+        }
+
+        public double GetZenerEquivalentAnisotropy()
+        {
+            double aU = this.GetUniversalAnisotropy();
+
+            double co = (5.0 / 12.0) * aU;
+            co += 1;
+
+            double ret = co + Math.Sqrt(Math.Pow(co, 2) - 1);
+
+            return ret;
+        }
+
+        public double DirectionalS1ReussHexagonal(double h)
+        {
+            double ret = this.S12 * (1 - Math.Pow(h, 2));
+            ret += this.S13 * Math.Pow(h, 2);
+            ret += (this.S11 + this.S33 - (2 * this.S13) - this.S44) * (1 - Math.Pow(h, 2)) * Math.Pow(h, 2);
+
+            return 0.5 * ret;
+        }
+
+        public double DirectionalS2ReussHexagonal(double h)
+        {
+            double ret = this.S11 * (1 - Math.Pow(h, 2)) * (2 - (3 * Math.Pow(h, 2)));
+            ret -= this.S12 * (1 - Math.Pow(h, 2));
+            ret += this.S13 * ((Math.Pow(h, 2) * (5 - (6 * Math.Pow(h, 2)))) - 1);
+            ret += this.S33 * (3 * Math.Pow(h, 2) - 1) * Math.Pow(h, 2);
+            ret += this.S44 * (1 - Math.Pow(h, 2)) * Math.Pow(h, 2);
+
+            return 0.5 * ret;
+        }
+
+        #endregion
 
         #region averaged parameters
 
@@ -7914,11 +8050,14 @@ namespace CalScec.Analysis.Stress.Microsopic
             this.S12Error = Math.Sqrt(CoVMatrixCompliance[1, 1]);
             this.S44Error = Math.Sqrt(CoVMatrixCompliance[2, 2]);
 
-            MathNet.Numerics.LinearAlgebra.Matrix<double> ErrorMatrixStiffness =this._complianceTensorError.Inverse();
+            //MathNet.Numerics.LinearAlgebra.Matrix<double> ErrorMatrixStiffness =this._complianceTensorError.Inverse();
 
-            this.C11Error = ErrorMatrixStiffness[0, 0];
-            this.C12Error = ErrorMatrixStiffness[1, 1];
-            this.C44Error = ErrorMatrixStiffness[2, 2];
+            //this.C11Error = ErrorMatrixStiffness[0, 0];
+            //this.C12Error = ErrorMatrixStiffness[1, 1];
+            //this.C44Error = ErrorMatrixStiffness[2, 2];
+            this.C11Error = Math.Abs(this.C11 * this.S11Error / this.S11);
+            this.C12Error = Math.Abs(this.C12 * this.S12Error / this.S12);
+            this.C44Error = Math.Abs(this.C44 * this.S44Error / this.S44);
 
         }
 
@@ -7997,14 +8136,19 @@ namespace CalScec.Analysis.Stress.Microsopic
             this.S13Error = Math.Sqrt(CoVMatrixCompliance[3, 3]);
             this.S44Error = Math.Sqrt(CoVMatrixCompliance[4, 4]);
 
-            MathNet.Numerics.LinearAlgebra.Matrix<double> ErrorMatrixStiffness = this._complianceTensorError.Inverse();
+            //MathNet.Numerics.LinearAlgebra.Matrix<double> ErrorMatrixStiffness = this._complianceTensorError.Inverse();
 
-            this.C11Error = ErrorMatrixStiffness[0, 0];
-            this.C33Error = ErrorMatrixStiffness[1, 1];
-            this.C12Error = ErrorMatrixStiffness[2, 2];
-            this.C13Error = ErrorMatrixStiffness[3, 3];
-            this.C44Error = ErrorMatrixStiffness[4, 4];
+            //this.C11Error = ErrorMatrixStiffness[0, 0];
+            //this.C33Error = ErrorMatrixStiffness[1, 1];
+            //this.C12Error = ErrorMatrixStiffness[2, 2];
+            //this.C13Error = ErrorMatrixStiffness[3, 3];
+            //this.C44Error = ErrorMatrixStiffness[4, 4];
 
+            this.C11Error = Math.Abs(this.C11 * this.S11Error / this.S11);
+            this.C33Error = Math.Abs(this.C33 * this.S33Error / this.S33);
+            this.C12Error = Math.Abs(this.C12 * this.S12Error / this.S12);
+            this.C13Error = Math.Abs(this.C13 * this.S13Error / this.S13);
+            this.C44Error = Math.Abs(this.C44 * this.S44Error / this.S44);
         }
 
         private void SetErrorReussCubic()
@@ -8046,11 +8190,14 @@ namespace CalScec.Analysis.Stress.Microsopic
             this.S12Error = Math.Sqrt(CoVMatrixCompliance[1, 1]);
             this.S44Error = Math.Sqrt(CoVMatrixCompliance[2, 2]);
 
-            MathNet.Numerics.LinearAlgebra.Matrix<double> ErrorMatrixStiffness = this._complianceTensorError.Inverse();
+            //MathNet.Numerics.LinearAlgebra.Matrix<double> ErrorMatrixStiffness = this._complianceTensorError.Inverse();
 
-            this.C11Error = ErrorMatrixStiffness[0, 0];
-            this.C12Error = ErrorMatrixStiffness[1, 1];
-            this.C44Error = ErrorMatrixStiffness[2, 2];
+            //this.C11Error = ErrorMatrixStiffness[0, 0];
+            //this.C12Error = ErrorMatrixStiffness[1, 1];
+            //this.C44Error = ErrorMatrixStiffness[2, 2];
+            this.C11Error = Math.Abs(this.C11 * this.S11Error / this.S11);
+            this.C12Error = Math.Abs(this.C12 * this.S12Error / this.S12);
+            this.C44Error = Math.Abs(this.C44 * this.S44Error / this.S44);
 
         }
 
@@ -8129,14 +8276,19 @@ namespace CalScec.Analysis.Stress.Microsopic
             this.S13Error = Math.Sqrt(CoVMatrixCompliance[3, 3]);
             this.S44Error = Math.Sqrt(CoVMatrixCompliance[4, 4]);
 
-            MathNet.Numerics.LinearAlgebra.Matrix<double> ErrorMatrixStiffness = this._complianceTensorError.Inverse();
+            //MathNet.Numerics.LinearAlgebra.Matrix<double> ErrorMatrixStiffness = this._complianceTensorError.Inverse();
 
-            this.C11Error = ErrorMatrixStiffness[0, 0];
-            this.C33Error = ErrorMatrixStiffness[1, 1];
-            this.C12Error = ErrorMatrixStiffness[2, 2];
-            this.C13Error = ErrorMatrixStiffness[3, 3];
-            this.C44Error = ErrorMatrixStiffness[4, 4];
+            //this.C11Error = ErrorMatrixStiffness[0, 0];
+            //this.C33Error = ErrorMatrixStiffness[1, 1];
+            //this.C12Error = ErrorMatrixStiffness[2, 2];
+            //this.C13Error = ErrorMatrixStiffness[3, 3];
+            //this.C44Error = ErrorMatrixStiffness[4, 4];
 
+            this.C11Error = Math.Abs(this.C11 * this.S11Error / this.S11);
+            this.C33Error = Math.Abs(this.C33 * this.S33Error / this.S33);
+            this.C12Error = Math.Abs(this.C12 * this.S12Error / this.S12);
+            this.C13Error = Math.Abs(this.C13 * this.S13Error / this.S13);
+            this.C44Error = Math.Abs(this.C44 * this.S44Error / this.S44);
         }
 
         #endregion
@@ -18817,20 +18969,23 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         public void SetPeakStressAssociation(Sample actSample)
         {
-            this.UsedPSA.Clear();
-            for (int i = 0; i < this.GetPhaseInformation.HKLList.Count; i++)
+            if (this.GetPhaseInformation.A != 0 && this.GetPhaseInformation.B != 0 && this.GetPhaseInformation.B != 0)
             {
-                for (int j = 0; j < actSample.DiffractionPatterns.Count; j++)
+                this.UsedPSA.Clear();
+                for (int i = 0; i < this.GetPhaseInformation.HKLList.Count; i++)
                 {
-                    for (int k = 0; k < actSample.DiffractionPatterns[j].FoundPeaks.Count; k++)
+                    for (int j = 0; j < actSample.DiffractionPatterns.Count; j++)
                     {
-                        if (actSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedCrystalData.SymmetryGroupID == this.GetPhaseInformation.SymmetryGroupID)
+                        for (int k = 0; k < actSample.DiffractionPatterns[j].FoundPeaks.Count; k++)
                         {
-                            if (actSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedHKLReflex.HKLString == this.GetPhaseInformation.HKLList[i].HKLString)
+                            if (actSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedCrystalData.SymmetryGroupID == this.GetPhaseInformation.SymmetryGroupID)
                             {
-                                Stress.Macroskopic.PeakStressAssociation NewAssociation = new Stress.Macroskopic.PeakStressAssociation(actSample.DiffractionPatterns[j].Stress, actSample.DiffractionPatterns[j].PsiAngle(actSample.DiffractionPatterns[j].FoundPeaks[k].Angle), actSample.DiffractionPatterns[j].FoundPeaks[k], actSample.DiffractionPatterns[j].PhiAngle(actSample.DiffractionPatterns[j].FoundPeaks[k].Angle));
-                                NewAssociation._macroskopicStrain = actSample.DiffractionPatterns[j].MacroStrain;
-                                this.UsedPSA.Add(NewAssociation);
+                                if (actSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedHKLReflex.HKLString == this.GetPhaseInformation.HKLList[i].HKLString)
+                                {
+                                    Stress.Macroskopic.PeakStressAssociation NewAssociation = new Stress.Macroskopic.PeakStressAssociation(actSample.DiffractionPatterns[j].Stress, actSample.DiffractionPatterns[j].PsiAngle(actSample.DiffractionPatterns[j].FoundPeaks[k].Angle), actSample.DiffractionPatterns[j].FoundPeaks[k], actSample.DiffractionPatterns[j].PhiAngle(actSample.DiffractionPatterns[j].FoundPeaks[k].Angle));
+                                    NewAssociation._macroskopicStrain = actSample.DiffractionPatterns[j].MacroStrain;
+                                    this.UsedPSA.Add(NewAssociation);
+                                }
                             }
                         }
                     }

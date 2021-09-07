@@ -13,11 +13,28 @@ namespace CalScec.Analysis.Stress.Plasticity
         public DataManagment.CrystalData.HKLReflex MainSlipDirection;
         public DataManagment.CrystalData.HKLReflex SecondarySlipDirection;
 
+        private int activeSystem = 1;
+        public int ActiveSystem
+        {
+            get
+            {
+                return this.activeSystem;
+            }
+            set
+            {
+                this.activeSystem = value;
+            }
+        }
+
         public string HKLString
         {
             get
             {
                 return this.SlipPlane.HKLString;
+            }
+            set
+            {
+
             }
         }
         public string HKLStringSlipDirection
@@ -25,6 +42,10 @@ namespace CalScec.Analysis.Stress.Plasticity
             get
             {
                 return this.MainSlipDirection.HKLString;
+            }
+            set
+            {
+
             }
         }
 
@@ -38,6 +59,44 @@ namespace CalScec.Analysis.Stress.Plasticity
             set
             {
                 this._yieldMainHardennedStrength = value;
+            }
+        }
+
+        private double _yieldMainAvgHardenning = -1;
+        public double YieldMainAvgHardenning
+        {
+            get
+            {
+                return this._yieldMainAvgHardenning;
+            }
+            set
+            {
+                this._yieldMainAvgHardenning = value;
+            }
+        }
+
+        private double _yieldHardenning = -1;
+        public double YieldHardenning
+        {
+            get
+            {
+                return this._yieldHardenning;
+            }
+            set
+            {
+                this._yieldHardenning = value;
+            }
+        }
+        private double _yieldLimit = 1000;
+        public double YieldLimit
+        {
+            get
+            {
+                return this._yieldLimit;
+            }
+            set
+            {
+                this._yieldLimit = value;
             }
         }
 
@@ -222,12 +281,42 @@ namespace CalScec.Analysis.Stress.Plasticity
                                                 if (ReflexReader.NodeType == System.Xml.XmlNodeType.Text)
                                                 {
                                                     string PlainString = ReflexReader.Value;
+                                                    int aktIndex = 0;
+                                                    int PH = 0;
+                                                    if (PlainString[aktIndex].ToString() == "-")
+                                                    {
+                                                        PH = Convert.ToInt32(PlainString[aktIndex].ToString() + PlainString[aktIndex + 1].ToString());
+                                                        aktIndex += 2;
+                                                    }
+                                                    else
+                                                    {
+                                                        PH = Convert.ToInt32(PlainString[aktIndex].ToString());
+                                                        aktIndex++;
+                                                    }
+                                                    int PK = 0;
+                                                    if (PlainString[aktIndex].ToString() == "-")
+                                                    {
+                                                        PK = Convert.ToInt32(PlainString[aktIndex].ToString() + PlainString[aktIndex + 1].ToString());
+                                                        aktIndex += 2;
+                                                    }
+                                                    else
+                                                    {
+                                                        PK = Convert.ToInt32(PlainString[aktIndex].ToString());
+                                                        aktIndex++;
+                                                    }
+                                                    int PL = 0;
+                                                    if (PlainString[aktIndex].ToString() == "-")
+                                                    {
+                                                        PL = Convert.ToInt32(PlainString[aktIndex].ToString() + PlainString[aktIndex + 1].ToString());
+                                                        aktIndex += 2;
+                                                    }
+                                                    else
+                                                    {
+                                                        PL = Convert.ToInt32(PlainString[aktIndex].ToString());
+                                                        aktIndex++;
+                                                    }
 
-                                                    int PH = Convert.ToInt32(PlainString[0].ToString());
-                                                    int PK = Convert.ToInt32(PlainString[1].ToString());
-                                                    int PL = Convert.ToInt32(PlainString[2].ToString());
-
-                                                    if(this.SlipPlane.H == PH && this.SlipPlane.K == PK && this.SlipPlane.L == PL)
+                                                    if (this.SlipPlane.H == PH && this.SlipPlane.K == PK && this.SlipPlane.L == PL)
                                                     {
                                                         bool InnerSystemRead = true;
                                                         while(InnerSystemRead)
@@ -787,6 +876,103 @@ namespace CalScec.Analysis.Stress.Plasticity
 
                 ret[2, 1] = this.MainSlipDirection.K * this.SlipPlane.L * (slipPlaneNorm * slipDirectionNorm);
                 ret[2, 1] += this.MainSlipDirection.L * this.SlipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 1] *= 0.5;
+            }
+
+            return ret;
+        }
+
+
+        /// <summary>
+        /// Alpha, multiplied with the applied stress gets the resolved shear stress
+        /// </summary>
+        /// <param name="slipPlane"></param>
+        /// <param name="slipDirection"></param>
+        /// <returns>alpha</returns>
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvingParameterMainHexTestAC1(double a, double c)
+        {
+            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+            double slipPlaneNorm = this.SlipPlane.NormFaktor;
+            double slipDirectionNorm = this.MainSlipDirection.NormFaktor;
+
+            double acFactor = a / c;
+            if (slipPlaneNorm != 0 && slipDirectionNorm != 0)
+            {
+                ret[0, 0] = (this.MainSlipDirection.H * this.SlipPlane.H) * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 1] = (this.MainSlipDirection.K * this.SlipPlane.K) * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 2] = Math.Pow(acFactor, 2) * (this.MainSlipDirection.L * this.SlipPlane.L) * (slipPlaneNorm * slipDirectionNorm);
+
+                ret[0, 1] = this.MainSlipDirection.H * this.SlipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+                ret[0, 1] += this.MainSlipDirection.K * this.SlipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+                ret[0, 1] *= 0.5;
+
+                ret[1, 0] = this.MainSlipDirection.H * this.SlipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 0] += this.MainSlipDirection.K * this.SlipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 0] *= 0.5;
+
+                ret[0, 2] = acFactor * this.MainSlipDirection.H * this.SlipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+                ret[0, 2] += acFactor * this.MainSlipDirection.L * this.SlipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+                ret[0, 2] *= 0.5;
+
+                ret[2, 0] = acFactor * this.MainSlipDirection.H * this.SlipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 0] += acFactor * this.MainSlipDirection.L * this.SlipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 0] *= 0.5;
+
+                ret[1, 2] = acFactor * this.MainSlipDirection.K * this.SlipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 2] += acFactor * this.MainSlipDirection.L * this.SlipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 2] *= 0.5;
+
+                ret[2, 1] = acFactor * this.MainSlipDirection.K * this.SlipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 1] += acFactor * this.MainSlipDirection.L * this.SlipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 1] *= 0.5;
+            }
+
+            return ret;
+        }
+
+
+        /// <summary>
+        /// Alpha, multiplied with the applied stress gets the resolved shear stress
+        /// </summary>
+        /// <param name="slipPlane"></param>
+        /// <param name="slipDirection"></param>
+        /// <returns>alpha</returns>
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvingParameterMainHexTestAC2(double a, double c)
+        {
+            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+            double slipPlaneNorm = this.SlipPlane.NormFaktor;
+            double slipDirectionNorm = this.MainSlipDirection.NormFaktor;
+
+            double aFactor = 1 / a;
+            double cFactor = 1 / c;
+            if (slipPlaneNorm != 0 && slipDirectionNorm != 0)
+            {
+                ret[0, 0] = Math.Pow(aFactor, 2) * (this.MainSlipDirection.H * this.SlipPlane.H) * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 1] = Math.Pow(aFactor, 2) * (this.MainSlipDirection.K * this.SlipPlane.K) * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 2] = Math.Pow(cFactor, 2) * (this.MainSlipDirection.L * this.SlipPlane.L) * (slipPlaneNorm * slipDirectionNorm);
+
+                ret[0, 1] = Math.Pow(aFactor, 2) * this.MainSlipDirection.H * this.SlipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+                ret[0, 1] += Math.Pow(aFactor, 2) * this.MainSlipDirection.K * this.SlipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+                ret[0, 1] *= 0.5;
+
+                ret[1, 0] = Math.Pow(aFactor, 2) * this.MainSlipDirection.H * this.SlipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 0] += Math.Pow(aFactor, 2) * this.MainSlipDirection.K * this.SlipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 0] *= 0.5;
+
+                ret[0, 2] = aFactor * cFactor * this.MainSlipDirection.H * this.SlipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+                ret[0, 2] += aFactor * cFactor * this.MainSlipDirection.L * this.SlipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+                ret[0, 2] *= 0.5;
+
+                ret[2, 0] = aFactor * cFactor * this.MainSlipDirection.H * this.SlipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 0] += aFactor * cFactor * this.MainSlipDirection.L * this.SlipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 0] *= 0.5;
+
+                ret[1, 2] = aFactor * cFactor * this.MainSlipDirection.K * this.SlipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 2] += aFactor * cFactor * this.MainSlipDirection.L * this.SlipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 2] *= 0.5;
+
+                ret[2, 1] = aFactor * cFactor * this.MainSlipDirection.K * this.SlipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 1] += aFactor * cFactor * this.MainSlipDirection.L * this.SlipPlane.K * (slipPlaneNorm * slipDirectionNorm);
                 ret[2, 1] *= 0.5;
             }
 

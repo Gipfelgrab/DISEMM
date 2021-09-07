@@ -19,6 +19,24 @@
     <okk>-</okk>
   </HKLCondition>
   <HKLCondition>
+    <SpaceGroup>F d -3 m</SpaceGroup>
+    <SpaceGroupId>227</SpaceGroupId>
+    <hkl>h+k,h+l,k+l=2n</hkl>
+    <hko>k,h=2n</hko>
+    <hol>h,l=2n</hol>
+    <okl>k,l=2n,k+l=4n</okl>
+    <hoo>h=4n</hoo>
+    <oko>-</oko>
+    <ool>-</ool>
+    <hhl>h+l=2n</hhl>
+    <hkk>h+k=2n</hkk>
+    <hkh>-</hkh>
+    <hhh>-</hhh>
+    <hho>h=2n</hho>
+    <hoh>-</hoh>
+    <okk>-</okk>
+  </HKLCondition>
+  <HKLCondition>
     <SpaceGroup>I m -3 m</SpaceGroup>
     <SpaceGroupId>229</SpaceGroupId>
     <hkl>h+k+l=2n</hkl>

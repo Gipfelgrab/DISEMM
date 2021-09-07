@@ -6817,14 +6817,29 @@ namespace CalScec.Analysis.Fitting
 
         #region Peak region routines
 
+        //private static void FitPeakRegionFunction(Analysis.Peaks.Functions.PeakRegionFunction PRF, double lambda)
+        //{
+        //    bool Converged = false;
+        //    double Lambda = lambda;
+
+        //    Analysis.Peaks.Functions.PeakRegionFunction TrialPeakRegion = PRF.Clone() as Analysis.Peaks.Functions.PeakRegionFunction;
+
+        //    double FirstChi2 = TrialPeakRegion.Chi2Function;
+        //    for (int TotalTrials = 0; TotalTrials < CalScec.Properties.Settings.Default.MaxFittingTrials; TotalTrials++)
+        //    {
+
+        //    }
+
+        //}
+
         private static void CorrectFWHMLorentzRatioDown(Analysis.Peaks.Functions.PeakRegionFunction PRF)
         {
             for (int i = 0; i < 5; i++)
             {
                 for (int n = 0; n < PRF.Count; n++)
                 {
-                    PRF[n].Sigma *= 0.9;
-                    PRF[n].LorentzRatio *= 0.9;
+                    PRF[n].Sigma *= 0.95;
+                    //PRF[n].LorentzRatio *= 0.9;
                 }
 
                 FitAngleSigmaIntensityLorentzRatioBackground(PRF, LMA._lambda, true);

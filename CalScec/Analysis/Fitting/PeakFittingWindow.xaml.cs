@@ -716,9 +716,9 @@ namespace CalScec.Analysis.Fitting
                 this.FWHMTextBox.Text = PF.FWHM.ToString("F3");
                 this.LorentzRatioTextBox.Text = PF.LorentzRatio.ToString("F3");
                 this.IntensityTextBox.Text = PF.Intensity.ToString("F3");
-                this.ConstantBackgroundTextBox.Text = PF.ConstantBackground.ToString("F3");
-                this.CenterBackgroundTextBox.Text = PF.CenterBackground.ToString("F3");
-                this.AclivityBackgroundTextBox.Text = PF.AclivityBackground.ToString("F3");
+                //this.ConstantBackgroundTextBox.Text = PF.ConstantBackground.ToString("F3");
+                //this.CenterBackgroundTextBox.Text = PF.CenterBackground.ToString("F3");
+                //this.AclivityBackgroundTextBox.Text = PF.AclivityBackground.ToString("F3");
 
                 this.AngleConstraintTextBox.Text = PF.ParameterConstraints.AngleConstraint.ToString("F3");
                 this.FWHMConstraintTextBox.Text = PF.ParameterConstraints.SigmaConstraint.ToString("F3");
@@ -728,13 +728,13 @@ namespace CalScec.Analysis.Fitting
                 this.FWHMConstraintActive.IsChecked = PF.ParameterConstraints.SigmaConstraintActiv;
                 this.LorentzRatioConstraintActive.IsChecked = PF.ParameterConstraints.LorentzRatioConstraintActiv;
 
-                this.AngleFitActive.IsChecked = PF.FreeParameters[1];
-                this.FWHMFitActive.IsChecked = PF.FreeParameters[0];
-                this.LorentzRatioFitActive.IsChecked = PF.FreeParameters[2];
-                this.IntensityFitActive.IsChecked = PF.FreeParameters[3];
-                this.ConstantBackgroundFitActive.IsChecked = PF.FreeParameters[4];
-                this.CenterBackgroundFitActive.IsChecked = PF.FreeParameters[5];
-                this.AclivityBackgroundFitActive.IsChecked = PF.FreeParameters[6];
+                //this.AngleFitActive.IsChecked = PF.FreeParameters[1];
+                //this.FWHMFitActive.IsChecked = PF.FreeParameters[0];
+                //this.LorentzRatioFitActive.IsChecked = PF.FreeParameters[2];
+                //this.IntensityFitActive.IsChecked = PF.FreeParameters[3];
+                //this.ConstantBackgroundFitActive.IsChecked = PF.FreeParameters[4];
+                //this.CenterBackgroundFitActive.IsChecked = PF.FreeParameters[5];
+                //this.AclivityBackgroundFitActive.IsChecked = PF.FreeParameters[6];
 
                 this.PeakFunctionBox.SelectedIndex = PF.functionType;
 
@@ -1068,150 +1068,78 @@ namespace CalScec.Analysis.Fitting
 
         private void AngleFitActive_Checked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[1] = true;
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[1] = true;
-                    }
+                    PRF.FreeParameters[1] = true;
                 }
             }
         }
 
         private void AngleFitActive_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[1] = false;
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[1] = false;
-                    }
+                    PRF.FreeParameters[1] = false;
                 }
             }
         }
 
         private void FWHMFitActive_Checked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[0] = true;
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[0] = true;
-                    }
+                    PRF.FreeParameters[0] = true;
                 }
             }
         }
 
         private void FWHMFitActive_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[0] = false;
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[0] = false;
-                    }
+                    PRF.FreeParameters[0] = false;
                 }
             }
         }
 
         private void LorentzRatioFitActive_Checked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[2] = true;
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[2] = true;
-                    }
+                    PRF.FreeParameters[2] = true;
                 }
             }
         }
 
         private void LorentzRatioFitActive_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[2] = false;
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[2] = false;
-                    }
+                    PRF.FreeParameters[2] = false;
                 }
             }
         }
@@ -1225,6 +1153,20 @@ namespace CalScec.Analysis.Fitting
                     Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
 
                     PF.functionType = PeakFunctionBox.SelectedIndex;
+
+                    PeakView.Items.Refresh();
+
+                    if (RegionView.SelectedIndex != -1)
+                    {
+                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
+
+                        System.ComponentModel.BackgroundWorker worker = new System.ComponentModel.BackgroundWorker();
+
+                        worker.DoWork += PlotFittingPatterns_Work;
+                        worker.RunWorkerCompleted += PlotFittingPatterns_Completed;
+
+                        worker.RunWorkerAsync(PRF);
+                    }
                 }
             }
         }
@@ -1267,50 +1209,26 @@ namespace CalScec.Analysis.Fitting
 
         private void IntensityFitActive_Checked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[3] = true;
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[3] = true;
-                    }
+                    PRF.FreeParameters[3] = true;
                 }
             }
         }
 
         private void IntensityFitActive_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[3] = false;
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[3] = false;
-                    }
+                    PRF.FreeParameters[3] = false;
                 }
             }
         }
@@ -1319,42 +1237,21 @@ namespace CalScec.Analysis.Fitting
         {
             if (EditAktive)
             {
-                if (PeakView.SelectedIndex != -1)
+                if (RegionView.SelectedIndex != -1)
                 {
                     try
                     {
                         double NewConstantBackground = Convert.ToDouble(ConstantBackgroundTextBox.Text);
 
-                        Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                        PF.ConstantBackground = NewConstantBackground;
+                        PRF.PolynomialBackgroundFunction.Constant = NewConstantBackground;
 
                         PeakView.Items.Refresh();
                     }
                     catch
                     {
 
-                    }
-
-                }
-                else
-                {
-                    if (RegionView.SelectedIndex != -1)
-                    {
-                        try
-                        {
-                            double NewConstantBackground = Convert.ToDouble(ConstantBackgroundTextBox.Text);
-
-                            Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                            PRF.PolynomialBackgroundFunction.Constant = NewConstantBackground;
-
-                            PeakView.Items.Refresh();
-                        }
-                        catch
-                        {
-
-                        }
                     }
                 }
 
@@ -1376,44 +1273,21 @@ namespace CalScec.Analysis.Fitting
         {
             if (EditAktive)
             {
-                if (PeakView.SelectedIndex != -1)
+                if (RegionView.SelectedIndex != -1)
                 {
-
-
                     try
                     {
                         double NewCenterBackground = Convert.ToDouble(CenterBackgroundTextBox.Text);
 
-                        Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                        PF.CenterBackground = NewCenterBackground;
+                        PRF.PolynomialBackgroundFunction.Center = NewCenterBackground;
 
                         PeakView.Items.Refresh();
                     }
                     catch
                     {
 
-                    }
-
-                }
-                else
-                {
-                    if (RegionView.SelectedIndex != -1)
-                    {
-                        try
-                        {
-                            double NewCenterBackground = Convert.ToDouble(CenterBackgroundTextBox.Text);
-
-                            Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                            PRF.PolynomialBackgroundFunction.Center = NewCenterBackground;
-
-                            PeakView.Items.Refresh();
-                        }
-                        catch
-                        {
-
-                        }
                     }
                 }
 
@@ -1435,44 +1309,21 @@ namespace CalScec.Analysis.Fitting
         {
             if (EditAktive)
             {
-                if (PeakView.SelectedIndex != -1)
+                if (RegionView.SelectedIndex != -1)
                 {
-
-
                     try
                     {
                         double NewAclivityBackground = Convert.ToDouble(AclivityBackgroundTextBox.Text);
 
-                        Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                        PF.AclivityBackground = NewAclivityBackground;
+                        PRF.PolynomialBackgroundFunction.Aclivity = NewAclivityBackground;
 
                         PeakView.Items.Refresh();
                     }
                     catch
                     {
 
-                    }
-
-                }
-                else
-                {
-                    if (RegionView.SelectedIndex != -1)
-                    {
-                        try
-                        {
-                            double NewAclivityBackground = Convert.ToDouble(AclivityBackgroundTextBox.Text);
-
-                            Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                            PRF.PolynomialBackgroundFunction.Aclivity = NewAclivityBackground;
-
-                            PeakView.Items.Refresh();
-                        }
-                        catch
-                        {
-
-                        }
                     }
                 }
 
@@ -1492,61 +1343,31 @@ namespace CalScec.Analysis.Fitting
 
         private void ConstantBackgroundFitActive_Checked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[4] = true;
-                    PF.backgroundFit = true;
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[4] = true;
-                        PRF.backgroundFit = true;
-                    }
+                    PRF.FreeParameters[4] = true;
+                    PRF.backgroundFit = true;
                 }
             }
         }
 
         private void ConstantBackgroundFitActive_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[4] = false;
-                    if(!PF.FreeParameters[5] && !PF.FreeParameters[6])
+                    PRF.FreeParameters[4] = false;
+                    if (!PRF.FreeParameters[5] && !PRF.FreeParameters[6])
                     {
 
-                        PF.backgroundFit = false;
-                    }
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[4] = false;
-                        if (!PRF.FreeParameters[5] && !PRF.FreeParameters[6])
-                        {
-
-                            PRF.backgroundFit = false;
-                        }
+                        PRF.backgroundFit = false;
                     }
                 }
             }
@@ -1554,61 +1375,31 @@ namespace CalScec.Analysis.Fitting
 
         private void CenterBackgroundFitActive_Checked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[5] = true;
-                    PF.backgroundFit = true;
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[5] = true;
-                        PRF.backgroundFit = true;
-                    }
+                    PRF.FreeParameters[5] = true;
+                    PRF.backgroundFit = true;
                 }
             }
         }
 
         private void CenterBackgroundFitActive_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[5] = false;
-                    if (!PF.FreeParameters[4] && !PF.FreeParameters[6])
+                    PRF.FreeParameters[5] = false;
+                    if (!PRF.FreeParameters[4] && !PRF.FreeParameters[6])
                     {
 
-                        PF.backgroundFit = false;
-                    }
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[5] = false;
-                        if (!PRF.FreeParameters[4] && !PRF.FreeParameters[6])
-                        {
-
-                            PRF.backgroundFit = false;
-                        }
+                        PRF.backgroundFit = false;
                     }
                 }
             }
@@ -1616,61 +1407,31 @@ namespace CalScec.Analysis.Fitting
 
         private void AclivityBackgroundFitActive_Checked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[6] = true;
-                    PF.backgroundFit = true;
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[6] = true;
-                        PRF.backgroundFit = true;
-                    }
+                    PRF.FreeParameters[6] = true;
+                    PRF.backgroundFit = true;
                 }
             }
         }
 
         private void AclivityBackgroundFitActive_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (PeakView.SelectedIndex != -1)
+            if (RegionView.SelectedIndex != -1)
             {
                 if (EditAktive)
                 {
-                    Analysis.Peaks.Functions.PeakFunction PF = (Analysis.Peaks.Functions.PeakFunction)PeakView.SelectedItem;
+                    Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
 
-                    PF.FreeParameters[6] = false;
-                    if (!PF.FreeParameters[4] && !PF.FreeParameters[5])
+                    PRF.FreeParameters[6] = false;
+                    if (!PRF.FreeParameters[4] && !PRF.FreeParameters[5])
                     {
 
-                        PF.backgroundFit = false;
-                    }
-                }
-            }
-            else
-            {
-                if (RegionView.SelectedIndex != -1)
-                {
-                    if (EditAktive)
-                    {
-                        Analysis.Peaks.Functions.PeakRegionFunction PRF = (Analysis.Peaks.Functions.PeakRegionFunction)RegionView.SelectedItem;
-
-                        PRF.FreeParameters[6] = false;
-                        if (!PRF.FreeParameters[4] && !PRF.FreeParameters[5])
-                        {
-
-                            PRF.backgroundFit = false;
-                        }
+                        PRF.backgroundFit = false;
                     }
                 }
             }
@@ -2452,7 +2213,7 @@ namespace CalScec.Analysis.Fitting
             PRF.backgroundFit = true;
             PRF.backgroundSwitch = true;
 
-            PRF.functionType = 2;
+            //PRF.functionType = 2;
 
             PRF.SetResetEvent(new System.Threading.ManualResetEvent(true));
             PRF.startingLambda = -1;
@@ -2462,7 +2223,7 @@ namespace CalScec.Analysis.Fitting
 
             for(int n = 0; n < PRF.Count; n++)
             {
-                PRF[n].functionType = 2;
+                //PRF[n].functionType = 2;
                 PRF[n].backgroundSwitch = true;
                 PRF[n].backgroundFit = true;
 

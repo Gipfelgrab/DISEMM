@@ -1,0 +1,119 @@
+﻿<Window x:Class="CalScec.Tools.YieldSurfacePlotSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CalScec.Tools"
+        mc:Ignorable="d"
+        Title="YieldSurfacePlotSettings" Height="300" Width="500">
+    <Grid>
+
+        <GroupBox Grid.Row="2" Header="Plot Settings">
+            <Grid Margin="0,1,0,-1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Margin="5,18,5,5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Grid.ColumnSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Line Thickness:" />
+                    <Label Grid.Row="1" Grid.ColumnSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Line Type:"/>
+                    <Label Grid.Row="2" Grid.ColumnSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Marker Size:"/>
+                    <Label Grid.Row="3" Grid.ColumnSpan="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Marker Type:"/>
+                </Grid>
+                <GroupBox Grid.Column="4" Header="Axis">
+                    <Grid Margin="5,5,5,5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="YAxisFontSize" ToolTip="Font Size of the Y Axis" Text="28"/>
+                        <TextBox Grid.Row="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="YAxisMajorTickIntervall" ToolTip="Minimum Tick Intervall of the Y Axis (-1 for auto)" Text="-1"/>
+                        <TextBox Grid.Row="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="XAxisMajorTickIntervall" ToolTip="Minimum Tick Intervall of the X Axis (-1 for auto)" Text="-1"/>
+                        <TextBox Grid.Row="3" HorizontalAlignment="Stretch" MaxHeight="30" Name="LegendTitleFontSize" ToolTip="Font Size of the Legend Title if Set to Zero Legend is Disbaled" Text="0"/>
+                        <TextBox Grid.Row="4" HorizontalAlignment="Stretch" MaxHeight="30" Name="LegendFontSize" ToolTip="Font Size of the Legend" Text="0"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Column="1" Header="Simulation">
+                    <Grid Margin="5,5,5,5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="SimuLineThickness" ToolTip="Line Thickness of the Plot" Text="7"/>
+                        <ComboBox Grid.Row="1" Name="SimuLineType" MaxWidth="350" MaxHeight="30" Margin="0,5,0,5">
+                            <ComboBoxItem Content="Solid"/>
+                            <ComboBoxItem Content="Dash"/>
+                            <ComboBoxItem Content="Dot"/>
+                        </ComboBox>
+
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Column="2" Header="Experimental Data">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExpLineThickness" ToolTip="Line Thickness of the Plot" Text="1"/>
+                        <ComboBox Grid.Row="1" Name="ExpLineType" MaxWidth="350" MaxHeight="30" Margin="0,5,0,5">
+                            <ComboBoxItem Content="None"/>
+                            <ComboBoxItem Content="Solid"/>
+                            <ComboBoxItem Content="Dash"/>
+                            <ComboBoxItem Content="Dot"/>
+                        </ComboBox>
+                        <TextBox Grid.Row="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExpMarkerSize" ToolTip="Marker Size" Text="10"/>
+                        <ComboBox Grid.Row="3" Name="ExpMarkerType" MaxWidth="350" MaxHeight="30" Margin="0,5,0,5">
+                            <ComboBoxItem Content="Circle"/>
+                            <ComboBoxItem Content="Cross"/>
+                            <ComboBoxItem Content="Plus"/>
+                        </ComboBox>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Column="3" Header="Tensile Test">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBox Grid.Row="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="TensileLineThickness" ToolTip="Line Thickness of the Plot" Text="0"/>
+                        <ComboBox Grid.Row="1" Name="TensileLineType" MaxWidth="350" MaxHeight="30" Margin="0,5,0,5">
+                            <ComboBoxItem Content="None"/>
+                            <ComboBoxItem Content="Solid"/>
+                            <ComboBoxItem Content="Dash"/>
+                            <ComboBoxItem Content="Dot"/>
+                        </ComboBox>
+                        <TextBox Grid.Row="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="TensileMarkerSize" ToolTip="Marker Size" Text="10"/>
+                        <ComboBox Grid.Row="3" Name="TensileMarkerType" MaxWidth="350" MaxHeight="30" Margin="0,5,0,5">
+                            <ComboBoxItem Content="Circle"/>
+                            <ComboBoxItem Content="Cross"/>
+                            <ComboBoxItem Content="X"/>
+                        </ComboBox>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</Window>

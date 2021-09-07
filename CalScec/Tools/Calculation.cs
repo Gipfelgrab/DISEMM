@@ -147,6 +147,21 @@ namespace CalScec.Tools
 
         #endregion
 
+        public static List<int> IntegrateIndices(double psi, List<Analysis.Stress.Plasticity.GrainOrientationParameter> orientations)
+        {
+            List<int> ret = new List<int>();
+
+            for(int n = 0; n < orientations.Count; n++)
+            {
+                if(orientations[n].Psi == psi)
+                {
+                    ret.Add(n);
+                }
+            }
+
+            return ret;
+        }
+
         public static double GetEstimatedFWHM(double angle)
         {
             double Angle = angle / 2.0;
@@ -162,6 +177,151 @@ namespace CalScec.Tools
             }
 
             return Ret;
+        }
+
+        public static MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvingParameter(DataManagment.CrystalData.HKLReflex slipPlane, DataManagment.CrystalData.HKLReflex slipDirection)
+        {
+            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+            double slipPlaneNorm = slipPlane.NormFaktor;
+            double slipDirectionNorm = slipDirection.NormFaktor;
+
+            ret[0, 0] = (slipDirection.H * slipPlane.H) * (slipPlaneNorm * slipDirectionNorm);
+            ret[1, 1] = (slipDirection.K * slipPlane.K) * (slipPlaneNorm * slipDirectionNorm);
+            ret[2, 2] = (slipDirection.L * slipPlane.L) * (slipPlaneNorm * slipDirectionNorm);
+
+            ret[0, 1] = slipDirection.H * slipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+            ret[0, 1] += slipDirection.K * slipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+            ret[0, 1] *= 0.5;
+
+            ret[1, 0] = slipDirection.H * slipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+            ret[1, 0] += slipDirection.K * slipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+            ret[1, 0] *= 0.5;
+
+            ret[0, 2] = slipDirection.H * slipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+            ret[0, 2] += slipDirection.L * slipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+            ret[0, 2] *= 0.5;
+
+            ret[2, 0] = slipDirection.H * slipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+            ret[2, 0] += slipDirection.L * slipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+            ret[2, 0] *= 0.5;
+
+            ret[1, 2] = slipDirection.K * slipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+            ret[1, 2] += slipDirection.L * slipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+            ret[1, 2] *= 0.5;
+
+            ret[2, 1] = slipDirection.K * slipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+            ret[2, 1] += slipDirection.L * slipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+            ret[2, 1] *= 0.5;
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Alpha, multiplied with the applied stress gets the resolved shear stress
+        /// </summary>
+        /// <param name="slipPlane"></param>
+        /// <param name="slipDirection"></param>
+        /// <returns>alpha</returns>
+        public static MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvingParameterMainHex(DataManagment.CrystalData.HKLReflex slipPlane, DataManagment.CrystalData.HKLReflex slipDirection, double a, double c)
+        {
+            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+
+            double normFactorPlane = Math.Pow(a, 2) * (Math.Pow(slipPlane.H, 2) + Math.Pow(slipPlane.K, 2));
+            normFactorPlane += Math.Pow(c, 2) * Math.Pow(slipPlane.L, 2);
+            normFactorPlane = Math.Sqrt(normFactorPlane);
+            double normFactorDirection = Math.Pow(a, 2) * (Math.Pow(slipDirection.H, 2) + Math.Pow(slipDirection.K, 2));
+            normFactorDirection += Math.Pow(c, 2) * Math.Pow(slipDirection.L, 2);
+            normFactorDirection = Math.Sqrt(normFactorDirection);
+
+            double hStarPlane = (a * slipPlane.H) / normFactorPlane;
+            double kStarPlane = (a * slipPlane.K) / normFactorPlane;
+            double lStarPlane = (c * slipPlane.L) / normFactorPlane;
+            double hStarDirection = (a * slipDirection.H) / normFactorDirection;
+            double kStarDirection = (a * slipDirection.K) / normFactorDirection;
+            double lStarDirection = (c * slipDirection.L) / normFactorDirection;
+            
+            if (normFactorPlane != 0 && normFactorDirection != 0)
+            {
+                ret[0, 0] = hStarPlane * hStarDirection;
+                ret[1, 1] = kStarPlane * kStarDirection;
+                ret[2, 2] = lStarPlane * lStarDirection;
+
+                ret[0, 1] = hStarDirection * kStarPlane;
+                ret[0, 1] += kStarDirection * hStarPlane;
+                ret[0, 1] *= 0.5;
+
+                ret[1, 0] = hStarDirection * kStarPlane;
+                ret[1, 0] += kStarDirection * hStarPlane;
+                ret[1, 0] *= 0.5;
+
+                ret[0, 2] = hStarDirection * lStarPlane;
+                ret[0, 2] += lStarDirection * hStarPlane;
+                ret[0, 2] *= 0.5;
+
+                ret[2, 0] = hStarDirection * lStarPlane;
+                ret[2, 0] += lStarDirection * hStarPlane;
+                ret[2, 0] *= 0.5;
+
+                ret[1, 2] = kStarDirection * lStarPlane;
+                ret[1, 2] += lStarDirection * kStarPlane;
+                ret[1, 2] *= 0.5;
+
+                ret[2, 1] = kStarDirection * lStarPlane;
+                ret[2, 1] += lStarDirection * kStarPlane;
+                ret[2, 1] *= 0.5;
+            }
+
+            return ret;
+        }
+
+
+        /// <summary>
+        /// Alpha, multiplied with the applied stress gets the resolved shear stress
+        /// </summary>
+        /// <param name="slipPlane"></param>
+        /// <param name="slipDirection"></param>
+        /// <returns>alpha</returns>
+        public static MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvingParameterMainHexTestAC2(DataManagment.CrystalData.HKLReflex slipPlane, DataManagment.CrystalData.HKLReflex slipDirection, double a, double c)
+        {
+            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+            double slipPlaneNorm = slipPlane.NormFaktor;
+            double slipDirectionNorm = slipDirection.NormFaktor;
+
+            double aFactor = 1 / a;
+            double cFactor = 1 / c;
+            if (slipPlaneNorm != 0 && slipDirectionNorm != 0)
+            {
+                ret[0, 0] = Math.Pow(aFactor, 2) * (slipDirection.H * slipPlane.H) * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 1] = Math.Pow(aFactor, 2) * (slipDirection.K * slipPlane.K) * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 2] = (slipDirection.L * slipPlane.L) * (slipPlaneNorm * slipDirectionNorm);
+
+                ret[0, 1] = Math.Pow(aFactor, 2) * slipDirection.H * slipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+                ret[0, 1] += Math.Pow(aFactor, 2) * slipDirection.K * slipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+                ret[0, 1] *= 0.5;
+
+                ret[1, 0] = Math.Pow(aFactor, 2) * slipDirection.H * slipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 0] += Math.Pow(aFactor, 2) * slipDirection.K * slipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 0] *= 0.5;
+
+                ret[0, 2] = aFactor * cFactor * slipDirection.H * slipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+                ret[0, 2] += aFactor * cFactor * slipDirection.L * slipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+                ret[0, 2] *= 0.5;
+
+                ret[2, 0] = aFactor * cFactor * slipDirection.H * slipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 0] += aFactor * cFactor * slipDirection.L * slipPlane.H * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 0] *= 0.5;
+
+                ret[1, 2] = aFactor * cFactor * slipDirection.K * slipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 2] += aFactor * cFactor * slipDirection.L * slipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+                ret[1, 2] *= 0.5;
+
+                ret[2, 1] = aFactor * cFactor * slipDirection.K * slipPlane.L * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 1] += aFactor * cFactor * slipDirection.L * slipPlane.K * (slipPlaneNorm * slipDirectionNorm);
+                ret[2, 1] *= 0.5;
+                
+            }
+
+            return ret;
         }
     }
 

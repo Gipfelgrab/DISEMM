@@ -1,0 +1,98 @@
+﻿<Window x:Class="CalScec.Tools.AutoFillWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CalScec.Tools"
+        mc:Ignorable="d"
+        Title="Auto Fill" Height="300" Width="400">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.6*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            Please select the lower and upper border fot the anisitropy investigations
+        </TextBlock>
+        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="1" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            Chi Angle:
+        </TextBlock>
+        <TextBlock Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="1" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            Phi Angle:
+        </TextBlock>
+        <TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="1" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            Omega Angle:
+        </TextBlock>
+        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="1" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            Applied force:
+        </TextBlock>
+        <TextBlock Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="1" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            Macro-Strain:
+        </TextBlock>
+        <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="1" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            Applied stress:
+        </TextBlock>
+        <TextBox Grid.Row="1" Grid.Column="1" Name="ChiAngle1" MaxHeight="27" Margin="5,5,5,5"/>
+        <TextBox Grid.Row="1" Grid.Column="2" Name="ChiAngle2" MaxHeight="27" Margin="5,5,5,5"/>
+        <TextBox Grid.Row="1" Grid.Column="3" Name="ChiAngle3" MaxHeight="27" Margin="5,5,5,5"/>
+        <CheckBox Grid.Row="1" Grid.Column="4" VerticalAlignment="Center" Name="ChiAngleFileName" ToolTip="Check if the information is coded into the name. Enter the position of the value in the first textbox. Check manual for further instructions">
+            <TextBlock  TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            From File Name
+            </TextBlock>
+        </CheckBox>
+        <TextBox Grid.Row="2" Grid.Column="1" Name="PhiAngle1" MaxHeight="27" Margin="5,5,5,5"/>
+        <TextBox Grid.Row="2" Grid.Column="2" Name="PhiAngle2" MaxHeight="27" Margin="5,5,5,5"/>
+        <TextBox Grid.Row="2" Grid.Column="3" Name="PhiAngle3" MaxHeight="27" Margin="5,5,5,5"/>
+        <CheckBox Grid.Row="2" Grid.Column="4" VerticalAlignment="Center" Name="PhiAngleFileName" ToolTip="Check if the information is coded into the name. Enter the position of the value in the first textbox. Check manual for further instructions">
+            <TextBlock  TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            From File Name
+            </TextBlock>
+        </CheckBox>
+        <TextBox Grid.Row="3" Grid.Column="1" Name="OmegaAngle1" MaxHeight="27" Margin="5,5,5,5"/>
+        <TextBox Grid.Row="3" Grid.Column="2" Name="OmegaAngle2" MaxHeight="27" Margin="5,5,5,5"/>
+        <TextBox Grid.Row="3" Grid.Column="3" Name="OmegaAngle3" MaxHeight="27" Margin="5,5,5,5"/>
+        <CheckBox Grid.Row="3" Grid.Column="4" VerticalAlignment="Center" Name="OmegaAngleFileName" ToolTip="Check if the information is coded into the name. Enter the position of the value in the first textbox. Check manual for further instructions">
+            <TextBlock  TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            From File Name
+            </TextBlock>
+        </CheckBox>
+        <TextBox Grid.Row="4" Grid.Column="1" Name="AppliedForce1" MaxHeight="27" Margin="5,5,5,5"/>
+        <TextBox Grid.Row="4" Grid.Column="2" Name="AppliedForce2" MaxHeight="27" Margin="5,5,5,5"/>
+        <TextBox Grid.Row="4" Grid.Column="3" Name="AppliedForce3" MaxHeight="27" Margin="5,5,5,5"/>
+        <CheckBox Grid.Row="4" Grid.Column="4" VerticalAlignment="Center" Name="AppliedForceFileName" ToolTip="Check if the information is coded into the name. Enter the position of the value in the first textbox. Check manual for further instructions">
+            <TextBlock  TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            From File Name
+            </TextBlock>
+        </CheckBox>
+        <TextBox Grid.Row="5" Grid.Column="1" Name="MacroStrain1" MaxHeight="27" Margin="5,5,5,5"/>
+        <TextBox Grid.Row="5" Grid.Column="2" Name="MacroStrain2" MaxHeight="27" Margin="5,5,5,5"/>
+        <TextBox Grid.Row="5" Grid.Column="3" Name="MacroStrain3" MaxHeight="27" Margin="5,5,5,5"/>
+        <CheckBox Grid.Row="5" Grid.Column="4" VerticalAlignment="Center" Name="MacroStrainFileName" ToolTip="Check if the information is coded into the name. Enter the position of the value in the first textbox. Check manual for further instructions">
+            <TextBlock  TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            From File Name
+            </TextBlock>
+        </CheckBox>
+        <TextBox Grid.Row="6" Grid.Column="1" Name="AppliedStress1" MaxHeight="27" Margin="5,5,5,5"/>
+        <TextBox Grid.Row="6" Grid.Column="2" Name="AppliedStress2" MaxHeight="27" Margin="5,5,5,5"/>
+        <TextBox Grid.Row="6" Grid.Column="3" Name="AppliedStress3" MaxHeight="27" Margin="5,5,5,5"/>
+        <CheckBox Grid.Row="6" Grid.Column="4" VerticalAlignment="Center" Name="AppliedStressFileName" ToolTip="Check if the information is coded into the name. Enter the position of the value in the first textbox. Check manual for further instructions">
+            <TextBlock  TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center" VerticalAlignment="Center">
+            From File Name
+            </TextBlock>
+        </CheckBox>
+        <Button Name="Autofill" Grid.Row="7" Grid.Column="3" Content="Apply" Margin="5,5,5,5" Click="Autofill_Click"/>
+    </Grid>
+</Window>

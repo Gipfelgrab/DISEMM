@@ -8,71 +8,146 @@ namespace CalScec.Analysis.Stress.Plasticity
 {
     public class PlasticityTensor
     {
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousStiffnessTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousStiffnessTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        #region Old Stuff
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousComplianceTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousComplianceTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousStiffnessTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousStiffnessTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousGrainStiffnessTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousGrainStiffnessTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousComplianceTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousComplianceTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousGrainComplianceTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousGrainComplianceTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousGrainStiffnessTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousGrainStiffnessTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _effectiveStiffnessTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _effectiveStiffnessTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousGrainComplianceTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _instantaneousGrainComplianceTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _effectiveComplianceTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _effectiveComplianceTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _effectiveStiffnessTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _effectiveStiffnessTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _hardenningTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _isotropicHardenningTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _independentHardenningTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _kinematicHardenningTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _effectiveComplianceTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _effectiveComplianceTensorError = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _plasticStrainRate = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-        public List<MathNet.Numerics.LinearAlgebra.Matrix<double>> appliedCrystalStress = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _hardenningTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _isotropicHardenningTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _independentHardenningTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _kinematicHardenningTensor = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> _phaseStrainRate = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-        public double PhaseStrainRate
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _plasticStrainRate = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        //public List<MathNet.Numerics.LinearAlgebra.Matrix<double>> appliedCrystalStress = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
+
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> _phaseStrainRate = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        //public double PhaseStrainRate
+        //{
+        //    get
+        //    {
+        //        return this._phaseStrainRate[2, 2];
+        //    }
+        //    set
+        //    {
+        //        this._phaseStrainRate[2, 2] = value;
+        //    }
+        //}
+
+        //private double _phaseHardeningRate;
+        //public double PhaseHardeningRate
+        //{
+        //    get
+        //    {
+        //        return this._phaseHardeningRate;
+        //    }
+        //    set
+        //    {
+        //        this._phaseHardeningRate = value;
+        //    }
+        //}
+        //private double _phaseYieldStrength;
+        //public double PhaseYieldStrength
+        //{
+        //    get
+        //    {
+        //        return this._phaseYieldStrength;
+        //    }
+        //    set
+        //    {
+        //        this._phaseYieldStrength = value;
+        //        this.PhaseActYieldStrength = value;
+        //    }
+        //}
+        //public double PhaseActYieldStrength = 0.0;
+
+        #endregion
+
+        /// <summary>
+        /// Lc
+        /// Mc
+        /// </summary>
+        public Tools.FourthRankTensor _grainStiffness = new Tools.FourthRankTensor();
+        public Tools.FourthRankTensor GrainStiffness
         {
             get
             {
-                return this._phaseStrainRate[2, 2];
+                return this._grainStiffness;
             }
             set
             {
-                this._phaseStrainRate[2, 2] = value;
+                this._grainStiffness = value;
+                this._grainCompliance = value.InverseSC();
+            }
+        }
+        public Tools.FourthRankTensor _grainCompliance = new Tools.FourthRankTensor();
+        public Tools.FourthRankTensor GrainCompliance
+        {
+            get
+            {
+                return this._grainCompliance;
+            }
+            set
+            {
+                this._grainCompliance = value;
+                this._grainStiffness = value.InverseSC();
             }
         }
 
-        private double _phaseHardeningRate;
-        public double PhaseHardeningRate
+        /// <summary>
+        /// Ac
+        /// Bc
+        /// </summary>
+        public Tools.FourthRankTensor GrainTransitionStiffness = new Tools.FourthRankTensor();
+        public Tools.FourthRankTensor GrainTransitionCompliance = new Tools.FourthRankTensor();
+
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> HardeningMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> _conditionX = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> ConditionX
         {
             get
             {
-                return this._phaseHardeningRate;
+                return this._conditionX;
             }
             set
             {
-                this._phaseHardeningRate = value;
+                this._conditionX = value;
+                this._conditionY = value.Inverse();
             }
         }
-        private double _phaseYieldStrength;
-        public double PhaseYieldStrength
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> _conditionY = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> ConditionY
         {
             get
             {
-                return this._phaseYieldStrength;
+                return this._conditionY;
             }
             set
             {
-                this._phaseYieldStrength = value;
-                this.PhaseActYieldStrength = value;
+                this._conditionY = value;
+                this._conditionX = value.Inverse();
             }
         }
-        public double PhaseActYieldStrength = 0.0;
+        //f^i
+        public List<MathNet.Numerics.LinearAlgebra.Matrix<double>> InstantStiffnessFactors = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
+
+        //To Be deleted
+        public YieldSurface YieldSurfaceData;
 
         public int _symmetry;
         public string Symmetry
@@ -142,400 +217,14 @@ namespace CalScec.Analysis.Stress.Plasticity
         }
 
         #region Voigt notation
-
-        #region stiffness
-
-        public double EffectiveC11
-        {
-            get
-            {
-                return this._effectiveStiffnessTensor[0, 0];
-            }
-            set
-            {
-                this._effectiveStiffnessTensor[0, 0] = value;
-                if(this._symmetry == 1)
-                {
-                    this._effectiveStiffnessTensor[1, 1] = value;
-                    this._effectiveStiffnessTensor[2, 2] = value;
-                }
-                else if(this._symmetry == 2)
-                {
-                    this._effectiveStiffnessTensor[1, 1] = value;
-                }
-            }
-        }
-        public double EffectiveC33
-        {
-            get
-            {
-                return this._effectiveStiffnessTensor[2, 2];
-            }
-            set
-            {
-                this._effectiveStiffnessTensor[2, 2] = value;
-                if (this._symmetry == 1)
-                {
-                    this._effectiveStiffnessTensor[0, 0] = value;
-                    this._effectiveStiffnessTensor[1, 1] = value;
-                }
-            }
-        }
-
-        public double EffectiveC12
-        {
-            get
-            {
-                return this._effectiveStiffnessTensor[0, 1];
-            }
-            set
-            {
-                this._effectiveStiffnessTensor[0, 1] = value;
-                if (this._symmetry == 1)
-                {
-                    this._effectiveStiffnessTensor[1, 2] = value;
-                    this._effectiveStiffnessTensor[0, 2] = value;
-                }
-            }
-        }
-        public double EffectiveC13
-        {
-            get
-            {
-                return this._effectiveStiffnessTensor[0, 2];
-            }
-            set
-            {
-                this._effectiveStiffnessTensor[0, 2] = value;
-                if (this._symmetry == 1)
-                {
-                    this._effectiveStiffnessTensor[0, 1] = value;
-                    this._effectiveStiffnessTensor[1, 2] = value;
-                }
-                else if (this._symmetry == 2)
-                {
-                    this._effectiveStiffnessTensor[1, 2] = value;
-                }
-            }
-        }
-
-        public double EffectiveC44
-        {
-            get
-            {
-                return this._effectiveStiffnessTensor[3, 3];
-            }
-            set
-            {
-                this._effectiveStiffnessTensor[3, 3] = value;
-                if (this._symmetry == 1)
-                {
-                    this._effectiveStiffnessTensor[4, 4] = value;
-                    this._effectiveStiffnessTensor[5, 5] = value;
-                }
-                else if (this._symmetry == 2)
-                {
-                    this._effectiveStiffnessTensor[4, 4] = value;
-                }
-            }
-        }
-
-        #endregion
-
-        #region compliance
-
-        public double EffectiveS11
-        {
-            get
-            {
-                return this._effectiveComplianceTensor[0, 0];
-            }
-            set
-            {
-                this._effectiveComplianceTensor[0, 0] = value;
-                if (this._symmetry == 1)
-                {
-                    this._effectiveComplianceTensor[1, 1] = value;
-                    this._effectiveComplianceTensor[2, 2] = value;
-                }
-                else if (this._symmetry == 2)
-                {
-                    this._effectiveComplianceTensor[1, 1] = value;
-                }
-            }
-        }
-        public double EffectiveS33
-        {
-            get
-            {
-                return this._effectiveComplianceTensor[2, 2];
-            }
-            set
-            {
-                this._effectiveComplianceTensor[2, 2] = value;
-                if (this._symmetry == 1)
-                {
-                    this._effectiveComplianceTensor[0, 0] = value;
-                    this._effectiveComplianceTensor[1, 1] = value;
-                }
-            }
-        }
-
-        public double EffectiveS12
-        {
-            get
-            {
-                return this._effectiveComplianceTensor[0, 1];
-            }
-            set
-            {
-                this._effectiveComplianceTensor[0, 1] = value;
-                if (this._symmetry == 1)
-                {
-                    this._effectiveComplianceTensor[1, 2] = value;
-                    this._effectiveComplianceTensor[0, 2] = value;
-                }
-            }
-        }
-        public double EffectiveS13
-        {
-            get
-            {
-                return this._effectiveComplianceTensor[0, 2];
-            }
-            set
-            {
-                this._effectiveComplianceTensor[0, 2] = value;
-                if (this._symmetry == 1)
-                {
-                    this._effectiveComplianceTensor[0, 1] = value;
-                    this._effectiveComplianceTensor[1, 2] = value;
-                }
-                else if (this._symmetry == 2)
-                {
-                    this._effectiveComplianceTensor[1, 2] = value;
-                }
-            }
-        }
-
-        public double EffectiveS44
-        {
-            get
-            {
-                return this._effectiveComplianceTensor[3, 3];
-            }
-            set
-            {
-                this._effectiveComplianceTensor[3, 3] = value;
-                if (this._symmetry == 1)
-                {
-                    this._effectiveComplianceTensor[4, 4] = value;
-                    this._effectiveComplianceTensor[5, 5] = value;
-                }
-                else if (this._symmetry == 2)
-                {
-                    this._effectiveComplianceTensor[4, 4] = value;
-                }
-            }
-        }
-
-        public double GrainS11
-        {
-            get
-            {
-                return this._instantaneousGrainComplianceTensor[0, 0];
-            }
-            set
-            {
-                this._instantaneousGrainComplianceTensor[0, 0] = value;
-                if (this._symmetry == 1)
-                {
-                    this._instantaneousGrainComplianceTensor[1, 1] = value;
-                    this._instantaneousGrainComplianceTensor[2, 2] = value;
-                }
-                else if (this._symmetry == 2)
-                {
-                    this._instantaneousGrainComplianceTensor[1, 1] = value;
-                }
-            }
-        }
-        public double GrainS33
-        {
-            get
-            {
-                return this._instantaneousGrainComplianceTensor[2, 2];
-            }
-            set
-            {
-                this._instantaneousGrainComplianceTensor[2, 2] = value;
-                if (this._symmetry == 1)
-                {
-                    this._instantaneousGrainComplianceTensor[0, 0] = value;
-                    this._instantaneousGrainComplianceTensor[1, 1] = value;
-                }
-            }
-        }
-
-        public double GrainS12
-        {
-            get
-            {
-                return this._instantaneousGrainComplianceTensor[0, 1];
-            }
-            set
-            {
-                this._instantaneousGrainComplianceTensor[0, 1] = value;
-                if (this._symmetry == 1)
-                {
-                    this._instantaneousGrainComplianceTensor[1, 2] = value;
-                    this._instantaneousGrainComplianceTensor[0, 2] = value;
-                }
-            }
-        }
-        public double GrainS13
-        {
-            get
-            {
-                return this._instantaneousGrainComplianceTensor[0, 2];
-            }
-            set
-            {
-                this._instantaneousGrainComplianceTensor[0, 2] = value;
-                if (this._symmetry == 1)
-                {
-                    this._instantaneousGrainComplianceTensor[0, 1] = value;
-                    this._instantaneousGrainComplianceTensor[1, 2] = value;
-                }
-                else if (this._symmetry == 2)
-                {
-                    this._instantaneousGrainComplianceTensor[1, 2] = value;
-                }
-            }
-        }
-
-        public double GrainS44
-        {
-            get
-            {
-                return this._instantaneousGrainComplianceTensor[3, 3];
-            }
-            set
-            {
-                this._instantaneousGrainComplianceTensor[3, 3] = value;
-                if (this._symmetry == 1)
-                {
-                    this._instantaneousGrainComplianceTensor[4, 4] = value;
-                    this._instantaneousGrainComplianceTensor[5, 5] = value;
-                }
-                else if (this._symmetry == 2)
-                {
-                    this._instantaneousGrainComplianceTensor[4, 4] = value;
-                }
-            }
-        }
         
-        public double ConstraintS11
-        {
-            get
-            {
-                return this._instantaneousComplianceTensor[0, 0];
-            }
-            set
-            {
-                this._instantaneousComplianceTensor[0, 0] = value;
-                if (this._symmetry == 1)
-                {
-                    this._instantaneousComplianceTensor[1, 1] = value;
-                    this._instantaneousComplianceTensor[2, 2] = value;
-                }
-                else if (this._symmetry == 2)
-                {
-                    this._instantaneousComplianceTensor[1, 1] = value;
-                }
-            }
-        }
-        public double ConstraintS33
-        {
-            get
-            {
-                return this._instantaneousComplianceTensor[2, 2];
-            }
-            set
-            {
-                this._instantaneousComplianceTensor[2, 2] = value;
-                if (this._symmetry == 1)
-                {
-                    this._instantaneousComplianceTensor[0, 0] = value;
-                    this._instantaneousComplianceTensor[1, 1] = value;
-                }
-            }
-        }
 
-        public double ConstraintS12
-        {
-            get
-            {
-                return this._instantaneousComplianceTensor[0, 1];
-            }
-            set
-            {
-                this._instantaneousComplianceTensor[0, 1] = value;
-                if (this._symmetry == 1)
-                {
-                    this._instantaneousComplianceTensor[1, 2] = value;
-                    this._instantaneousComplianceTensor[0, 2] = value;
-                }
-            }
-        }
-        public double ConstraintS13
-        {
-            get
-            {
-                return this._instantaneousComplianceTensor[0, 2];
-            }
-            set
-            {
-                this._instantaneousComplianceTensor[0, 2] = value;
-                if (this._symmetry == 1)
-                {
-                    this._instantaneousComplianceTensor[0, 1] = value;
-                    this._instantaneousComplianceTensor[1, 2] = value;
-                }
-                else if (this._symmetry == 2)
-                {
-                    this._instantaneousComplianceTensor[1, 2] = value;
-                }
-            }
-        }
-
-        public double ConstraintS44
-        {
-            get
-            {
-                return this._instantaneousComplianceTensor[3, 3];
-            }
-            set
-            {
-                this._instantaneousComplianceTensor[3, 3] = value;
-                if (this._symmetry == 1)
-                {
-                    this._instantaneousComplianceTensor[4, 4] = value;
-                    this._instantaneousComplianceTensor[5, 5] = value;
-                }
-                else if (this._symmetry == 2)
-                {
-                    this._instantaneousComplianceTensor[4, 4] = value;
-                }
-            }
-        }
-
-        #endregion
 
         #endregion
 
         public Texture.OrientationDistributionFunction ODF;
 
-        public YieldSurface YieldSurfaceData;
+        //public YieldSurface YieldSurfaceData;
         
         /// <summary>
         /// Alpha, multiplied with the applied stress gets the resolved shear stress
@@ -545,195 +234,167 @@ namespace CalScec.Analysis.Stress.Plasticity
         /// <returns>alpha</returns>
         public MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvingParameter(DataManagment.CrystalData.HKLReflex slipPlane, DataManagment.CrystalData.HKLReflex slipDirection)
         {
-            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-            double slipPlaneNorm = slipPlane.NormFaktor;
-            double slipDirectionNorm = slipDirection.NormFaktor;
-
-            ret[1, 1] = (slipDirection.H * slipPlane.H) * (slipPlaneNorm * slipDirectionNorm);
-            ret[2, 2] = (slipDirection.K * slipPlane.K) * (slipPlaneNorm * slipDirectionNorm);
-            ret[3, 3] = (slipDirection.L * slipPlane.L) * (slipPlaneNorm * slipDirectionNorm);
-
-            ret[1, 2] = slipDirection.H * slipPlane.K * (slipPlaneNorm * slipDirectionNorm);
-            ret[1, 2] += slipDirection.K * slipPlane.H * (slipPlaneNorm * slipDirectionNorm);
-            ret[1, 2] *= 0.5;
-
-            ret[2, 1] = slipDirection.H * slipPlane.K * (slipPlaneNorm * slipDirectionNorm);
-            ret[2, 1] += slipDirection.K * slipPlane.H * (slipPlaneNorm * slipDirectionNorm);
-            ret[2, 1] *= 0.5;
-
-            ret[1, 3] = slipDirection.H * slipPlane.L * (slipPlaneNorm * slipDirectionNorm);
-            ret[1, 3] += slipDirection.L * slipPlane.H * (slipPlaneNorm * slipDirectionNorm);
-            ret[1, 3] *= 0.5;
-
-            ret[3, 1] = slipDirection.H * slipPlane.L * (slipPlaneNorm * slipDirectionNorm);
-            ret[3, 1] += slipDirection.L * slipPlane.H * (slipPlaneNorm * slipDirectionNorm);
-            ret[3, 1] *= 0.5;
-
-            ret[2, 3] = slipDirection.K * slipPlane.L * (slipPlaneNorm * slipDirectionNorm);
-            ret[2, 3] += slipDirection.L * slipPlane.K * (slipPlaneNorm * slipDirectionNorm);
-            ret[2, 3] *= 0.5;
-
-            ret[3, 2] = slipDirection.K * slipPlane.L * (slipPlaneNorm * slipDirectionNorm);
-            ret[3, 2] += slipDirection.L * slipPlane.K * (slipPlaneNorm * slipDirectionNorm);
-            ret[3, 2] *= 0.5;
-
-            return ret;
+            return Tools.Calculation.GetResolvingParameter(slipPlane, slipDirection);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="potentialAktiveSystems"></param>
-        /// <param name="hardenningType">
-        /// 0: perfect plasticity
-        /// 1: isotropic hardening
-        /// 2: independent hardening
-        /// 3: kinematic hardening
-        /// </param>
-        /// <returns>Direction resolved hardening Matrix</returns>
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvedHardening(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET, int hardenningType)
-        {
-            switch(hardenningType)
-            {
-                case 0:
-                    return this.GetResolvedPerfectHardening(potentialAktiveSystems, ET);
-                case 1:
-                    return this.GetResolvedIsotropicHardening(potentialAktiveSystems, ET);
-                case 2:
-                    return this.GetResolvedIndependentHardening(potentialAktiveSystems, ET);
-                case 3:
-                    return this.GetResolvedKinematicHardening(potentialAktiveSystems, ET);
-                default:
-                    return this.GetResolvedPerfectHardening(potentialAktiveSystems, ET);
-            }
-        }
+        #region Old Stuff
 
-        private MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvedPerfectHardening(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET)
-        {
-            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(potentialAktiveSystems.Count, potentialAktiveSystems.Count, 0.0);
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="potentialAktiveSystems"></param>
+        ///// <param name="hardenningType">
+        ///// 0: perfect plasticity
+        ///// 1: isotropic hardening
+        ///// 2: independent hardening
+        ///// 3: kinematic hardening
+        ///// </param>
+        ///// <returns>Direction resolved hardening Matrix</returns>
+        //public MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvedHardening(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET, int hardenningType)
+        //{
+        //    switch(hardenningType)
+        //    {
+        //        case 0:
+        //            return this.GetResolvedPerfectHardening(potentialAktiveSystems, ET);
+        //        case 1:
+        //            return this.GetResolvedIsotropicHardening(potentialAktiveSystems, ET);
+        //        case 2:
+        //            return this.GetResolvedIndependentHardening(potentialAktiveSystems, ET);
+        //        case 3:
+        //            return this.GetResolvedKinematicHardening(potentialAktiveSystems, ET);
+        //        default:
+        //            return this.GetResolvedPerfectHardening(potentialAktiveSystems, ET);
+        //    }
+        //}
 
-            for(int i = 0; i < potentialAktiveSystems.Count; i++)
-            {
-                for(int j = 0; j < potentialAktiveSystems.Count; j++)
-                {
-                    MathNet.Numerics.LinearAlgebra.Matrix<double> resI = this.GetResolvingParameter(potentialAktiveSystems[i].SlipPlane, potentialAktiveSystems[i].MainSlipDirection);
-                    MathNet.Numerics.LinearAlgebra.Matrix<double> resJ = this.GetResolvingParameter(potentialAktiveSystems[j].SlipPlane, potentialAktiveSystems[j].MainSlipDirection);
+        //private MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvedPerfectHardening(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET)
+        //{
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(potentialAktiveSystems.Count, potentialAktiveSystems.Count, 0.0);
 
-                    Tools.FourthRankTensor ETFourthRank = new Tools.FourthRankTensor(ET._stiffnessTensor);
+        //    for(int i = 0; i < potentialAktiveSystems.Count; i++)
+        //    {
+        //        for(int j = 0; j < potentialAktiveSystems.Count; j++)
+        //        {
+        //            MathNet.Numerics.LinearAlgebra.Matrix<double> resI = this.GetResolvingParameter(potentialAktiveSystems[i].SlipPlane, potentialAktiveSystems[i].MainSlipDirection);
+        //            MathNet.Numerics.LinearAlgebra.Matrix<double> resJ = this.GetResolvingParameter(potentialAktiveSystems[j].SlipPlane, potentialAktiveSystems[j].MainSlipDirection);
 
-                    MathNet.Numerics.LinearAlgebra.Matrix<double> elasticResJ = ETFourthRank * resJ;
+        //            Tools.FourthRankTensor ETFourthRank = new Tools.FourthRankTensor(ET._stiffnessTensor);
 
-                    for(int m = 0; m < 3; m++)
-                    {
-                        for(int n = 0; n < 3; n++)
-                        {
-                            ret[i, j] += resI[m, n] * elasticResJ[m, n];
-                        }
-                    }
-                }
-            }
+        //            MathNet.Numerics.LinearAlgebra.Matrix<double> elasticResJ = ETFourthRank * resJ;
 
-            return ret;
-        }
+        //            for(int m = 0; m < 3; m++)
+        //            {
+        //                for(int n = 0; n < 3; n++)
+        //                {
+        //                    ret[i, j] += resI[m, n] * elasticResJ[m, n];
+        //                }
+        //            }
+        //        }
+        //    }
 
-        private MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvedIsotropicHardening(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET)
-        {
-            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = this.GetResolvedPerfectHardening(potentialAktiveSystems, ET);
+        //    return ret;
+        //}
 
-            for (int i = 0; i < potentialAktiveSystems.Count; i++)
-            {
-                for (int j = 0; j < potentialAktiveSystems.Count; j++)
-                {
-                    ret[i, j] += this._isotropicHardenningTensor[i, j];
-                }
-            }
+        //private MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvedIsotropicHardening(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET)
+        //{
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> ret = this.GetResolvedPerfectHardening(potentialAktiveSystems, ET);
 
-            return ret;
-        }
+        //    for (int i = 0; i < potentialAktiveSystems.Count; i++)
+        //    {
+        //        for (int j = 0; j < potentialAktiveSystems.Count; j++)
+        //        {
+        //            ret[i, j] += this._isotropicHardenningTensor[i, j];
+        //        }
+        //    }
 
-        private MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvedIndependentHardening(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET)
-        {
-            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = this.GetResolvedPerfectHardening(potentialAktiveSystems, ET);
+        //    return ret;
+        //}
 
-            for (int i = 0; i < potentialAktiveSystems.Count; i++)
-            {
-                for (int j = 0; j < potentialAktiveSystems.Count; j++)
-                {
-                    ret[i, j] += this._independentHardenningTensor[i, j];
-                }
-            }
+        //private MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvedIndependentHardening(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET)
+        //{
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> ret = this.GetResolvedPerfectHardening(potentialAktiveSystems, ET);
 
-            return ret;
-        }
+        //    for (int i = 0; i < potentialAktiveSystems.Count; i++)
+        //    {
+        //        for (int j = 0; j < potentialAktiveSystems.Count; j++)
+        //        {
+        //            ret[i, j] += this._independentHardenningTensor[i, j];
+        //        }
+        //    }
 
-        private MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvedKinematicHardening(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET)
-        {
-            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = this.GetResolvedPerfectHardening(potentialAktiveSystems, ET);
+        //    return ret;
+        //}
 
-            for (int i = 0; i < potentialAktiveSystems.Count; i++)
-            {
-                for (int j = 0; j < potentialAktiveSystems.Count; j++)
-                {
-                    ret[i, j] += this._kinematicHardenningTensor[i, j];
-                }
-            }
+        //private MathNet.Numerics.LinearAlgebra.Matrix<double> GetResolvedKinematicHardening(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET)
+        //{
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> ret = this.GetResolvedPerfectHardening(potentialAktiveSystems, ET);
 
-            return ret;
-        }
+        //    for (int i = 0; i < potentialAktiveSystems.Count; i++)
+        //    {
+        //        for (int j = 0; j < potentialAktiveSystems.Count; j++)
+        //        {
+        //            ret[i, j] += this._kinematicHardenningTensor[i, j];
+        //        }
+        //    }
+
+        //    return ret;
+        //}
 
 
-        public List<MathNet.Numerics.LinearAlgebra.Matrix<double>> GetShearRateCoefficientF(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET, int hardenningType)
-        {
-            List<MathNet.Numerics.LinearAlgebra.Matrix<double>> ret = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
+        //public List<MathNet.Numerics.LinearAlgebra.Matrix<double>> GetShearRateCoefficientF(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET, int hardenningType)
+        //{
+        //    List<MathNet.Numerics.LinearAlgebra.Matrix<double>> ret = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
 
-            MathNet.Numerics.LinearAlgebra.Matrix<double> ResolvedHardening = this.GetResolvedHardening(potentialAktiveSystems, ET, hardenningType);
-            MathNet.Numerics.LinearAlgebra.Matrix<double> ResolvedHardeningInverse = ResolvedHardening.Inverse();
-            for(int i = 0; i < ResolvedHardeningInverse.RowCount; i++)
-            {
-                MathNet.Numerics.LinearAlgebra.Matrix<double> retTmp = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(6, 6, 0);
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> ResolvedHardening = this.GetResolvedHardening(potentialAktiveSystems, ET, hardenningType);
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> ResolvedHardeningInverse = ResolvedHardening.Inverse();
+        //    for(int i = 0; i < ResolvedHardeningInverse.RowCount; i++)
+        //    {
+        //        MathNet.Numerics.LinearAlgebra.Matrix<double> retTmp = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(6, 6, 0);
 
-                for (int j = 0; j < potentialAktiveSystems.Count; j++)
-                {
-                    MathNet.Numerics.LinearAlgebra.Matrix<double> resJ = this.GetResolvingParameter(potentialAktiveSystems[j].SlipPlane, potentialAktiveSystems[j].MainSlipDirection);
+        //        for (int j = 0; j < potentialAktiveSystems.Count; j++)
+        //        {
+        //            MathNet.Numerics.LinearAlgebra.Matrix<double> resJ = this.GetResolvingParameter(potentialAktiveSystems[j].SlipPlane, potentialAktiveSystems[j].MainSlipDirection);
 
-                    MathNet.Numerics.LinearAlgebra.Vector<double> resJVektor = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(6);
+        //            MathNet.Numerics.LinearAlgebra.Vector<double> resJVektor = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(6);
 
-                    resJVektor[0] = resJ[0, 0];
-                    resJVektor[1] = resJ[1, 1];
-                    resJVektor[2] = resJ[2, 2];
-                    resJVektor[3] = resJ[1, 2];
-                    resJVektor[4] = resJ[0, 2];
-                    resJVektor[5] = resJ[0, 1];
+        //            resJVektor[0] = resJ[0, 0];
+        //            resJVektor[1] = resJ[1, 1];
+        //            resJVektor[2] = resJ[2, 2];
+        //            resJVektor[3] = resJ[1, 2];
+        //            resJVektor[4] = resJ[0, 2];
+        //            resJVektor[5] = resJ[0, 1];
 
-                    MathNet.Numerics.LinearAlgebra.Vector<double> elasticResJVektor = ET._stiffnessTensor * resJVektor;
+        //            MathNet.Numerics.LinearAlgebra.Vector<double> elasticResJVektor = ET._stiffnessTensor * resJVektor;
 
-                    MathNet.Numerics.LinearAlgebra.Matrix<double> elasticResJ = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(6, 6, 0);
+        //            MathNet.Numerics.LinearAlgebra.Matrix<double> elasticResJ = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(6, 6, 0);
 
-                    elasticResJ[0, 0] = elasticResJVektor[0];
-                    elasticResJ[1, 1] = elasticResJVektor[1];
-                    elasticResJ[2, 2] = elasticResJVektor[2];
+        //            elasticResJ[0, 0] = elasticResJVektor[0];
+        //            elasticResJ[1, 1] = elasticResJVektor[1];
+        //            elasticResJ[2, 2] = elasticResJVektor[2];
 
-                    elasticResJ[0, 1] = elasticResJVektor[5];
-                    elasticResJ[1, 0] = elasticResJVektor[5];
+        //            elasticResJ[0, 1] = elasticResJVektor[5];
+        //            elasticResJ[1, 0] = elasticResJVektor[5];
 
-                    elasticResJ[0, 2] = elasticResJVektor[4];
-                    elasticResJ[2, 0] = elasticResJVektor[4];
+        //            elasticResJ[0, 2] = elasticResJVektor[4];
+        //            elasticResJ[2, 0] = elasticResJVektor[4];
 
-                    elasticResJ[1, 2] = elasticResJVektor[3];
-                    elasticResJ[2, 1] = elasticResJVektor[3];
+        //            elasticResJ[1, 2] = elasticResJVektor[3];
+        //            elasticResJ[2, 1] = elasticResJVektor[3];
 
-                    elasticResJ = elasticResJ * ResolvedHardeningInverse[i, j];
+        //            elasticResJ = elasticResJ * ResolvedHardeningInverse[i, j];
 
-                    retTmp += elasticResJ;
-                }
+        //            retTmp += elasticResJ;
+        //        }
 
-                ret.Add(retTmp);
-            }
+        //        ret.Add(retTmp);
+        //    }
 
-            return ret;
-        }
+        //    return ret;
+        //}
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> GetInstantanousGrainSiffnessTensor(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET, List<MathNet.Numerics.LinearAlgebra.Matrix<double>> coefficientF, int hardeningType)
+        #endregion
+
+        public Tools.FourthRankTensor GetInstantanousGrainSiffnessTensor(List<ReflexYield> potentialAktiveSystems, Microsopic.ElasticityTensors ET, List<MathNet.Numerics.LinearAlgebra.Matrix<double>> coefficientF)
         {
             Tools.FourthRankTensor FRT = new Tools.FourthRankTensor();
 
@@ -764,24 +425,45 @@ namespace CalScec.Analysis.Stress.Plasticity
 
             Tools.FourthRankTensor GrainStiffness = StiffnessFourthRank * FRT;
 
-            return GrainStiffness.GetVoigtTensor();
+            return GrainStiffness;
         }
 
         #region Effective stiffness caluclations
+
+        public Tools.FourthRankTensor GetAc(Tools.FourthRankTensor Ls, Tools.FourthRankTensor Lc, Tools.FourthRankTensor L)
+        {
+            Tools.FourthRankTensor inv = new Tools.FourthRankTensor();
+            Tools.FourthRankTensor fac = new Tools.FourthRankTensor();
+
+            inv = Ls + Lc;
+            fac = Ls + L;
+
+            Tools.FourthRankTensor ret = inv.InverseSC() * fac;
+
+            return ret;
+        }
+
+        public Tools.FourthRankTensor GetBc(Tools.FourthRankTensor Ac, Tools.FourthRankTensor Lc, Tools.FourthRankTensor L)
+        {
+            Tools.FourthRankTensor inv = L.Inverse();
+            Tools.FourthRankTensor ret = Lc * Ac * inv;
+
+            return ret;
+        }
 
         #region cubic
 
         private double GetBetaParameter(Microsopic.ElasticityTensors ET, int shearType)
         {
             double shearModulus = ET.ConstantsShearModulusCubicStiffness;
-            if(shearType == 1)
-            {
-                shearModulus = ET.KroenerShearModulus;
-            }
-            else if(shearType == 2)
-            {
-                shearModulus = ET.DeWittShearModulus;
-            }
+            //if(shearType == 1)
+            //{
+            //    shearModulus = ET.KroenerShearModulus;
+            //}
+            //else if(shearType == 2)
+            //{
+            //    shearModulus = ET.DeWittShearModulus;
+            //}
 
             double Z = 6 * (ET.KappaCubicStiffness + (2 * shearModulus));
             double N = 5 * ((3 * ET.KappaCubicStiffness) + (4 * shearModulus));
@@ -789,17 +471,25 @@ namespace CalScec.Analysis.Stress.Plasticity
             return Z / N;
         }
 
-        public Tools.FourthRankTensor GetEffectiveStiffnessCubic(Microsopic.ElasticityTensors ET, int shearType)
+        public Tools.FourthRankTensor GetConstraintStiffnessCubicIsotropic(Microsopic.ElasticityTensors ET, int shearType)
         {
             double shearModulus = ET.ConstantsShearModulusCubicStiffness;
-            if (shearType == 1)
-            {
-                shearModulus = ET.KroenerShearModulus;
-            }
-            else if (shearType == 2)
-            {
-                shearModulus = ET.DeWittShearModulus;
-            }
+            //if (ET.Symmetry == "cubic")
+            //{
+            //    if (shearType == 1 && ET.KroenerShearModulus != 0)
+            //    {
+            //        shearModulus = ET.KroenerShearModulus;
+            //    }
+            //    else if (shearType == 2 && ET.DeWittShearModulus != 0)
+            //    {
+            //        shearModulus = ET.DeWittShearModulus;
+            //    }
+            //}
+            //else if (ET.Symmetry == "hexagonal")
+            //{
+            //    shearModulus = ET.ConstantsShearModulusHexagonalStiffness;
+            //}
+            //double shearModulus = ET.ConstantsShearModulusHexagonalStiffness;
 
             Tools.FourthRankTensor ret = new Tools.FourthRankTensor();
 
@@ -1036,21 +726,23 @@ namespace CalScec.Analysis.Stress.Plasticity
         }
 
         //TODO: Implement this one
-        private MathNet.Numerics.LinearAlgebra.Matrix<double> GetLambdaPrimeParameter(MathNet.Numerics.LinearAlgebra.Matrix<double> usedStiffness)
+        private Tools.FourthRankTensor GetLambdaPrime0Parameter(MathNet.Numerics.LinearAlgebra.Matrix<double> usedStiffness)
         {
-            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(6, 6, 0);
+            Tools.FourthRankTensor ret = new Tools.FourthRankTensor();
+
+            ret[0, 0, 0, 0] = usedStiffness[3, 3] * (usedStiffness[0, 0] + (3.0 * usedStiffness[5, 5]));
+            ret[1, 1, 1, 1] = ret[0, 0, 0, 0];
 
             return ret;
         }
 
         public Tools.FourthRankTensor GetElastoPlasticEshelbyTensor(MathNet.Numerics.LinearAlgebra.Matrix<double> usedStiffness)
         {
-            MathNet.Numerics.LinearAlgebra.Matrix<double> LambdaPrime = this.GetLambdaPrimeParameter(usedStiffness);
-
-            Tools.FourthRankTensor LambdaPrimeTensor = new Tools.FourthRankTensor(LambdaPrime);
+            Tools.FourthRankTensor LambdaPrime = this.GetLambdaPrime0Parameter(usedStiffness);
+            
             Tools.FourthRankTensor StiffnessTensor = new Tools.FourthRankTensor(usedStiffness);
 
-            return LambdaPrimeTensor * StiffnessTensor;
+            return LambdaPrime * StiffnessTensor;
         }
 
         public Tools.FourthRankTensor GetEffectiveStiffnessHexagonal(MathNet.Numerics.LinearAlgebra.Matrix<double> usedStiffness)

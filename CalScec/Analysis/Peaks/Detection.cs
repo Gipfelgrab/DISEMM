@@ -299,6 +299,8 @@ namespace CalScec.Analysis.Peaks
 
                         DPeak.AddHKLAssociation(CrystalData[n].HKLList[i], CrystalData[n]);
 
+                        DPeak.PFunction.functionType = 2;
+
                         DPeakList.Add(DPeak);
                     }
                 }
@@ -318,13 +320,13 @@ namespace CalScec.Analysis.Peaks
                 int dChannel = 0;
                 double dHeight = 0.0;
 
-                double StartDegree = PrevDP.FoundPeaks[n].PFunction.Angle - (2.0 * FWHMD);
+                double StartDegree = PrevDP.FoundPeaks[n].PFunction.Angle - (CalScec.Properties.Settings.Default.PeakWidthFWHM * FWHMD);
                 if (StartDegree < CalScec.Properties.Settings.Default.PatternLowerLimit)
                 {
                     StartDegree = CalScec.Properties.Settings.Default.PatternLowerLimit;
                 }
 
-                double StopDegree = PrevDP.FoundPeaks[n].PFunction.Angle + (2.0 * FWHMD);
+                double StopDegree = PrevDP.FoundPeaks[n].PFunction.Angle + (CalScec.Properties.Settings.Default.PeakWidthFWHM * FWHMD);
                 if (StopDegree > CalScec.Properties.Settings.Default.PatternUpperLimit)
                 {
                     StopDegree = CalScec.Properties.Settings.Default.PatternUpperLimit;
@@ -356,7 +358,9 @@ namespace CalScec.Analysis.Peaks
                 double dBackground = FittingCounts[0][1];
 
                 DiffractionPeak DPeak = new DiffractionPeak(PrevDP.FoundPeaks[n].DetectedChannel, PrevDP.FoundPeaks[n].PFunction.Angle, PrevDP.FoundPeaks[n].PFunction.Intensity, dBackground, FittingCounts);
-
+                DPeak.PFunction.functionType = PrevDP.FoundPeaks[n].PFunction.functionType;
+                DPeak.PFunction.FWHM = PrevDP.FoundPeaks[n].PFunction.FWHM;
+                DPeak.PFunction.LorentzRatio = PrevDP.FoundPeaks[n].PFunction.LorentzRatio;
                 DPeak.AddHKLAssociation(PrevDP.FoundPeaks[n].AssociatedHKLReflex, PrevDP.FoundPeaks[n].AssociatedCrystalData);
 
                 DPeakList.Add(DPeak);

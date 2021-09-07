@@ -90,6 +90,7 @@ namespace CalScec.Analysis.Peaks.Functions
         }
 
         public System.Threading.ManualResetEvent _doneEvent;
+
         /// <summary>
         /// If positive this lamdba is used in LMA as starting parameter
         /// </summary>
@@ -228,6 +229,86 @@ namespace CalScec.Analysis.Peaks.Functions
         }
 
         #region Reduced Hessian
+
+        //public MathNet.Numerics.LinearAlgebra.Vector<double> ParameterDeltaVektor(double Lambda)
+        //{
+        //    int fitDimension = 0;
+        //    for (int i = 0; i < this.Count; i++)
+        //    {
+        //        for(int j = 0; j < 4; j++)
+        //        {
+        //            if(this[i].FreeParameters[j])
+        //            {
+        //                fitDimension++;
+        //            }
+        //        }
+        //    }
+
+        //    if(this.FreeParameters[4])
+        //    {
+        //        fitDimension++;
+        //    }
+        //    if (this.FreeParameters[5])
+        //    {
+        //        fitDimension++;
+        //    }
+        //    if (this.FreeParameters[6])
+        //    {
+        //        fitDimension++;
+        //    }
+
+        //    //[0][0] Sigma
+        //    //[1][1] Angle
+        //    //[2][2] Intensity
+        //    //[3][3] Lorentz Ratio
+        //    //  *
+        //    //  *
+        //    //  *
+        //    //[4][4] Background Constant
+        //    //[5][5] BackgroundCenter
+        //    //[6][6] Background aclivity
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> HessianMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(fitDimension, fitDimension, 0.0);
+
+        //    //[0] Sigma
+        //    //[1] Angle
+        //    //[2] Intensity
+        //    //[3] Lorentz Ratio
+        //    //  *
+        //    //  *
+        //    //  *
+        //    //[4] Background Constant
+        //    //[5] BackgroundCenter
+        //    //[6] Background aclivity
+        //    MathNet.Numerics.LinearAlgebra.Vector<double> SolutionVector = MathNet.Numerics.LinearAlgebra.CreateVector.Dense<double>(fitDimension, 0.0);
+
+        //    for (int n = 0; n < this.FittingCounts.Count; n++)
+        //    {
+        //        int parameterIndex = 0;
+        //        for (int i = 0; i < this.Count; i++)
+        //        {
+        //            for (int j = 0; j < 4; j++)
+        //            {
+        //                if (this[i].FreeParameters[j])
+        //                {
+        //                    switch(j)
+        //                    {
+        //                        case 0:
+        //                            HessianMatrix[parameterIndex, parameterIndex] += (this[i].FirstDerivativeSigma(this.FittingCounts[n][0]) * this[j].FirstDerivativeSigma(this.FittingCounts[n][0]) / Math.Pow(this.FittingCounts[n][2], 2));
+        //                            break;
+        //                        case 1:
+        //                            break;
+        //                        case 2:
+        //                            break;
+        //                        case 3:
+        //                            break;
+        //                        default:
+        //                            break;
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Calculates the Hessian matrix and the solution vecor

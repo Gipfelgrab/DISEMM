@@ -54,6 +54,8 @@ namespace CalScec.DataManagment.Files.SCEC
 
         #region MacroElasticity
 
+        public List<Analysis.Stress.Macroskopic.TensileTest> TensileTests = new List<Analysis.Stress.Macroskopic.TensileTest>();
+
         public List<MacroElasticInformation> MacroElasticData = new List<MacroElasticInformation>();
 
         #endregion
@@ -80,6 +82,7 @@ namespace CalScec.DataManagment.Files.SCEC
         #region EPSC
 
         public List<Analysis.Stress.Plasticity.ElastoPlasticExperiment> SimulationData = new List<Analysis.Stress.Plasticity.ElastoPlasticExperiment>();
+        public List<SimulatedExperimentInformation> SimulationInformation = new List<SimulatedExperimentInformation>();
 
         public List<PlasticityTensorInformation> PlasticTensor = new List<PlasticityTensorInformation>();
 
@@ -93,6 +96,7 @@ namespace CalScec.DataManagment.Files.SCEC
             this.SampleArea = sample.Area;
             this.SampleName = sample.Name;
             this._usedWaveLength = CalScec.Properties.Settings.Default.UsedWaveLength;
+            this.TensileTests = sample.TensileTests;
             
             for (int n = 0; n < sample.CrystalData.Count; n++)
             {
@@ -119,11 +123,21 @@ namespace CalScec.DataManagment.Files.SCEC
 
                     this.ODFData.Add(ODFDataTmp);
                 }
-
-                this.PlasticTensor.Add(new PlasticityTensorInformation(sample.PlasticTensor[n]));
+                if (sample.PlasticTensor.Count != 0)
+                {
+                    this.PlasticTensor.Add(new PlasticityTensorInformation(sample.PlasticTensor[n]));
+                }
+                else
+                {
+                    this.PlasticTensor = null;
+                }
             }
 
-            this.SimulationData = sample.SimulationData;
+            //this.SimulationData = sample.SimulationData;
+            //for(int n = 0; n < sample.SimulationData.Count; n++)
+            //{
+            //    this.SimulationInformation.Add(new SimulatedExperimentInformation(sample.SimulationData[n]));
+            //}
 
             for (int n = 0; n < sample.MacroElasticData.Count; n++)
             {
@@ -145,9 +159,29 @@ namespace CalScec.DataManagment.Files.SCEC
             Ret.Name = this.SampleName;
             Ret.Area = this.SampleArea;
 
+            if(this.TensileTests != null)
+            {
+                Ret.TensileTests = this.TensileTests;
+            }
+
             CalScec.Properties.Settings.Default.UsedWaveLength = this._usedWaveLength;
-            Ret.SimulationData = this.SimulationData;
+            //Ret.SimulationData = this.SimulationData;
+            if (this.SimulationInformation != null)
+            {
+                for (int n = 0; n < this.SimulationInformation.Count; n++)
+                {
+                    Ret.SimulationData.Add(this.SimulationInformation[n].GetElastoPlasticExperiment());
+                }
+            }
             if (this.StressTransitionFactors == null)
+            {
+                for (int n = 0; n < this.CrystalData.Count; n++)
+                {
+                    MathNet.Numerics.LinearAlgebra.Matrix<double> tmp = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(6, 6, 0.0);
+                    Ret.StressTransitionFactors.Add(tmp);
+                }
+            }
+            else if(this.StressTransitionFactors.Count != this.CrystalData.Count)
             {
                 for (int n = 0; n < this.CrystalData.Count; n++)
                 {
@@ -158,6 +192,37 @@ namespace CalScec.DataManagment.Files.SCEC
             else
             {
                 Ret.StressTransitionFactors = this.StressTransitionFactors;
+            }
+
+            for (int n = 0; n < Ret.SimulationData.Count; n++)
+            {
+                if(Ret.SimulationData[n].YieldInformation == null)
+                {
+                    Ret.SimulationData[n].YieldInformation = new List<Analysis.Stress.Plasticity.YieldSurface>();
+                }
+
+                if (Ret.SimulationData[n].YieldInformation.Count == 0)
+                {
+                    for (int i = 0; i < this.CrystalData.Count; i++)
+                    {
+                        Ret.SimulationData[n].YieldInformation.Add(new Analysis.Stress.Plasticity.YieldSurface(this.CrystalData[i]));
+                    }
+                }
+                if(Ret.SimulationData[n]._hardenningTensor == null)
+                {
+                    Ret.SimulationData[n]._hardenningTensor = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
+                }
+                if(Ret.SimulationData[n]._hardenningTensor.Count == 0)
+                {
+                    for (int i = 0; i < this.CrystalData.Count; i++)
+                    {
+                        MathNet.Numerics.LinearAlgebra.Matrix<double> tmp = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0.0);
+                        tmp[0, 0] = 1;
+                        tmp[1, 1] = 1;
+                        tmp[2, 2] = 1;
+                        Ret.SimulationData[n]._hardenningTensor.Add(tmp);
+                    }
+                }
             }
 
             for (int n = 0; n < this.CrystalData.Count; n++)

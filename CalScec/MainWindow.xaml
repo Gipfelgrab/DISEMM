@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:oxycore="clr-namespace:OxyPlot;assembly=OxyPlot"
         xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
-        Title="CalScec" Height="800" Width="1600" >
+        Title="Disemm" Height="800" Width="1600" Icon="Res\Logo-Icon\DISEMM-Full-1.ico">
     <DockPanel LastChildFill="True">
         <Menu DockPanel.Dock="Top" Name="MainMenu" Height="25">
             <MenuItem Header="_Application">
@@ -20,13 +20,17 @@
                     <MenuItem Header="Save" Click="SaveToSCEC_Click"/>
                     <MenuItem Header="Load" Click="LoadFromSCEC_Click"/>
                 </MenuItem>
+                <MenuItem Header="Load tensile test" Click="LoadTensileTest_Click"/>
                 <MenuItem Header="Export">
                     <MenuItem Header="To xlsx" Click="ExportToxlsx_Click"/>
                 </MenuItem>
+                <MenuItem Header="Load reflex data">
+                    <MenuItem Header="From file" Click="OpenReflexInformationFile_Click"/>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="_Crystallographic data">
-                <MenuItem Header="From files" Click="OpenCrystallographyDataFile_Click"/>
-                <MenuItem Header="From database" Click="OpenCrystallographyDataDatabase_Click"/>
+                <MenuItem Header="From file" Click="OpenCrystallographyDataFile_Click"/>
+                <!--<MenuItem Header="From database" Click="OpenCrystallographyDataDatabase_Click"/>-->
                 <MenuItem Header="Manual input" Click="ManualInputCrystallographicData_Click"/>
                 <Separator/>
                 <MenuItem Header="Show loaded data" Click="ModifyCrystallographicData_Click"/>
@@ -48,8 +52,8 @@
                 <MenuItem Header="Extension-stress" Click="ExtensionStressCalculation_Click"/>
             </MenuItem>
             <MenuItem Header="Elastic calculation">
-                <MenuItem Header="REK calculation" Click="REKCalculation_Click"/>
-                <MenuItem Header="Elasticity tensor calculation" Click="ElasticityTensorCalculation_Click"/>
+                <MenuItem Header="DEC calculation" Click="REKCalculation_Click"/>
+                <MenuItem Header="Single-Crystal Elastic Constants" Click="ElasticityTensorCalculation_Click"/>
                 <MenuItem Header="Model Fitting simulation" Click="OpenModelSimulationWindow_Click"/>
             </MenuItem>
             <MenuItem Header="Plastic calculation">
@@ -57,7 +61,7 @@
             </MenuItem>
             <MenuItem Header="Texture">
                 <MenuItem Header="Load texture" Click="LoadTexture_Click"/>
-                <MenuItem Header="Show polefigures" Click="ShowPoleFigures_Click"/>
+                <!--<MenuItem Header="Show polefigures" Click="ShowPoleFigures_Click"/>-->
             </MenuItem>
             <Separator/>
             <MenuItem Header="_Settings">
@@ -110,16 +114,6 @@
                         <MenuItem Name="PeakDetectionRoutineCIF" Header="CIF-based detection" IsCheckable="True" Checked="PeakDetectionRoutineCIF_Checked" Unchecked="PeakDetectionRoutineCIF_Unchecked"/>
                         <MenuItem Name="PeakDetectionRoutineHyper" Header="Hyper detection" IsCheckable="True" Checked="PeakDetectionRoutineHyper_Checked" Unchecked="PeakDetectionRoutineHyper_Unchecked"/>
                         <MenuItem Name="PeakDetectionRoutinePattern" Header="Pattern detection" IsCheckable="True" Checked="PeakDetectionRoutinePattern_Checked"  Unchecked="PeakDetectionRoutinePattern_Unchecked"/>
-                    </MenuItem>
-                    <MenuItem Header="Pattern limits">
-                        <StackPanel Orientation="Horizontal">
-                            <Label Content="Lower limit: " Width="80"/>
-                            <TextBox Name="PatternLowerLimitTextBox" Height="25" Width="35" VerticalContentAlignment="Center" TextChanged="PatternLowerLimitTextBox_TextChanged"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Label Content="Upper limit: " Width="80"/>
-                            <TextBox Name="PatternUpperLimitTextBox" Height="25" Width="35" VerticalContentAlignment="Center" TextChanged="PatternUpperLimitTextBox_TextChanged"/>
-                        </StackPanel>
                     </MenuItem>
                     <MenuItem Header="Hyper detection">
                         <StackPanel Orientation="Horizontal">
@@ -176,6 +170,19 @@
                         </StackPanel>
                     </Button>
                 </StackPanel>
+
+                <ToolBar>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="λ: "/>
+                        <TextBox Name="WavelengthTextBox" Height="25" Width="55" VerticalContentAlignment="Center" TextChanged="WavelengthTextBox_TextChanged"/>
+                        <Rectangle Width="2" Fill="Gray" Margin="5,5,5,5"/>
+                        <Label Content="Pattern Limits: "/>
+                        <Label Content="Lower: "/>
+                        <TextBox Name="PatternLowerLimitTextBox" Height="25" Width="35" VerticalContentAlignment="Center" TextChanged="PatternLowerLimitTextBox_TextChanged"/>
+                        <Label Content="Upper limit:"/>
+                        <TextBox Name="PatternUpperLimitTextBox" Height="25" Width="35" VerticalContentAlignment="Center" TextChanged="PatternUpperLimitTextBox_TextChanged"/>
+                    </StackPanel>
+                </ToolBar>
             </ToolBar>
         </ToolBarTray>
         <StatusBar DockPanel.Dock="Bottom" Height="30">
@@ -200,13 +207,13 @@
                 </ItemsPanelTemplate>
             </StatusBar.ItemsPanel>
             <StatusBarItem Grid.Column="0">
-                <Label Content="CalcScec" />
+                <Label Content="Disemm" />
             </StatusBarItem>
             <StatusBarItem Grid.Column="1">
                 <Label Content="Version" />
             </StatusBarItem>
             <StatusBarItem Grid.Column="2">
-                <Label Content="0.0.1" />
+                <Label Content="0.8.1" />
             </StatusBarItem>
             <StatusBarItem Grid.Column="4">
                 <Label Name="ErrorLog1" Foreground="DarkRed"/>
@@ -227,48 +234,210 @@
         <DockPanel LastChildFill="True" DockPanel.Dock="Top" VerticalAlignment="Stretch" MinHeight="670">
             <Grid VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="0.5*"/>
-                    <RowDefinition Height="0.5*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.75*"/>
-                        <ColumnDefinition Width="0.25*"/>
-                    </Grid.ColumnDefinitions>
-                    <GroupBox Header="Diffraction pattern" Grid.Column="0">
-                        <oxy:PlotView Name="MainDiffPlot" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5" MouseLeftButtonUp="MainPlot_MouseLeftButtonUp"/>
-                    </GroupBox>
-                    <GroupBox Header="Diffraction pattern list" Grid.Column="1">
-                        <ListView Name="DiffractionPatternList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5" AllowDrop="True" Drop="DiffractionPatternList_Drop" KeyDown="DiffractionPatternList_KeyDown" SelectionChanged="DiffractionPatternList_SelectionChanged">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Width="350" Header="Name" DisplayMemberBinding="{Binding Path=Name}"/>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-                    </GroupBox>
-                </Grid>
-                <Grid Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.3*"/>
-                        <ColumnDefinition Width="0.7*"/>
-                    </Grid.ColumnDefinitions>
-                    <GroupBox Header="Peak list">
-                        <ListView Name="PeakList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5,5,5,5" SelectionChanged="PeakList_SelectionChanged" KeyDown="PeakList_KeyDown">
-                            <ListView.View>
-                                <GridView>
-                                    <GridViewColumn Width="100" Header="Position" DisplayMemberBinding="{Binding Path=Angle}"/>
-                                    <GridViewColumn Width="120" Header="Symmetry and HKL" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
-                                    <GridViewColumn Width="120" Header="Lattice distance" DisplayMemberBinding="{Binding Path=LatticeDistance}"/>
-                                </GridView>
-                            </ListView.View>
-                            <ListView.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="Change HKL association" Click="ChangeHKLAssociationPeak_Click"/>
-                                    <MenuItem Header="Remove HKL association" Click="RemoveHKLAssociationPeak_Click"/>
-                                </ContextMenu>
-                            </ListView.ContextMenu>
-                            <!--<ListView.GroupStyle>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Header="Samples and basic properties" Grid.RowSpan="2" >
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="0.7*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.4*"/>
+                                <ColumnDefinition Width="0.6*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Column="0" Grid.Row="0" Content="Name:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                            <Label Grid.Column="0" Grid.Row="1" Content="Area (mm²):" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                            <Label Grid.Column="0" Grid.Row="2" Content="Phase:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                            <TextBox Name="SampleName" Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="SampleName_TextChanged"/>
+                            <TextBox Name="SampleArea" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="SampleArea_TextChanged"/>
+                            <ComboBox Grid.Row="2" Grid.Column="1" Margin="5,2,5,2" Name="PhaseSelection" MaxWidth="350" MaxHeight="30" SelectionChanged="PhaseSelection_SelectionChanged"/>
+                        </Grid>
+                        <Grid Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0.1*"/>
+                                <ColumnDefinition Width="0.6*"/>
+                                <ColumnDefinition Width="0.1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0.1*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="0.1*"/>
+                            </Grid.RowDefinitions>
+
+                            <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="170" Content="Diffraction Elastic Constants" Click="REKCalculation_Click"/>
+                            <Button Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="170" Content="Single Crystal Elastic Constants" Click="ElasticityTensorCalculation_Click"/>
+                            <Button Grid.Column="1" Grid.Row="3" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="170" Content="EPSC" Click="YieldSurfaceWindow_Click"/>
+                        </Grid>
+                        <GroupBox Header="Composition" Grid.Row="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="2*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.4*"/>
+                                    <ColumnDefinition Width="0.6*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" Grid.Row="0" Content="Phase type" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                                <Label Grid.Column="0" Grid.Row="1" Content="Inclusion type" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                                <Label Grid.Column="0" Grid.Row="2" Content="PhaseFraction" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                                <Label Grid.Column="0" Grid.Row="3" Content="Phase parameter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Name="PhaseParameter1Label"/>
+                                <Label Grid.Column="0" Grid.Row="4" Content="Phase parameter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Name="PhaseParameter2Label"/>
+                                <Label Grid.Column="0" Grid.Row="5" Content="Phase parameter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Name="PhaseParameter3Label"/>
+                                <ComboBox Grid.Row="0" Grid.Column="1" Margin="5,2,5,2" Name="PhaseTypeSelection" MaxWidth="350" MaxHeight="30" SelectionChanged="PhaseTypeSelection_SelectionChanged">
+                                    <ComboBoxItem Content="Matrix"/>
+                                    <ComboBoxItem Content="Inclusion"/>
+                                </ComboBox>
+                                <ComboBox Grid.Row="1" Grid.Column="1" Margin="5,2,5,2" Name="InclusionTypeSelection" MaxWidth="350" MaxHeight="30" SelectionChanged="InclusionTypeSelection_SelectionChanged"/>
+                                <TextBox Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="1" Name="PhaseFraction" Margin="5,2,5,2" MaxHeight="28" MaxWidth="250" TextChanged="PhaseFraction_TextChanged"/>
+                                <TextBox Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="1" Name="PhaseParameter1Text" Margin="5,2,5,2" MaxHeight="28" MaxWidth="250" TextChanged="PhaseParameter1Text_TextChanged"/>
+                                <TextBox Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="1" Name="PhaseParameter2Text" Margin="5,2,5,2" MaxHeight="28" MaxWidth="250" TextChanged="PhaseParameter2Text_TextChanged"/>
+                                <TextBox Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="1" Name="PhaseParameter3Text" Margin="5,2,5,2" MaxHeight="28" MaxWidth="250" TextChanged="PhaseParameter3Text_TextChanged"/>
+
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Header="Crystal parameters" Grid.Row="1" Grid.Column="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.35*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Label Grid.Column="0" Grid.Row="1" Content="A:" ToolTip="Cell parameter A in Angström"/>
+                                <Label Grid.Column="0" Grid.Row="2" Content="B:" ToolTip="Cell parameter B in Angström"/>
+                                <Label Grid.Column="0" Grid.Row="3" Content="C:" ToolTip="Cell parameter C in Angström"/>
+                                <Label Grid.Column="2" Grid.Row="1" Content="Alpha:" ToolTip="Angle Alpha in Degree"/>
+                                <Label Grid.Column="2" Grid.Row="2" Content="Beta:" ToolTip="Angle Beta in Degree"/>
+                                <Label Grid.Column="2" Grid.Row="3" Content="Gamma:" ToolTip="Angle Gamma in Degree"/>
+                                <Label Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Content="Name:"/>
+                                <TextBox Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="2" Name="ElementalCompositionText" Margin="5,2,5,2" MaxHeight="28" MaxWidth="250" ToolTip="The elemental composition of the crystallographic data. Please use space as a sepperator otherwise it won't recognize the number of elements correctly!"/>
+                                <Label Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Content="Symmetry group:"/>
+                                <TextBox Grid.Column="1" Grid.Row="1" Height="28" HorizontalAlignment="Stretch" Name="CellAText" Margin="0,2,0,2" MaxHeight="35"/>
+                                <TextBox Grid.Column="1" Grid.Row="2" Height="28" HorizontalAlignment="Stretch" Name="CellBText" Margin="0,2,0,2" MaxHeight="35"/>
+                                <TextBox Grid.Column="1" Grid.Row="3" Height="28" HorizontalAlignment="Stretch" Name="CellCText" Margin="0,2,0,2" MaxHeight="35"/>
+                                <TextBox Grid.Column="3" Grid.Row="1" Height="28" HorizontalAlignment="Stretch" Name="CellAlphaText" Margin="0,2,0,2" MaxHeight="35"/>
+                                <TextBox Grid.Column="3" Grid.Row="2" Height="28" HorizontalAlignment="Stretch" Name="CellBetaText" Margin="0,2,0,2" MaxHeight="35"/>
+                                <TextBox Grid.Column="3" Grid.Row="3" Height="28" HorizontalAlignment="Stretch" Name="CellGammaText" Margin="0,2,0,2" MaxHeight="35"/>
+                                <TextBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" HorizontalAlignment="Stretch" Name="CrystalNameText" Margin="0,2,0,2" MaxHeight="35"/>
+                                <TextBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="4" Height="32"  Name="SymetryBox" HorizontalAlignment="Stretch" Margin="0,2,0,2" MaxHeight="35"/>
+                                <Button Grid.Column="3" Grid.Row="6" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="100" Content="Save"/>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Header="Diffraction pattern" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2">
+                    <oxy:PlotView Name="MainDiffPlot" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5" MouseLeftButtonUp="MainPlot_MouseLeftButtonUp"/>
+                </GroupBox>
+                <GroupBox Header="Diffraction Experiments" Grid.Row="2" Grid.ColumnSpan="3">
+                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.6*"/>
+                            <ColumnDefinition Width="0.2*"/>
+                            <ColumnDefinition Width="0.4*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Grid Grid.Column="0" Grid.ColumnSpan="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Grid.Row="1" Header="Pattern data">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="0.7*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="0.6*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Label Grid.Column="0" Grid.Row="0" Content="Name:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                                    <Label Grid.Column="0" Grid.Row="1" Content="Chi angle:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                                    <Label Grid.Column="2" Grid.Row="1" Content="Omega angle:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                                    <Label Grid.Column="0" Grid.Row="2" Content="Phi sample angle:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                                    <Label Grid.Column="0" Grid.Row="3" Content="Applied force:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                                    <Label Grid.Column="2" Grid.Row="3" Content="Applied stress:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                                    <Label Grid.Column="0" Grid.Row="4" Content="Macro strain:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                                    <TextBox Name="PatternName" Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" Height="27"/>
+                                    <TextBox Name="PatternChiAngle" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternChiAngle_TextChanged"/>
+                                    <TextBox Name="PatternOmegaAngle" Grid.Row="1" Grid.Column="3" VerticalAlignment="Stretch" Height="27" TextChanged="PatternOmegaAngle_TextChanged"/>
+                                    <TextBox Name="PatternPhiSampleAngle" Grid.Row="2" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternPhiSampleAngle_TextChanged"/>
+                                    <TextBox Name="PatternAppliedForce" Grid.Row="3" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternAppliedForce_TextChanged"/>
+                                    <TextBox Name="PatternAppliedStress" Grid.Row="3" Grid.Column="3" VerticalAlignment="Stretch" Height="27" TextChanged="PatternAppliedStress_TextChanged"/>
+                                    <TextBox Name="PatternMacroStrain" Grid.Row="4" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternMacroStrain_TextChanged"/>
+                                    <Button Name="Autofill" Grid.Row="5" Grid.Column="3" Content="Auto fill" Margin="5,5,5,5" Click="AutofillPattern_Click"/>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Header="Diffraction pattern list" Grid.Column="1">
+                                <ListView Name="DiffractionPatternList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5" AllowDrop="True" Drop="DiffractionPatternList_Drop" KeyDown="DiffractionPatternList_KeyDown" SelectionChanged="DiffractionPatternList_SelectionChanged">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Width="250" Header="Name" DisplayMemberBinding="{Binding Path=Name}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                            </GroupBox>
+                        </Grid>
+
+                        <GroupBox Header="Peak list" Grid.Column="2">
+                            <ListView Name="PeakList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5,5,5,5" SelectionChanged="PeakList_SelectionChanged" KeyDown="PeakList_KeyDown">
+                                <ListView.View>
+                                    <GridView>
+                                        <GridViewColumn Width="100" Header="Position" DisplayMemberBinding="{Binding Path=Angle}"/>
+                                        <GridViewColumn Width="120" Header="Symmetry and HKL" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
+                                        <GridViewColumn Width="120" Header="Lattice distance" DisplayMemberBinding="{Binding Path=LatticeDistance}"/>
+                                    </GridView>
+                                </ListView.View>
+                                <ListView.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Change HKL association" Click="ChangeHKLAssociationPeak_Click"/>
+                                        <MenuItem Header="Remove HKL association" Click="RemoveHKLAssociationPeak_Click"/>
+                                    </ContextMenu>
+                                </ListView.ContextMenu>
+                                <!--<ListView.GroupStyle>
                                 <GroupStyle>
                                     <GroupStyle.HeaderTemplate>
                                         <DataTemplate>
@@ -277,31 +446,39 @@
                                     </GroupStyle.HeaderTemplate>
                                 </GroupStyle>
                             </ListView.GroupStyle>-->
-                            <ListView.GroupStyle>
-                                <GroupStyle>
-                                    <GroupStyle.ContainerStyle>
-                                        <Style TargetType="{x:Type GroupItem}">
-                                            <Setter Property="Template">
-                                                <Setter.Value>
-                                                    <ControlTemplate>
-                                                        <Expander IsExpanded="False">
-                                                            <Expander.Header>
-                                                                <StackPanel Orientation="Horizontal">
-                                                                    <TextBlock FontWeight="Bold" FontSize="14" Foreground="Black" Text="{Binding Name}"/>
-                                                                </StackPanel>
-                                                            </Expander.Header>
-                                                            <ItemsPresenter/>
-                                                        </Expander>
-                                                    </ControlTemplate>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Style>
-                                    </GroupStyle.ContainerStyle>
-                                </GroupStyle>
-                            </ListView.GroupStyle>
-                        </ListView>
-                    </GroupBox>
+                                <ListView.GroupStyle>
+                                    <GroupStyle>
+                                        <GroupStyle.ContainerStyle>
+                                            <Style TargetType="{x:Type GroupItem}">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate>
+                                                            <Expander IsExpanded="False">
+                                                                <Expander.Header>
+                                                                    <StackPanel Orientation="Horizontal">
+                                                                        <TextBlock FontWeight="Bold" FontSize="14" Foreground="Black" Text="{Binding Name}"/>
+                                                                    </StackPanel>
+                                                                </Expander.Header>
+                                                                <ItemsPresenter/>
+                                                            </Expander>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </GroupStyle.ContainerStyle>
+                                    </GroupStyle>
+                                </ListView.GroupStyle>
+                            </ListView>
+                        </GroupBox>
+                    </Grid>
+                </GroupBox>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
                 </Grid>
+                
             </Grid>
         </DockPanel>
     </DockPanel>

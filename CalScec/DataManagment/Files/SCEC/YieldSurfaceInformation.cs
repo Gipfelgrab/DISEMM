@@ -36,6 +36,9 @@ namespace CalScec.DataManagment.Files.SCEC
             Analysis.Stress.Plasticity.YieldSurface ret = new Analysis.Stress.Plasticity.YieldSurface(this.CrystalData);
             ret.CrystalData = this.CrystalData;
 
+            ret.ReflexYieldData.Clear();
+            ret.PotentialSlipSystems.Clear();
+
             for (int n = 0; n < this.ReflexYieldData.Count; n++)
             {
                 Analysis.Stress.Plasticity.ReflexYield rYITmp = this.ReflexYieldData[n].GetReflexYield();
@@ -43,7 +46,7 @@ namespace CalScec.DataManagment.Files.SCEC
             }
             for (int n = 0; n < this.PotentialSlipSystems.Count; n++)
             {
-                Analysis.Stress.Plasticity.ReflexYield rYITmp = this.ReflexYieldData[n].GetReflexYield();
+                Analysis.Stress.Plasticity.ReflexYield rYITmp = this.PotentialSlipSystems[n].GetReflexYield();
                 ret.PotentialSlipSystems.Add(rYITmp);
             }
 

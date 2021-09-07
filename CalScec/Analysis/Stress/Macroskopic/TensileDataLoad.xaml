@@ -1,0 +1,101 @@
+﻿<Window x:Class="CalScec.Analysis.Stress.Macroskopic.TensileDataLoad"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CalScec.Analysis.Stress.Macroskopic"
+        mc:Ignorable="d"
+        Title="TensileDataLoad" Height="450" Width="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="6*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label VerticalContentAlignment="Center" VerticalAlignment="Center" Margin="5,5,5,5">Tensile test execution:</Label>
+            <DatePicker Grid.Column="1" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Name="ExecutionDate" Margin="5,5,5,5"/>
+        </Grid>
+        <GroupBox Grid.Row="1" Header="Parameter">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Grid.Row="0" Grid.Column="0" Margin="5,5,5,5" Name="BaseLength" VerticalAlignment="Center" ToolTip="Base length or measurement distance"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="5,5,5,5" Name="Offset" VerticalAlignment="Center" ToolTip="Offset, type -1 if the first value should be taken as a reference">-1</TextBox>
+                <TextBox Grid.Row="1" Grid.Column="0" Margin="5,5,5,5" Name="SampleArea" VerticalAlignment="Center" ToolTip="Sample area in mm from which the stress is calculated"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="FormatSelection" Margin="5,0,5,0">
+                    <ComboBoxItem Content="xls"/>
+                    <ComboBoxItem Content="xlsx"/>
+                    <ComboBoxItem Content="csv"/>
+                    <ComboBoxItem Content="sonstige"/>
+                </ComboBox>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Data Format" Grid.Row="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="0.5*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="0" Grid.Column="0" VerticalContentAlignment="Center" VerticalAlignment="Center" Margin="5,5,5,5">Test time:</Label>
+                <Label Grid.Row="1" Grid.Column="0" VerticalContentAlignment="Center" VerticalAlignment="Center" Margin="5,5,5,5">Applied force:</Label>
+                <Label Grid.Row="2" Grid.Column="0" VerticalContentAlignment="Center" VerticalAlignment="Center" Margin="5,5,5,5">Extension:</Label>
+                <Label Grid.Row="3" Grid.Column="0" VerticalContentAlignment="Center" VerticalAlignment="Center" Margin="5,5,5,5">Stress:</Label>
+                <Label Grid.Row="4" Grid.Column="0" VerticalContentAlignment="Center" VerticalAlignment="Center" Margin="5,5,5,5">Strain:</Label>
+                <TextBox Grid.Row="0" Grid.Column="1" Margin="5,5,5,5" Width="30" Name="ColoumnSelection1" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Coloumn, -1 if no data is present"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Margin="5,5,5,5" Width="30" Name="ColoumnSelection2" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Coloumn, -1 if no data is present"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Margin="5,5,5,5" Width="30" Name="ColoumnSelection3" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Coloumn, -1 if no data is present"/>
+                <TextBox Grid.Row="3" Grid.Column="1" Margin="5,5,5,5" Width="30" Name="ColoumnSelection4" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Coloumn, -1 if no data is present"/>
+                <TextBox Grid.Row="4" Grid.Column="1" Margin="5,5,5,5" Width="30" Name="ColoumnSelection5" HorizontalAlignment="Left" VerticalAlignment="Center" ToolTip="Coloumn, -1 if no data is present"/>
+
+                <ComboBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="TimeUnit" Margin="5,0,5,0">
+                    <ComboBoxItem Content="s"/>
+                    <ComboBoxItem Content="m"/>
+                    <ComboBoxItem Content="h"/>
+                </ComboBox>
+                <ComboBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="ForceUnit" Margin="5,0,5,0">
+                    <ComboBoxItem Content="N"/>
+                    <ComboBoxItem Content="kN"/>
+                </ComboBox>
+                <ComboBox Grid.Row="2" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExtensionUnit" Margin="5,0,5,0">
+                    <ComboBoxItem Content="micro m"/>
+                    <ComboBoxItem Content="mm"/>
+                    <ComboBoxItem Content="m"/>
+                </ComboBox>
+                <ComboBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="StressUnit" Margin="5,0,5,0">
+                    <ComboBoxItem Content="Pa"/>
+                    <ComboBoxItem Content="kPa"/>
+                    <ComboBoxItem Content="MPa"/>
+                    <ComboBoxItem Content="GPa"/>
+                </ComboBox>
+            </Grid>
+        </GroupBox>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Row="0" Grid.Column="2" MaxHeight="28"  Margin="5,6,5,4" Name="LoadData" Content="Load File" Click="LoadData_Click"/>
+        </Grid>
+    </Grid>
+</Window>

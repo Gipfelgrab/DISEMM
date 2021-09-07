@@ -63,7 +63,7 @@
       <Value Profile="(Default)">16</Value>
     </Setting>
     <Setting Name="UsedWaveLength" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0.12619</Value>
+      <Value Profile="(Default)">1.688</Value>
     </Setting>
     <Setting Name="MaxMeasurmentAngle" Type="System.Double" Scope="User">
       <Value Profile="(Default)">180</Value>
@@ -99,7 +99,7 @@
       <Value Profile="(Default)">10</Value>
     </Setting>
     <Setting Name="PeakWidthFWHM" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">2</Value>
+      <Value Profile="(Default)">3</Value>
     </Setting>
     <Setting Name="FitWindowIsMaximized" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -187,6 +187,12 @@
     </Setting>
     <Setting Name="ActivateDECTextureWeighting" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="ExstensionBase" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">12900</Value>
+    </Setting>
+    <Setting Name="EPSCSimulationLimit" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">100</Value>
     </Setting>
   </Settings>
 </SettingsFile>

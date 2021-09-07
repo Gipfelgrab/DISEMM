@@ -2046,6 +2046,10 @@ namespace CalScec.DataManagment.CrystalData
             {
                 return this._h;
             }
+            set
+            {
+                this._h = value;
+            }
         }
 
         private int _k;
@@ -2055,6 +2059,10 @@ namespace CalScec.DataManagment.CrystalData
             {
                 return this._k;
             }
+            set
+            {
+                this._k = value;
+            }
         }
 
         private int _l;
@@ -2063,6 +2071,10 @@ namespace CalScec.DataManagment.CrystalData
             get
             {
                 return this._l;
+            }
+            set
+            {
+                this._l = value;
             }
         }
 
@@ -2146,6 +2158,21 @@ namespace CalScec.DataManagment.CrystalData
             }
         }
 
+        public MathNet.Numerics.LinearAlgebra.Vector<double> DirectionNorm
+        {
+            get
+            {
+                MathNet.Numerics.LinearAlgebra.Vector<double> ret = MathNet.Numerics.LinearAlgebra.CreateVector.Dense(3, 0.0);
+
+                ret[0] = this.H;
+                ret[1] = this.K;
+                ret[2] = this.L;
+
+                ret /= ret.L2Norm();
+
+                return ret;
+            }
+        }
 
     }
 }

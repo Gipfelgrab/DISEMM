@@ -14,8 +14,14 @@ namespace CalScec.DataManagment.Files.SCEC
         public CrystalData.HKLReflex MainSlipDirection;
         public CrystalData.HKLReflex SecondarySlipDirection;
 
+        private double _yieldMainHardenedStrength = -1;
+
+        private double _yieldHardenning = -1;
+
         private double _yieldMainStrength = -1;
         private int _plainMainMultiplizity;
+
+        private double _yieldLimit = -1;
 
         public DiffractionOrientation.OrientationMatrix MeasurementCrystalTransformation = new DiffractionOrientation.OrientationMatrix();
 
@@ -27,8 +33,11 @@ namespace CalScec.DataManagment.Files.SCEC
             this.MainSlipDirection = rY.MainSlipDirection;
             this.SecondarySlipDirection = rY.SecondarySlipDirection;
             this.MeasurementCrystalTransformation = rY.MeasurementCrystalTransformation;
+            this._yieldMainHardenedStrength = rY.YieldMainHardennedStrength;
             this._yieldMainStrength = rY.YieldMainStrength;
             this._plainMainMultiplizity = rY.PlainMainMultiplizity;
+            this._yieldHardenning = rY.YieldHardenning;
+            this._yieldLimit = rY.YieldLimit;
 
             for(int n = 0; n < rY.PeakData.Count; n++)
             {
@@ -51,7 +60,10 @@ namespace CalScec.DataManagment.Files.SCEC
             ret.SecondarySlipDirection = this.SecondarySlipDirection;
             ret.MeasurementCrystalTransformation = this.MeasurementCrystalTransformation;
             ret.YieldMainStrength = this._yieldMainStrength;
+            ret.YieldMainHardennedStrength = this._yieldMainHardenedStrength;
             ret.PlainMainMultiplizity = this._plainMainMultiplizity;
+            ret.YieldHardenning = this._yieldHardenning;
+            ret.YieldLimit = this._yieldLimit;
 
             for (int n = 0; n < this.PeakData.Count; n++)
             {
