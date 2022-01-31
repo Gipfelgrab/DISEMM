@@ -10,6 +10,11 @@ elasto-plastic self-consistent modelling (EPSC) of lattice strains.
 A collection of video tutorials is uploaded to:
 https://www.youtube.com/channel/UCg58LttOgWpBopD1i2mOw5g
 
+Part 1: https://www.youtube.com/watch?v=Nw_nXp5aFB0 <br>
+Part 2: https://www.youtube.com/watch?v=ha77Lud_awM&t=5s <br>
+Part 3: https://www.youtube.com/watch?v=ZzONpEQOMJo <br>
+Part 4: https://www.youtube.com/watch?v=viPfMkIRj6c <br>
+
 # Recent Changes
 
 **0.9.5** <br> 26.01.2022
