@@ -22,6 +22,11 @@ namespace CalScec.Analysis.Stress.Plasticity
                 this._simulationIndex = value;
             }
         }
+        public string Name
+        {
+            get;
+            set;
+        }
 
         private double _chiAngle;
         public double ChiAngle
@@ -118,6 +123,8 @@ namespace CalScec.Analysis.Stress.Plasticity
                 tmpHardenning[2, 2] = 1;
                 this._hardenningTensor.Add(tmpHardenning);
             }
+
+            this.SetStandardGrainOrientationList();
         }
 
         public ElastoPlasticExperiment()
@@ -241,7 +248,7 @@ namespace CalScec.Analysis.Stress.Plasticity
         //public List<List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>>> StressCFOrientedHistory = new List<List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>>>();
         //public List<List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>>> StrainCFOrientedHistory = new List<List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>>>();
 
-        public List<List<GrainOrientationParameter>> GrainOrientations = new List<List<GrainOrientationParameter>>();
+        
 
         public List<List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>>> StressRateCFOrientedHistory = new List<List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>>>();
         public List<List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>>> StrainRateCFOrientedHistory = new List<List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>>>();
@@ -255,8 +262,142 @@ namespace CalScec.Analysis.Stress.Plasticity
         /// </summary>
         public List<List<List<List<ReflexYield>>>> ActiveSystemsCFOrientedHistory = new List<List<List<List<ReflexYield>>>>();
 
+        #region Grain Orientation
+
+        public List<List<GrainOrientationParameter>> GrainOrientations = new List<List<GrainOrientationParameter>>();
+
+        public double SymLimitLowPhi1()
+        {
+            return 0;
+        }
+        public double SymLimitUpPhi1(int phaseIndex)
+        {
+            if (this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 225 & this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 227 & this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 229)
+            {
+                return 90.0;
+            }
+            else if(this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 194)
+            {
+                return 90.0;
+            }
+            else
+            {
+                return 90.0;
+            }
+        }
+        public double SymStepPhi1(int phaseIndex)
+        {
+            if (this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 225 & this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 227 & this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 229)
+            {
+                return 9.0;
+            }
+            else if (this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 194)
+            {
+                return 9.0;
+            }
+            else
+            {
+                return 9.0;
+            }
+        }
+
+        public double SymLimitLowPsi()
+        {
+            return 0;
+        }
+        public double SymLimitUpPsi(int phaseIndex)
+        {
+            if (this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 225 & this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 227 & this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 229)
+            {
+                return 90.0;
+            }
+            else if (this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 194)
+            {
+                return 90.0;
+            }
+            else
+            {
+                return 90.0;
+            }
+        }
+        public double SymStepPsi(int phaseIndex)
+        {
+            if (this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 225 & this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 227 & this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 229)
+            {
+                return 3.0;
+            }
+            else if (this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 194)
+            {
+                return 3.0;
+            }
+            else
+            {
+                return 3.0;
+            }
+        }
+
+        public double SymLimitLowPhi2()
+        {
+            return 0;
+        }
+        public double SymLimitUpPhi2(int phaseIndex)
+        {
+            if (this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 225 & this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 227 & this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 229)
+            {
+                return 90.0;
+            }
+            else if (this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 194)
+            {
+                return 60.0;
+            }
+            else
+            {
+                return 90.0;
+            }
+        }
+        public double SymStepPhi2(int phaseIndex)
+        {
+            if (this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 225 & this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 227 & this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 229)
+            {
+                return 9.0;
+            }
+            else if (this.YieldInformation[phaseIndex].CrystalData.SymmetryGroupID == 194)
+            {
+                return 6.0;
+            }
+            else
+            {
+                return 9.0;
+            }
+        }
+
+        public void SetStandardGrainOrientationList()
+        {
+            for (int phaseIndex = 0; phaseIndex < this.YieldInformation.Count; phaseIndex++)
+            {
+                this.GrainOrientations[phaseIndex].Clear();
+                for (double psi = this.SymLimitLowPsi(); psi <= this.SymLimitUpPsi(phaseIndex); psi += this.SymStepPsi(phaseIndex))
+                {
+                    for (double phi1 = SymLimitLowPhi1(); phi1 <= SymLimitUpPhi1(phaseIndex); phi1 += SymStepPhi1(phaseIndex))
+                    {
+                        for (double phi2 = SymLimitLowPhi2(); phi2 <= SymLimitUpPhi2(phaseIndex); phi2 += SymStepPhi2(phaseIndex))
+                        {
+                            this.GrainOrientations[phaseIndex].Add(new GrainOrientationParameter(phi1, psi, phi2));
+                        }
+                    }
+                }
+            }
+        }
+
+        public void SetGrainOrientationMRD(int phaseIndex, Texture.OrientationDistributionFunction oDF)
+        {
+
+        }
+
+        #endregion
+
         #region Old Stuff needs to be deleted but Seriealized
-        
+
         public List<List<List<ReflexYield>>> ActiveSystemsCFHistory = new List<List<List<ReflexYield>>>();
 
         #endregion
@@ -348,11 +489,34 @@ namespace CalScec.Analysis.Stress.Plasticity
             }
         }
 
+        private double _mRD;
+        public double MRD
+        {
+            get
+            {
+                return this._mRD;
+            }
+            set
+            {
+                this._mRD = value;
+            }
+        }
+
         public GrainOrientationParameter(double phi1, double psi, double phi2)
         {
             this._phi1 = phi1;
             this._psi = psi;
             this._phi2 = phi2;
+
+            this._mRD = 1;
+        }
+        public GrainOrientationParameter(double phi1, double psi, double phi2, double mrd)
+        {
+            this._phi1 = phi1;
+            this._psi = psi;
+            this._phi2 = phi2;
+
+            this._mRD = mrd;
         }
     }
 }

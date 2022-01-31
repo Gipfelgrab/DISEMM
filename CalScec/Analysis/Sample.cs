@@ -453,6 +453,60 @@ namespace CalScec.Analysis
 
             return ret;
         }
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> GetOverallCompliances(int sECIndex)
+        {
+            MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+
+            for (int n = 0; n < this.CrystalData.Count; n++)
+            {
+                Stress.Microsopic.ElasticityTensors eTPhase = this.GetSECByIndex(sECIndex, n);
+
+                ret[0, 0] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[0, 0];
+                ret[0, 1] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[0, 1];
+                ret[0, 2] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[0, 2];
+                ret[0, 3] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[0, 3];
+                ret[0, 4] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[0, 4];
+                ret[0, 5] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[0, 5];
+
+                ret[1, 0] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[1, 0];
+                ret[1, 1] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[1, 1];
+                ret[1, 2] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[1, 2];
+                ret[1, 3] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[1, 3];
+                ret[1, 4] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[1, 4];
+                ret[1, 5] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[1, 5];
+
+                ret[2, 0] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[2, 0];
+                ret[2, 1] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[2, 1];
+                ret[2, 2] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[2, 2];
+                ret[2, 3] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[2, 3];
+                ret[2, 4] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[2, 4];
+                ret[2, 5] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[2, 5];
+
+                ret[3, 0] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[3, 0];
+                ret[3, 1] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[3, 1];
+                ret[3, 2] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[3, 2];
+                ret[3, 3] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[3, 3];
+                ret[3, 4] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[3, 4];
+                ret[3, 5] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[3, 5];
+
+                ret[4, 0] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[4, 0];
+                ret[4, 1] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[4, 1];
+                ret[4, 2] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[4, 2];
+                ret[4, 3] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[4, 3];
+                ret[4, 4] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[4, 4];
+                ret[4, 5] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[4, 5];
+
+                ret[5, 0] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[5, 0];
+                ret[5, 1] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[5, 1];
+                ret[5, 2] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[5, 2];
+                ret[5, 3] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[5, 3];
+                ret[5, 4] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[5, 4];
+                ret[5, 5] += this.CrystalData[n].PhaseFraction * eTPhase._complianceTensor[5, 5];
+
+            }
+
+            return ret;
+        }
 
         public void SetPhaseStresses()
         {
@@ -500,12 +554,121 @@ namespace CalScec.Analysis
 
         public List<MathNet.Numerics.LinearAlgebra.Matrix<double>> StressTransitionFactors = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
 
-        public void SetStressTransitionFactors(int matrix, int inclusion, bool sphere)
+        #region old code
+        //public void SetStressTransitionFactors(int matrix, int inclusion, bool sphere)
+        //{
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> eshelbyTensor = this.GetEshelbyTensorEllipsoid(matrix, inclusion, 2);
+        //    if(sphere)
+        //    {
+        //        eshelbyTensor = this.GetEshelbyTensorSpherical(matrix, 2);
+        //    }
+
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> sampleCompliances = this.GetOverallCompliances();
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> sampleStiffnesses = sampleCompliances.Inverse();
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> unity = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+        //    unity[0, 0] = 1.0;
+        //    unity[1, 1] = 1.0;
+        //    unity[2, 2] = 1.0;
+        //    unity[3, 3] = 1.0;
+        //    unity[4, 4] = 1.0;
+        //    unity[5, 5] = 1.0;
+
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> first = -1 * sampleStiffnesses * (eshelbyTensor - unity);
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> second = (this.ReussTensorData[inclusion]._stiffnessTensor - sampleStiffnesses) * eshelbyTensor;
+        //    second += sampleStiffnesses;
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> third = (this.ReussTensorData[inclusion]._stiffnessTensor - sampleStiffnesses) * sampleCompliances;
+
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> ret1 = first * second.Inverse() * third;
+        //    ret1 += unity;
+
+        //    Tools.FourthRankTensor eshelbyTensorFR = new Tools.FourthRankTensor(eshelbyTensor);
+        //    Tools.FourthRankTensor sampleCompliancesFR = new Tools.FourthRankTensor(sampleCompliances);
+        //    Tools.FourthRankTensor sampleStiffnessesFR = new Tools.FourthRankTensor(sampleStiffnesses);
+        //    Tools.FourthRankTensor unityFR = Tools.FourthRankTensor.GetUnityTensor();
+        //    Tools.FourthRankTensor phaseStiffnessesFR = new Tools.FourthRankTensor(this.ReussTensorData[inclusion]._stiffnessTensor);
+
+        //    Tools.FourthRankTensor firstFR = -1.0 * sampleStiffnessesFR * (eshelbyTensorFR - unityFR);
+        //    Tools.FourthRankTensor secondFR = (phaseStiffnessesFR - sampleStiffnessesFR) * eshelbyTensorFR;
+        //    secondFR += sampleStiffnessesFR;
+        //    Tools.FourthRankTensor thirdFR = (phaseStiffnessesFR - sampleStiffnessesFR) * sampleCompliancesFR;
+
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> firstComp = firstFR.GetVoigtTensor();
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> secondComp = secondFR.GetVoigtTensor();
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> thirdComp = thirdFR.GetVoigtTensor();
+
+        //    Tools.FourthRankTensor secondInverseFR = new Tools.FourthRankTensor(secondComp.Inverse());
+
+        //    Tools.FourthRankTensor ret1FR = firstFR * secondInverseFR * thirdFR;
+        //    ret1FR += unityFR;
+
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> ret1Comp = ret1FR.GetVoigtTensor();
+
+        //    MathNet.Numerics.LinearAlgebra.Matrix<double> ret2 = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+
+        //    ret2[0, 0] = 1 - (this.CrystalData[inclusion].PhaseFraction * ret1[0, 0]);
+        //    ret2[0, 1] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[0, 1]);
+        //    ret2[0, 2] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[0, 2]);
+        //    ret2[0, 3] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[0, 3]);
+        //    ret2[0, 4] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[0, 4]);
+        //    ret2[0, 5] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[0, 5]);
+
+        //    ret2[1, 0] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[1, 0]);
+        //    ret2[1, 1] = 1 - (this.CrystalData[inclusion].PhaseFraction * ret1[1, 1]);
+        //    ret2[1, 2] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[1, 2]);
+        //    ret2[1, 3] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[1, 3]);
+        //    ret2[1, 4] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[1, 4]);
+        //    ret2[1, 5] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[1, 5]);
+
+        //    ret2[2, 0] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[2, 0]);
+        //    ret2[2, 1] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[2, 1]);
+        //    ret2[2, 2] = 1 - (this.CrystalData[inclusion].PhaseFraction * ret1[2, 2]);
+        //    ret2[2, 3] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[2, 3]);
+        //    ret2[2, 4] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[2, 4]);
+        //    ret2[2, 5] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[2, 5]);
+
+        //    ret2[3, 0] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[3, 0]);
+        //    ret2[3, 1] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[3, 1]);
+        //    ret2[3, 2] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[3, 2]);
+        //    ret2[3, 3] = 1 - (this.CrystalData[inclusion].PhaseFraction * ret1[3, 3]);
+        //    ret2[3, 4] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[3, 4]);
+        //    ret2[3, 5] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[3, 5]);
+
+        //    ret2[4, 0] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[4, 0]);
+        //    ret2[4, 1] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[4, 1]);
+        //    ret2[4, 2] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[4, 2]);
+        //    ret2[4, 3] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[4, 3]);
+        //    ret2[4, 4] = 1 - (this.CrystalData[inclusion].PhaseFraction * ret1[4, 4]);
+        //    ret2[4, 5] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[4, 5]);
+
+        //    ret2[5, 0] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[5, 0]);
+        //    ret2[5, 1] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[5, 1]);
+        //    ret2[5, 2] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[5, 2]);
+        //    ret2[5, 3] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[5, 3]);
+        //    ret2[5, 4] = -1 * (this.CrystalData[inclusion].PhaseFraction * ret1[5, 4]);
+        //    ret2[5, 5] = 1 - (this.CrystalData[inclusion].PhaseFraction * ret1[5, 5]);
+
+        //    ret2 /= this.CrystalData[matrix].PhaseFraction;
+        //    this.StressTransitionFactors.Clear();
+
+        //    if(inclusion < matrix)
+        //    {
+        //        this.StressTransitionFactors.Add(ret1);
+        //        this.StressTransitionFactors.Add(ret2);
+        //    }
+        //    else
+        //    {
+        //        this.StressTransitionFactors.Add(ret2);
+        //        this.StressTransitionFactors.Add(ret1);
+        //    }
+        //}
+        #endregion
+
+        public void SetStressTransitionFactors(int matrix, int inclusion, bool sphere, int sECIndex)
         {
-            MathNet.Numerics.LinearAlgebra.Matrix<double> eshelbyTensor = this.GetEshelbyTensorEllipsoid(matrix, inclusion);
-            if(sphere)
+            MathNet.Numerics.LinearAlgebra.Matrix<double> eshelbyTensor = this.GetEshelbyTensorEllipsoid(matrix, inclusion, sECIndex);
+            if (sphere)
             {
-                eshelbyTensor = this.GetEshelbyTensorSpherical(matrix);
+                eshelbyTensor = this.GetEshelbyTensorSpherical(matrix, sECIndex);
             }
 
             MathNet.Numerics.LinearAlgebra.Matrix<double> sampleCompliances = this.GetOverallCompliances();
@@ -518,10 +681,12 @@ namespace CalScec.Analysis
             unity[4, 4] = 1.0;
             unity[5, 5] = 1.0;
 
+            Stress.Microsopic.ElasticityTensors eTInclusion = this.GetSECByIndex(sECIndex, inclusion);
+
             MathNet.Numerics.LinearAlgebra.Matrix<double> first = -1 * sampleStiffnesses * (eshelbyTensor - unity);
-            MathNet.Numerics.LinearAlgebra.Matrix<double> second = (this.ReussTensorData[inclusion]._stiffnessTensor - sampleStiffnesses) * eshelbyTensor;
+            MathNet.Numerics.LinearAlgebra.Matrix<double> second = (eTInclusion._stiffnessTensor - sampleStiffnesses) * eshelbyTensor;
             second += sampleStiffnesses;
-            MathNet.Numerics.LinearAlgebra.Matrix<double> third = (this.ReussTensorData[inclusion]._stiffnessTensor - sampleStiffnesses) * sampleCompliances;
+            MathNet.Numerics.LinearAlgebra.Matrix<double> third = (eTInclusion._stiffnessTensor - sampleStiffnesses) * sampleCompliances;
 
             MathNet.Numerics.LinearAlgebra.Matrix<double> ret1 = first * second.Inverse() * third;
             ret1 += unity;
@@ -530,7 +695,7 @@ namespace CalScec.Analysis
             Tools.FourthRankTensor sampleCompliancesFR = new Tools.FourthRankTensor(sampleCompliances);
             Tools.FourthRankTensor sampleStiffnessesFR = new Tools.FourthRankTensor(sampleStiffnesses);
             Tools.FourthRankTensor unityFR = Tools.FourthRankTensor.GetUnityTensor();
-            Tools.FourthRankTensor phaseStiffnessesFR = new Tools.FourthRankTensor(this.ReussTensorData[inclusion]._stiffnessTensor);
+            Tools.FourthRankTensor phaseStiffnessesFR = new Tools.FourthRankTensor(eTInclusion._stiffnessTensor);
 
             Tools.FourthRankTensor firstFR = -1.0 * sampleStiffnessesFR * (eshelbyTensorFR - unityFR);
             Tools.FourthRankTensor secondFR = (phaseStiffnessesFR - sampleStiffnessesFR) * eshelbyTensorFR;
@@ -595,7 +760,7 @@ namespace CalScec.Analysis
             ret2 /= this.CrystalData[matrix].PhaseFraction;
             this.StressTransitionFactors.Clear();
 
-            if(inclusion < matrix)
+            if (inclusion < matrix)
             {
                 this.StressTransitionFactors.Add(ret1);
                 this.StressTransitionFactors.Add(ret2);
@@ -607,20 +772,42 @@ namespace CalScec.Analysis
             }
         }
 
+        private Stress.Microsopic.ElasticityTensors GetSECByIndex(int index, int phase)
+        {
+            switch(index)
+            {
+                case 0:
+                    return this.VoigtTensorData[phase];
+                case 1:
+                    return this.ReussTensorData[phase];
+                case 2:
+                    return this.HillTensorData[phase];
+                case 3:
+                    return this.KroenerTensorData[phase];
+                case 4:
+                    return this.DeWittTensorData[phase];
+                case 5:
+                    return this.GeometricHillTensorData[phase];
+                default:
+                    return HillTensorData[phase];
+            }
+        }
+
         #region Eshelby tensor
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> GetEshelbyTensorSpherical(int matrix)
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> GetEshelbyTensorSpherical(int matrix, int sECIndex)
         {
             MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
+            Stress.Microsopic.ElasticityTensors eTPhase = this.GetSECByIndex(sECIndex, matrix);
 
-            double e11 = 7 - (5 * this.HillTensorData[matrix].AveragedNu);
-            e11 /= 15 * (1 - this.HillTensorData[matrix].AveragedNu);
+            double e11 = 7 - (5 * eTPhase.AveragedNu);
+            e11 /= 15 * (1 - eTPhase.AveragedNu);
 
-            double e12 = -1 + (5 * this.HillTensorData[matrix].AveragedNu);
-            e12 /= 15 * (1 - this.HillTensorData[matrix].AveragedNu);
+            double e12 = -1 + (5 * eTPhase.AveragedNu);
+            e12 /= 15 * (1 - eTPhase.AveragedNu);
 
-            double e66 = 4 - (5 * this.HillTensorData[matrix].AveragedNu);
-            e66 /= 15 * (1 - this.HillTensorData[matrix].AveragedNu);
+            double e66 = 4 - (5 * eTPhase.AveragedNu);
+            e66 /= 15 * (1 - eTPhase.AveragedNu);
 
             ret[0, 0] = e11;
             ret[1, 1] = e11;
@@ -640,11 +827,13 @@ namespace CalScec.Analysis
             return ret;
         }
 
-        public MathNet.Numerics.LinearAlgebra.Matrix<double> GetEshelbyTensorEllipsoid(int matrix, int inclusion)
+        public MathNet.Numerics.LinearAlgebra.Matrix<double> GetEshelbyTensorEllipsoid(int matrix, int inclusion, int sECIndex)
         {
             MathNet.Numerics.LinearAlgebra.Matrix<double> ret = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(6, 6, 0.0);
-            double q = this.GetEshelbyQ(matrix);
-            double r = this.GetEshelbyR(matrix);
+            Stress.Microsopic.ElasticityTensors eTMatrix = this.GetSECByIndex(sECIndex, matrix);
+
+            double q = this.GetEshelbyQ(eTMatrix);
+            double r = this.GetEshelbyR(eTMatrix);
             double i = this.GetEshelbyI(inclusion);
             double l = this.GetEshelbyL(inclusion);
 
@@ -699,17 +888,17 @@ namespace CalScec.Analysis
             return ret;
         }
 
-        double GetEshelbyQ(int matrix)
+        double GetEshelbyQ(Stress.Microsopic.ElasticityTensors eTMatrix)
         {
             double ret = 3.0 / (8.0 * Math.PI);
-            ret /= (1 - this.ReussTensorData[matrix].AveragedNu);
+            ret /= (1 - eTMatrix.AveragedNu);
 
             return ret;
         }
-        double GetEshelbyR(int matrix)
+        double GetEshelbyR(Stress.Microsopic.ElasticityTensors eTMatrix)
         {
-            double ret = (1 - (2 * this.ReussTensorData[matrix].AveragedNu));
-            ret /= (8.0 * Math.PI) * (1 - this.ReussTensorData[matrix].AveragedNu);
+            double ret = (1 - (2 * eTMatrix.AveragedNu));
+            ret /= (8.0 * Math.PI) * (1 - eTMatrix.AveragedNu);
 
             return ret;
         }
@@ -1091,6 +1280,59 @@ namespace CalScec.Analysis
 
         public List<Texture.OrientationDistributionFunction> ODFList = new List<Texture.OrientationDistributionFunction>();
 
+        public void SetMRDForExperiment(int phaseIndex, int experimentIndex)
+        {
+            ODFList[phaseIndex].SetStepSizes();
+
+            double grainOrientationStepPhi1 = this.SimulationData[experimentIndex].SymStepPhi1(phaseIndex);
+            grainOrientationStepPhi1 /= 2;
+
+            double grainOrientationStepPsi = this.SimulationData[experimentIndex].SymStepPsi(phaseIndex);
+            grainOrientationStepPsi /= 2;
+
+            double grainOrientationStepPhi2 = this.SimulationData[experimentIndex].SymStepPhi2(phaseIndex);
+            grainOrientationStepPhi2 /= 2;
+
+            for (int i = 0; i < this.SimulationData[experimentIndex].GrainOrientations[phaseIndex].Count; i++)
+            {
+                this.SimulationData[experimentIndex].GrainOrientations[phaseIndex][i].MRD = 0;
+            }
+
+            for (int n = 0; n < ODFList[phaseIndex].TDData.Count; n++)
+            {
+                for(int i = 0; i < this.SimulationData[experimentIndex].GrainOrientations[phaseIndex].Count; i++)
+                {
+                    bool phi1 = false;
+                    bool psi = false;
+                    bool phi2 = false;
+
+                    if(this.SimulationData[experimentIndex].GrainOrientations[phaseIndex][i].Phi1 - grainOrientationStepPhi1 < ODFList[phaseIndex].TDData[n][0] && this.SimulationData[experimentIndex].GrainOrientations[phaseIndex][i].Phi1 + grainOrientationStepPhi1 > ODFList[phaseIndex].TDData[n][0])
+                    {
+                        phi1 = true;
+                    }
+                    if (this.SimulationData[experimentIndex].GrainOrientations[phaseIndex][i].Psi - grainOrientationStepPsi < ODFList[phaseIndex].TDData[n][1] && this.SimulationData[experimentIndex].GrainOrientations[phaseIndex][i].Psi + grainOrientationStepPsi > ODFList[phaseIndex].TDData[n][1])
+                    {
+                        psi = true;
+                    }
+                    if (this.SimulationData[experimentIndex].GrainOrientations[phaseIndex][i].Phi2 - grainOrientationStepPhi2 < ODFList[phaseIndex].TDData[n][2] && this.SimulationData[experimentIndex].GrainOrientations[phaseIndex][i].Phi2 + grainOrientationStepPhi2 > ODFList[phaseIndex].TDData[n][2])
+                    {
+                        phi2 = true;
+                    }
+
+                    if(phi1 && psi && phi2)
+                    {
+                        this.SimulationData[experimentIndex].GrainOrientations[phaseIndex][i].MRD += ODFList[phaseIndex].TDData[n][3];
+                        break;
+                    }
+                }
+            }
+        }
+
+        public void InterpolateMRDForExperiment(int phaseIndex, int experimentIndex)
+        {
+
+        }
+
         #endregion
 
         #region Elasto plastic self consistent
@@ -1317,11 +1559,11 @@ namespace CalScec.Analysis
         {
             List<Tools.FourthRankTensor> phaseOCompliances = new List<Tools.FourthRankTensor>();
 
-            for(int n = 0; n < this.ODFList.Count; n++)
+            for(int n = 0; n < this.CrystalData.Count; n++)
             {
                 if (textureActive)
                 {
-                    //this.ODFList[n].SetTextureTensor();
+                    phaseOCompliances.Add(this.SetTextureTensor(this.HillTensorData[n], n).GetFourtRankStiffnesses());
                 }
                 else
                 {
@@ -1385,7 +1627,7 @@ namespace CalScec.Analysis
             {
                 if (textureActive)
                 {
-                    //this.ODFList[n].SetTextureTensor();
+                    phaseOStiffnesses.Add(this.SetTextureTensor(this.HillTensorData[n], n).GetFourtRankStiffnesses());
                 }
                 else
                 {
@@ -1412,7 +1654,7 @@ namespace CalScec.Analysis
             {
                 if (textureActive)
                 {
-                    //this.ODFList[n].SetTextureTensor();
+                    phaseOStiffnesses.Add(this.SetTextureTensor(tensorData[n], n).GetFourtRankStiffnesses());
                 }
                 else
                 {
@@ -2012,6 +2254,550 @@ namespace CalScec.Analysis
             return ret;
         }
 
+        public Stress.Microsopic.ElasticityTensors SetTextureTensor(Stress.Microsopic.ElasticityTensors averagingTensor, int phaseIndex)
+        {
+            Stress.Microsopic.ElasticityTensors ret = averagingTensor.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            switch (averagingTensor.Symmetry)
+            {
+                case "cubic":
+                    ret = this.SetTextureTensorCubic(averagingTensor, phaseIndex);
+                    break;
+                case "hexagonal":
+                    ret = this.SetTextureTensorHexagonal(averagingTensor, phaseIndex);
+                    break;
+                case "tetragonal type 1":
+                    ret = this.SetTextureTensorTetragonalType1(averagingTensor, phaseIndex);
+                    break;
+                case "tetragonal type 2":
+
+                    break;
+                case "trigonal type 1":
+
+                    break;
+                case "trigonal type 2":
+
+                    break;
+                case "rhombic":
+                    ret = this.SetTextureTensorRhombic(averagingTensor, phaseIndex);
+                    break;
+                case "monoclinic":
+
+                    break;
+                case "triclinic":
+
+                    break;
+                default:
+
+                    break;
+            }
+
+            ret.CalculateCompliances();
+
+            return ret;
+        }
+
+        public Stress.Microsopic.ElasticityTensors SetTextureTensorCubic(Stress.Microsopic.ElasticityTensors averagingTensor, int phaseIndex)
+        {
+            double TC11 = 0;
+            double TC12 = 0;
+            double TC44 = 0;
+
+            double normFactor = 0.0;
+
+            for(int n = 0; n < this.ODFList[phaseIndex].TDData.Count; n++)
+            {
+                normFactor += this.ODFList[phaseIndex].TDData[n][3];
+
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C11;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C22;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C33;
+
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+                
+                //TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                //TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                //TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                //TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                //TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                //TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C33;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+                //TC12 += 4 * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                //TC12 += 4 * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                //TC12 += 4 * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C33;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C12;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C13;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C23;
+                //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C12;
+                //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C13;
+                //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C23;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                TC44 += Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+                //TC44 += 2 * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+            }
+
+            Stress.Microsopic.ElasticityTensors ret = averagingTensor.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            ret.C11 = (TC11 / normFactor);
+            ret.C12 = (TC12 / normFactor);
+            ret.C44 = (TC44 / normFactor);
+
+            return ret;
+        }
+
+        private Stress.Microsopic.ElasticityTensors SetTextureTensorHexagonal(Stress.Microsopic.ElasticityTensors averagingTensor, int phaseIndex)
+        {
+            double TC11 = 0;
+            double TC33 = 0;
+            double TC12 = 0;
+            double TC13 = 0;
+            double TC44 = 0;
+
+            double normFactor = 0.0;
+
+
+            for (int n = 0; n < this.ODFList[phaseIndex].TDData.Count; n++)
+            {
+                normFactor += this.ODFList[phaseIndex].TDData[n][3];
+
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C11;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C22;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C33;
+
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+                //TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                //TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                //TC11 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+                //TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                //TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                //TC11 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C11;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C22;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C33;
+
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+                //TC33 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                //TC33 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                //TC33 += 2 * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+                //TC33 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                //TC33 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                //TC33 += 4 * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C33;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+                //TC12 += 4 * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                //TC12 += 4 * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                //TC12 += 4 * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C33;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+                //TC13 += 4 * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                //TC13 += 4 * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                //TC13 += 4 * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C12;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C13;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C23;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+            }
+            
+
+            Stress.Microsopic.ElasticityTensors ret = averagingTensor.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            ret.C11 = TC11 / normFactor;
+            ret.C33 = TC33 / normFactor;
+            ret.C12 = TC12 / normFactor;
+            ret.C13 = TC13 / normFactor;
+            ret.C44 = TC44 / normFactor;
+
+            return ret;
+        }
+
+        private Stress.Microsopic.ElasticityTensors SetTextureTensorTetragonalType1(Stress.Microsopic.ElasticityTensors averagingTensor, int phaseIndex)
+        {
+            double TC11 = 0;
+            double TC33 = 0;
+            double TC12 = 0;
+            double TC13 = 0;
+            double TC44 = 0;
+            double TC66 = 0;
+
+            double normFactor = 0.0;
+
+            for (int n = 0; n < this.ODFList[phaseIndex].TDData.Count; n++)
+            {
+                normFactor += this.ODFList[phaseIndex].TDData[n][3];
+
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C11;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C22;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C33;
+
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C11;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C22;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C33;
+
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C33;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C33;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C12;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C13;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C23;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C12;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C13;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C23;
+
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+            }
+            
+
+            Stress.Microsopic.ElasticityTensors ret = averagingTensor.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            ret.C11 = TC11 / normFactor;
+            ret.C33 = TC33 / normFactor;
+            ret.C12 = TC12 / normFactor;
+            ret.C13 = TC13 / normFactor;
+            ret.C44 = TC44 / normFactor;
+            ret.C66 = TC66 / normFactor;
+
+            return ret;
+        }
+
+        private Stress.Microsopic.ElasticityTensors SetTextureTensorRhombic(Stress.Microsopic.ElasticityTensors averagingTensor, int phaseIndex)
+        {
+            double TC11 = 0;
+            double TC22 = 0;
+            double TC33 = 0;
+            double TC12 = 0;
+            double TC13 = 0;
+            double TC23 = 0;
+            double TC44 = 0;
+            double TC55 = 0;
+            double TC66 = 0;
+
+            double normFactor = 0.0;
+
+            for (int n = 0; n < this.ODFList[phaseIndex].TDData.Count; n++)
+            {
+                normFactor += this.ODFList[phaseIndex].TDData[n][3];
+
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C11;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C22;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C33;
+
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC11 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+
+                TC22 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C11;
+                TC22 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C22;
+                TC22 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C33;
+
+                TC22 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC22 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC22 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC22 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC22 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC22 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C11;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C22;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 4) * averagingTensor.C33;
+
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC33 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C33;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                TC12 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C33;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                TC13 += this.ODFList[phaseIndex].TDData[n][3] * this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+
+                TC23 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC23 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC23 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C33;
+
+                TC23 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+                TC23 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C12;
+
+                TC23 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+                TC23 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C13;
+
+                TC23 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+                TC23 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C23;
+
+                TC23 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+                TC23 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+                TC23 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C12;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C13;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C23;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+                TC44 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+
+                TC55 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC55 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC55 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+
+                TC55 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C12;
+                TC55 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C13;
+                TC55 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C23;
+
+                TC55 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC55 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+
+                TC55 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC55 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM33(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+
+                TC55 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+                TC55 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM32(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM31(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C11;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C22;
+
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C12;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C13;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C23;
+
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C44;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C44;
+
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C55;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM23(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM13(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C55;
+
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Math.Pow(Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * Math.Pow(Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]), 2) * averagingTensor.C66;
+                TC66 += this.ODFList[phaseIndex].TDData[n][3] * Texture.OrientationDistributionFunction.SCTM11(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM22(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM12(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * Texture.OrientationDistributionFunction.SCTM21(this.ODFList[phaseIndex].TDData[n][0], this.ODFList[phaseIndex].TDData[n][1], this.ODFList[phaseIndex].TDData[n][2]) * averagingTensor.C66;
+            }
+
+            Stress.Microsopic.ElasticityTensors ret = averagingTensor.Clone() as Stress.Microsopic.ElasticityTensors;
+
+            ret.C11 = TC11 / normFactor;
+            ret.C22 = TC22 / normFactor;
+            ret.C33 = TC33 / normFactor;
+            ret.C12 = TC12 / normFactor;
+            ret.C13 = TC13 / normFactor;
+            ret.C23 = TC23 / normFactor;
+            ret.C44 = TC44 / normFactor;
+            ret.C55 = TC55 / normFactor;
+            ret.C66 = TC66 / normFactor;
+
+            return ret;
+        }
         #endregion
 
         #endregion

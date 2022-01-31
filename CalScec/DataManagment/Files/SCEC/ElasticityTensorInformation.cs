@@ -85,7 +85,7 @@ namespace CalScec.DataManagment.Files.SCEC
 
             if (this.ODF != null)
             {
-                Ret.ODF = this.ODF.GetODF();
+                //Ret.ODF = this.ODF.GetODF();
             }
             else
             {

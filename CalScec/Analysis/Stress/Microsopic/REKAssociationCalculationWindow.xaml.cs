@@ -72,6 +72,11 @@ namespace CalScec.Analysis.Stress.Microsopic
 
             //RefreshSampleElasticData();
             TextEventsActive = true;
+
+            if(DiffractionPatternBox.Items.Count > 0)
+            {
+                DiffractionPatternBox.SelectedIndex = 1;
+            }
         }
 
         private void PreparePlot()
@@ -79,36 +84,36 @@ namespace CalScec.Analysis.Stress.Microsopic
             MainPlotModel.LegendBorder = OxyPlot.OxyColors.Black;
             MainPlotModel.LegendItemAlignment = OxyPlot.HorizontalAlignment.Left;
             MainPlotModel.LegendTitle = "DEC";
-            MainPlotModel.LegendFontSize = 22;
-            MainPlotModel.LegendTitleFontSize = 24;
+            MainPlotModel.LegendFontSize = 18;
+            MainPlotModel.LegendTitleFontSize = 20;
 
             MainXAxisLin.Position = OxyPlot.Axes.AxisPosition.Bottom;
             MainXAxisLin.Minimum = 0;
             MainXAxisLin.Maximum = 180;
-            MainXAxisLin.Title = "cos^2(Psi)";
-            MainXAxisLin.FontSize = 22;
-            MainXAxisLin.TitleFontSize = 24;
+            MainXAxisLin.Title = "cos²(ψ)";
+            MainXAxisLin.FontSize = 18;
+            MainXAxisLin.TitleFontSize = 20;
 
             MainYAxisLin.Position = OxyPlot.Axes.AxisPosition.Left;
             MainYAxisLin.Minimum = 0;
             MainYAxisLin.Maximum = 10;
-            MainYAxisLin.Title = "Strain / Applied stress";
-            MainYAxisLin.FontSize = 22;
-            MainYAxisLin.TitleFontSize = 24;
+            MainYAxisLin.Title = "ε/σ";
+            MainYAxisLin.FontSize = 18;
+            MainYAxisLin.TitleFontSize = 20;
 
             ResXAxisLin.Position = OxyPlot.Axes.AxisPosition.Bottom;
             ResXAxisLin.Minimum = 0;
             ResXAxisLin.Maximum = 180;
-            ResXAxisLin.Title = "cos^2(Psi)";
-            ResXAxisLin.FontSize = 22;
-            ResXAxisLin.TitleFontSize = 24;
+            ResXAxisLin.Title = "cos²(ψ)";
+            ResXAxisLin.FontSize = 18;
+            ResXAxisLin.TitleFontSize = 20;
 
             ResYAxisLin.Position = OxyPlot.Axes.AxisPosition.Left;
             ResYAxisLin.Minimum = -3.1;
             ResYAxisLin.Maximum = 3.1;
-            ResYAxisLin.Title = "TotalDeviation";
-            ResYAxisLin.FontSize = 22;
-            ResYAxisLin.TitleFontSize = 24;
+            ResYAxisLin.Title = "Δ";
+            ResYAxisLin.FontSize = 18;
+            ResYAxisLin.TitleFontSize = 20;
 
             MainXAxisLin.MajorGridlineStyle = OxyPlot.LineStyle.Dot;
             MainYAxisLin.MajorGridlineStyle = OxyPlot.LineStyle.Dot;
@@ -677,145 +682,163 @@ namespace CalScec.Analysis.Stress.Microsopic
         {
             if(CalScec.Properties.Settings.Default.REKAutoAusociationType == 1)
             {
-                for(int n = 0; n < this.ActSample.CrystalData.Count; n++)
+                #region Old Code
+                //for (int n = 0; n < this.ActSample.CrystalData.Count; n++)
+                //{
+
+                //    if (this.textureAktivated)
+                //    {
+                //        this.ActSample.DiffractionConstantsTexture[n].Clear();
+                //    }
+                //    else
+                //    {
+                //        this.ActSample.DiffractionConstants[n].Clear();
+                //    }
+
+                //    for (int i = 0; i < this.ActSample.CrystalData[n].HKLList.Count; i++)
+                //    {
+                //        REK ActualREK = new REK(this.ActSample.CrystalData[n], this.ActSample.CrystalData[n].HKLList[i]);
+
+                //        for(int j = 0; j < this.ActSample.DiffractionPatterns.Count; j++)
+                //        {
+                //            for(int k = 0; k < this.ActSample.DiffractionPatterns[j].FoundPeaks.Count; k++)
+                //            {
+                //                if(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedCrystalData.SymmetryGroupID == this.ActSample.CrystalData[n].SymmetryGroupID)
+                //                {
+                //                    if(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedHKLReflex.HKLString == this.ActSample.CrystalData[n].HKLList[i].HKLString)
+                //                    {
+                //                        Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(this.ActSample.DiffractionPatterns[j].Stress, this.ActSample.DiffractionPatterns[j].PsiAngle(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].Angle), this.ActSample.DiffractionPatterns[j].FoundPeaks[k], this.ActSample.DiffractionPatterns[j].PhiAngle(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].Angle));
+                //                        NewAssociation._macroskopicStrain = this.ActSample.DiffractionPatterns[j].MacroStrain;
+                //                        ActualREK.ElasticStressData.Add(NewAssociation);
+                //                    }
+                //                }
+                //            }
+                //        }
+
+                //        for (int j = 0; j < this.ActSample.MacroElasticData.Count; j++)
+                //        {
+                //            if (this.ActSample.MacroElasticData[j][0].HKLAssociation == ActualREK.HKLAssociation)
+                //            {
+                //                if (this.ActSample.MacroElasticData[j][0].PsiAngle == 0)
+                //                {
+                //                    ActualREK.LongitudionalElasticity = this.ActSample.MacroElasticData[j];
+                //                }
+                //                else if (this.ActSample.MacroElasticData[j][0].PsiAngle == 90)
+                //                {
+                //                    ActualREK.TransversalElasticity = this.ActSample.MacroElasticData[j];
+                //                }
+                //            }
+                //        }
+                //        if(this.textureAktivated)
+                //        {
+                //            this.ActSample.DiffractionConstantsTexture[n].Add(ActualREK);
+                //        }
+                //        else
+                //        {
+                //            this.ActSample.DiffractionConstants[n].Add(ActualREK);
+                //        }
+                //    }
+
+                //    //Removing empty DEC
+                //    bool run = true;
+                //    while (run)
+                //    {
+                //        int deleteIndex = -1;
+                //        if (this.textureAktivated)
+                //        {
+                //            for (int i = 0; i < this.ActSample.DiffractionConstantsTexture[n].Count; i++)
+                //            {
+
+                //                if (this.ActSample.DiffractionConstantsTexture[n][i].ElasticStressData.Count == 0)
+                //                {
+                //                    deleteIndex = i;
+                //                }
+
+                //                else if (deleteIndex > -1)
+                //                {
+                //                    this.ActSample.DiffractionConstantsTexture[n].RemoveAt(deleteIndex);
+                //                    break;
+                //                }
+                //            }
+                //            if (deleteIndex == -1)
+                //            {
+                //                run = false;
+                //                break;
+                //            }
+                //        }
+                //        else
+                //        {
+                //            for (int i = 0; i < this.ActSample.DiffractionConstants[n].Count; i++)
+                //            {
+
+                //                if (this.ActSample.DiffractionConstants[n][i].ElasticStressData.Count == 0)
+                //                {
+                //                    deleteIndex = i;
+                //                }
+
+                //                if (deleteIndex > -1)
+                //                {
+                //                    this.ActSample.DiffractionConstants[n].RemoveAt(deleteIndex);
+                //                    break;
+                //                }
+                //            }
+                //            if (deleteIndex == -1)
+                //            {
+                //                run = false;
+                //                break;
+                //            }
+                //        }
+                //    }
+
+                //    if (this.textureAktivated)
+                //    {
+                //        for (int i = 0; i < this.ActSample.DiffractionConstantsTexture[n].Count; i++)
+                //        {
+                //            if (Convert.ToBoolean(this.StressPartitioningBox.IsChecked))
+                //            {
+                //                this.ActSample.ODFList[this.PhaseSwitchBox.SelectedIndex].SetMRDValues(this.ActSample.DiffractionConstantsTexture[n][i].ElasticStressData);
+                //                this.ActSample.DiffractionConstantsTexture[n][i].FitTexturedPhaseREKFunction();
+                //            }
+                //            else
+                //            {
+                //                this.ActSample.ODFList[this.PhaseSwitchBox.SelectedIndex].SetMRDValues(this.ActSample.DiffractionConstantsTexture[n][i].ElasticStressData);
+                //                this.ActSample.DiffractionConstantsTexture[n][i].FitTexturedREKFunction();
+                //            }
+                //        }
+                //    }
+                //    else
+                //    {
+                //        for (int i = 0; i < this.ActSample.DiffractionConstants[n].Count; i++)
+                //        {
+                //            if (Convert.ToBoolean(this.StressPartitioningBox.IsChecked))
+                //            {
+                //                this.ActSample.DiffractionConstants[n][i].FitClassicPhaseREKFunction();
+                //            }
+                //            else
+                //            {
+                //                this.ActSample.DiffractionConstants[n][i].FitClassicREKFunction();
+                //            }
+                //        }
+                //    }
+                //}
+
+                #endregion
+                if (Convert.ToBoolean(this.TextureBox.IsChecked))
                 {
-
-                    if (this.textureAktivated)
+                    if (this.ActSample.CrystalData.Count > this.ActSample.ODFList.Count)
                     {
-                        this.ActSample.DiffractionConstantsTexture[n].Clear();
+                        MessageBox.Show("Not every phase has available texture information. Please add the missing ODF to continue.", "Missing ODF", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                     else
                     {
-                        this.ActSample.DiffractionConstants[n].Clear();
-                    }
-
-                    for (int i = 0; i < this.ActSample.CrystalData[n].HKLList.Count; i++)
-                    {
-                        REK ActualREK = new REK(this.ActSample.CrystalData[n], this.ActSample.CrystalData[n].HKLList[i]);
-
-                        for(int j = 0; j < this.ActSample.DiffractionPatterns.Count; j++)
-                        {
-                            for(int k = 0; k < this.ActSample.DiffractionPatterns[j].FoundPeaks.Count; k++)
-                            {
-                                if(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedCrystalData.SymmetryGroupID == this.ActSample.CrystalData[n].SymmetryGroupID)
-                                {
-                                    if(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].AssociatedHKLReflex.HKLString == this.ActSample.CrystalData[n].HKLList[i].HKLString)
-                                    {
-                                        Macroskopic.PeakStressAssociation NewAssociation = new Macroskopic.PeakStressAssociation(this.ActSample.DiffractionPatterns[j].Stress, this.ActSample.DiffractionPatterns[j].PsiAngle(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].Angle), this.ActSample.DiffractionPatterns[j].FoundPeaks[k], this.ActSample.DiffractionPatterns[j].PhiAngle(this.ActSample.DiffractionPatterns[j].FoundPeaks[k].Angle));
-                                        NewAssociation._macroskopicStrain = this.ActSample.DiffractionPatterns[j].MacroStrain;
-                                        ActualREK.ElasticStressData.Add(NewAssociation);
-                                    }
-                                }
-                            }
-                        }
-
-                        for (int j = 0; j < this.ActSample.MacroElasticData.Count; j++)
-                        {
-                            if (this.ActSample.MacroElasticData[j][0].HKLAssociation == ActualREK.HKLAssociation)
-                            {
-                                if (this.ActSample.MacroElasticData[j][0].PsiAngle == 0)
-                                {
-                                    ActualREK.LongitudionalElasticity = this.ActSample.MacroElasticData[j];
-                                }
-                                else if (this.ActSample.MacroElasticData[j][0].PsiAngle == 90)
-                                {
-                                    ActualREK.TransversalElasticity = this.ActSample.MacroElasticData[j];
-                                }
-                            }
-                        }
-                        if(this.textureAktivated)
-                        {
-                            this.ActSample.DiffractionConstantsTexture[n].Add(ActualREK);
-                        }
-                        else
-                        {
-                            this.ActSample.DiffractionConstants[n].Add(ActualREK);
-                        }
-                    }
-
-                    //Removing empty DEC
-                    bool run = true;
-                    while (run)
-                    {
-                        int deleteIndex = -1;
-                        if (this.textureAktivated)
-                        {
-                            for (int i = 0; i < this.ActSample.DiffractionConstantsTexture[n].Count; i++)
-                            {
-
-                                if (this.ActSample.DiffractionConstantsTexture[n][i].ElasticStressData.Count == 0)
-                                {
-                                    deleteIndex = i;
-                                }
-                                
-                                else if (deleteIndex > -1)
-                                {
-                                    this.ActSample.DiffractionConstantsTexture[n].RemoveAt(deleteIndex);
-                                    break;
-                                }
-                            }
-                            if (deleteIndex == -1)
-                            {
-                                run = false;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            for (int i = 0; i < this.ActSample.DiffractionConstants[n].Count; i++)
-                            {
-
-                                if (this.ActSample.DiffractionConstants[n][i].ElasticStressData.Count == 0)
-                                {
-                                    deleteIndex = i;
-                                }
-                                
-                                if (deleteIndex > -1)
-                                {
-                                    this.ActSample.DiffractionConstants[n].RemoveAt(deleteIndex);
-                                    break;
-                                }
-                            }
-                            if (deleteIndex == -1)
-                            {
-                                run = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (this.textureAktivated)
-                    {
-                        for (int i = 0; i < this.ActSample.DiffractionConstantsTexture[n].Count; i++)
-                        {
-                            if (Convert.ToBoolean(this.StressPartitioningBox.IsChecked))
-                            {
-                                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetMRDValues(this.ActSample.DiffractionConstantsTexture[n][i].ElasticStressData);
-                                this.ActSample.DiffractionConstantsTexture[n][i].FitTexturedPhaseREKFunction();
-                            }
-                            else
-                            {
-                                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.SetMRDValues(this.ActSample.DiffractionConstantsTexture[n][i].ElasticStressData);
-                                this.ActSample.DiffractionConstantsTexture[n][i].FitTexturedREKFunction();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < this.ActSample.DiffractionConstants[n].Count; i++)
-                        {
-                            if (Convert.ToBoolean(this.StressPartitioningBox.IsChecked))
-                            {
-                                this.ActSample.DiffractionConstants[n][i].FitClassicPhaseREKFunction();
-                            }
-                            else
-                            {
-                                this.ActSample.DiffractionConstants[n][i].FitClassicREKFunction();
-                            }
-                        }
+                        Tools.Calculation.AutoSetDEC(this.ActSample, Convert.ToBoolean(this.TextureBox.IsChecked), Convert.ToBoolean(this.StressPartitioningBox.IsChecked));
                     }
                 }
-                
+                else
+                {
+                    Tools.Calculation.AutoSetDEC(this.ActSample, Convert.ToBoolean(this.TextureBox.IsChecked), Convert.ToBoolean(this.StressPartitioningBox.IsChecked));
+                }
+
                 this.REKCalculationList.Items.Refresh();
             }
         }

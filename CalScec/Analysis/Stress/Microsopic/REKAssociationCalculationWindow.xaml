@@ -39,12 +39,12 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <CheckBox Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Name="TextureBox" Checked="TextureBox_Checked" Unchecked="TextureBox_Unchecked">Enable Texture</CheckBox>
-                <CheckBox Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Name="StressPartitioningBox">Enable phase stress</CheckBox>
-                <GroupBox Grid.Row="0" Grid.Column="1" Header="Selected phase">
+                <CheckBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Name="TextureBox" Checked="TextureBox_Checked" Unchecked="TextureBox_Unchecked" ToolTip="Enabling the texture creates a new set of diffraction elastic constants. The isotropic constants are not lost.">Enable Texture</CheckBox>
+                <CheckBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Name="StressPartitioningBox">Enable phase stress</CheckBox>
+                <GroupBox Grid.Row="0" Grid.Column="2" Header="Selected phase">
                     <ComboBox Name="PhaseSwitchBox" MaxWidth="350" MaxHeight="30" SelectionChanged="PhaseSwitchBox_SelectionChanged"/>
                 </GroupBox>
-                <Button Grid.Row="1" Grid.Column="1" Name="SetPhaseStress" Content="Correct stress" MaxHeight="30" MaxWidth="150" Click="SetPhaseStress_Click"/>
+                <!--<Button Grid.Row="1" Grid.Column="1" Name="SetPhaseStress" Content="Correct stress" MaxHeight="30" MaxWidth="150" Click="SetPhaseStress_Click"/>-->
                 <Button Grid.Row="1" Grid.Column="2" Name="RefitREK" Content="Refit DEC" MaxHeight="30" MaxWidth="150" Click="RefitREK_Click"/>
             </Grid>
         </Grid>
@@ -58,14 +58,17 @@
                 <ListView Name="REKCalculationList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" SelectionChanged="REKCalculationList_SelectionChanged">
                     <ListView.View>
                         <GridView>
+
                             <GridViewColumn Width="120" Header="(H K L)" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
-                            <GridViewColumn Width="120" Header="S1" DisplayMemberBinding="{Binding Path=ClassicS1}"/>
-                            <GridViewColumn Width="120" Header="Weighted error" DisplayMemberBinding="{Binding Path=ClassicS1Error}"/>
-                            <GridViewColumn Width="120" Header="S2" DisplayMemberBinding="{Binding Path=ClassicHS2}"/>
-                            <GridViewColumn Width="120" Header="Weighted error" DisplayMemberBinding="{Binding Path=ClassicHS2Error}"/>
-                            <GridViewColumn Width="120" Header="E(hkl)" DisplayMemberBinding="{Binding Path=ClassicEModulus}"/>
-                            <GridViewColumn Width="120" Header="Nu(hkl)" DisplayMemberBinding="{Binding Path=ClassicTransverseContraction}"/>
-                            <GridViewColumn Width="120" Header="Chi2" DisplayMemberBinding="{Binding Path=ClassicChi2}"/>
+                            <GridViewColumn Width="100" Header="S1" DisplayMemberBinding="{Binding Path=ViewS1}"/>
+                            <GridViewColumn Width="100" Header="ΔS1" DisplayMemberBinding="{Binding Path=ViewS1Error}"/>
+                            <GridViewColumn Width="100" Header="½S2" DisplayMemberBinding="{Binding Path=ViewHS2}"/>
+                            <GridViewColumn Width="100" Header="Δ½S2" DisplayMemberBinding="{Binding Path=ViewHS2Error}"/>
+                            <GridViewColumn Width="100" Header="E(hkl) [MPa]" DisplayMemberBinding="{Binding Path=ViewEModulus}"/>
+                            <GridViewColumn Width="120" Header="γ(hkl)" DisplayMemberBinding="{Binding Path=ViewShearModulus}"/>
+                            <GridViewColumn Width="120" Header="ν(hkl)" DisplayMemberBinding="{Binding Path=ViewTransverseContraction}"/>
+                            <GridViewColumn Width="120" Header="μ(hkl)" DisplayMemberBinding="{Binding Path=ViewBulkModulus}"/>
+                            <GridViewColumn Width="100" Header="Χ²" DisplayMemberBinding="{Binding Path=ClassicChi2}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -74,11 +77,11 @@
                 <ListView Name="REKPeakList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Width="100" Header="Angle" DisplayMemberBinding="{Binding Path=DifPeak.Angle}"/>
-                            <GridViewColumn Width="100" Header="Lattice distance" DisplayMemberBinding="{Binding Path=DifPeak.LatticeDistance}"/>
-                            <GridViewColumn Width="100" Header="Statistical error" DisplayMemberBinding="{Binding Path=DifPeak.LatticeDistanceError}"/>
-                            <GridViewColumn Width="100" Header="Applied stress" DisplayMemberBinding="{Binding Path=stress}"/>
-                            <GridViewColumn Width="100" Header="Psi angle" DisplayMemberBinding="{Binding Path=psiAngle}"/>
+                            <GridViewColumn Width="100" Header="2θ" DisplayMemberBinding="{Binding Path=DifPeak.AngleView}"/>
+                            <GridViewColumn Width="100" Header="d" DisplayMemberBinding="{Binding Path=DifPeak.LatticeDistanceView}"/>
+                            <GridViewColumn Width="100" Header="dev(d)" DisplayMemberBinding="{Binding Path=DifPeak.LatticeDistanceErrorView}"/>
+                            <GridViewColumn Width="100" Header="σ" DisplayMemberBinding="{Binding Path=stress}"/>
+                            <GridViewColumn Width="100" Header="ψ" DisplayMemberBinding="{Binding Path=psiAngleView}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -89,9 +92,9 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Name="RemovePeakFromREK" Content="Remove peak from DEC" MaxHeight="30" MaxWidth="150" Click="RemovePeakFromREK_Click"/>
-                <Button Grid.Column="1" Name="DeleteREK" Content="Remove DEC" MaxHeight="30" MaxWidth="150" Click="DeleteREK_Click"/>
-                <Button Grid.Column="2" Name="AutoREK" Content="Auto association of DECs" MaxHeight="30" MaxWidth="150" Click="AutoREK_Click"/>
+                <Button Grid.Column="0" Name="RemovePeakFromREK" Content="Remove peak from DEC" MaxHeight="30" MaxWidth="150" Click="RemovePeakFromREK_Click" ToolTip="Removes the selected peak from the selected diffraction elastic constant."/>
+                <Button Grid.Column="1" Name="DeleteREK" Content="Remove DEC" MaxHeight="30" MaxWidth="150" Click="DeleteREK_Click" ToolTip="Removes the selected diffraction elastic constant entirely."/>
+                <Button Grid.Column="2" Name="AutoREK" Content="Auto association of DECs" MaxHeight="30" MaxWidth="150" Click="AutoREK_Click" ToolTip="Automatically associates every peak to their respective diffraction elastic constant and fits them."/>
             </Grid>
         </Grid>
         <Grid Grid.Column="3" Grid.Row="1">
@@ -116,10 +119,10 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Omega angle"/>
-                    <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Chi angle"/>
-                    <Label Grid.Column="0" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Phi sample angle"/>
-                    <Label Grid.Column="0" Grid.Row="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Applied stress"/>
+                    <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Ω (Deg):"/>
+                    <Label Grid.Column="0" Grid.Row="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Χ (Deg):"/>
+                    <Label Grid.Column="0" Grid.Row="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="ρ (Deg):"/>
+                    <Label Grid.Column="0" Grid.Row="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="σ (MPa):"/>
                     <TextBox Grid.Column="1" Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="OmegaAngleBox" TextChanged="OmegaAngleBox_TextChanged"/>
                     <TextBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="ChiAngleBox" TextChanged="ChiAngleBox_TextChanged"/>
                     <TextBox Grid.Column="1" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Stretch" Name="PhiSampleAngleBox" TextChanged="PhiSampleAngleBox_TextChanged"/>
@@ -131,8 +134,8 @@
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Width="110" Header="( H K L )" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
-                            <GridViewColumn Width="100" Header="Lattice distrance" DisplayMemberBinding="{Binding Path=LatticeDistance}"/>
-                            <GridViewColumn Width="100" Header="Error" DisplayMemberBinding="{Binding Path=LatticeDistanceError}"/>
+                            <GridViewColumn Width="100" Header="d" DisplayMemberBinding="{Binding Path=LatticeDistanceView}"/>
+                            <GridViewColumn Width="100" Header="dev(d)" DisplayMemberBinding="{Binding Path=LatticeDistanceErrorView}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
@@ -142,8 +145,8 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Name="AddToREK" Content="Add peak to selected DEC" MaxHeight="30" MaxWidth="150" Click="AddToREKList_Click"/>
-                <Button Grid.Column="1" Name="CreateNewREK" Content="Create new DEC" MaxHeight="30" MaxWidth="150" Click="CreateNewList_Click"/>
+                <Button Grid.Column="0" Name="AddToREK" Content="Add peak to selected DEC" MaxHeight="30" MaxWidth="150" Click="AddToREKList_Click" ToolTip="Adds the selected peak to the selected diffraction elastic constant."/>
+                <Button Grid.Column="1" Name="CreateNewREK" Content="Create new DEC" MaxHeight="30" MaxWidth="150" Click="CreateNewList_Click" ToolTip="Creates an new diffraction elastic constant. The peak selected in the peak list will determine the DEC and is used as reference to calculate the strain values."/>
             </Grid>
         </Grid>
     </Grid>

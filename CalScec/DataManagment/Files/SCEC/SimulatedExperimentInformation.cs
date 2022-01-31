@@ -14,6 +14,7 @@ namespace CalScec.DataManagment.Files.SCEC
         private double _chiAngle;
         private double _omegaAngle;
         private double _sampleArea;
+        public string _name;
 
         public List<YieldSurfaceInformation> YieldInformation = new List<YieldSurfaceInformation>();
 
@@ -59,6 +60,7 @@ namespace CalScec.DataManagment.Files.SCEC
             this._chiAngle = Ep.ChiAngle;
             this._omegaAngle = Ep.OmegaAngle;
             this._sampleArea = Ep.SampleArea;
+            this._name = Ep.Name;
 
             if (Ep.GrainOrientations != null)
             {
@@ -249,6 +251,7 @@ namespace CalScec.DataManagment.Files.SCEC
             ret.ChiAngle = this._chiAngle;
             ret.OmegaAngle = this._omegaAngle;
             ret.SampleArea = this._sampleArea;
+            ret.Name = this._name;
 
             if (this.GrainOrientations != null)
             {

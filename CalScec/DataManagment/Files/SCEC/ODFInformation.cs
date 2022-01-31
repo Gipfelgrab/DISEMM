@@ -16,6 +16,7 @@ namespace CalScec.DataManagment.Files.SCEC
         /// [3] value
         /// </summary>
         public int TDData = 0;
+        public List<double[]> tDData = new List<double[]>();
 
         private double _stepSizePhi1;
 
@@ -30,7 +31,7 @@ namespace CalScec.DataManagment.Files.SCEC
 
         public ODFInformation(Analysis.Texture.OrientationDistributionFunction NewODF)
         {
-            //this.TDData = NewODF.TDData;
+            this.tDData = NewODF.TDData;
 
             this._stepSizePhi = NewODF.StepPhi;
             this._stepSizePhi1 = NewODF.StepSizePhi1;
@@ -46,8 +47,8 @@ namespace CalScec.DataManagment.Files.SCEC
         {
             Analysis.Texture.OrientationDistributionFunction Ret = new Analysis.Texture.OrientationDistributionFunction();
 
-            //Ret.TDData = this.TDData;
-            //Ret.SetStepSizes();
+            Ret.TDData = this.tDData;
+            Ret.SetStepSizes();
 
             Ret.BaseTensor = this.BaseTensor.GetElasticityTensor();
             Ret.TextureTensor = this.TextureTensor.GetElasticityTensor();

@@ -731,7 +731,7 @@ namespace CalScec.Analysis.Stress.Plasticity
         }
 
         //Actual model now in use --> BackUp
-        public static void PerformStressExperimentSt(Sample actSample, int experimentIndex, int n, int cycleLimit, bool textureActive, bool useHardenningMatrix, bool invertSlipSystems)
+        public static void PerformStressExperimentBackUp(Sample actSample, int experimentIndex, int n, int cycleLimit, bool textureActive, bool singleCrystalTracking, int slipCriterion, int elasticModel)
         {
             // Parameter definition
             //Potentiel aktivierte Gleitsysteme in 
@@ -740,36 +740,96 @@ namespace CalScec.Analysis.Stress.Plasticity
             MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateS = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
             //Dehnungstensoren Tensoren guess ist einfach elastisch
             Tools.FourthRankTensor overallStiffnesses = actSample.GetSampleStiffnesses(textureActive);
+            switch (elasticModel)
+            {
+                case 0:
+                    //Reuss
+                    overallStiffnesses = actSample.GetSampleStiffnesses(textureActive, actSample.ReussTensorData);
+                    break;
+                case 1:
+                    //Hill
+                    overallStiffnesses = actSample.GetSampleStiffnesses(textureActive, actSample.HillTensorData);
+                    break;
+                case 2:
+                    //Kroener
+                    overallStiffnesses = actSample.GetSampleStiffnesses(textureActive, actSample.KroenerTensorData);
+                    break;
+                case 3:
+                    //De Wit
+                    overallStiffnesses = actSample.GetSampleStiffnesses(textureActive, actSample.DeWittTensorData);
+                    break;
+                case 4:
+                    //Matthies
+                    overallStiffnesses = actSample.GetSampleStiffnesses(textureActive, actSample.GeometricHillTensorData);
+                    break;
+                default:
+                    //Hill
+                    overallStiffnesses = actSample.GetSampleStiffnesses(textureActive, actSample.HillTensorData);
+                    break;
+            }
             Tools.FourthRankTensor overallStiffnessesComp = overallStiffnesses.Clone() as Tools.FourthRankTensor;
             //Constraint Tensor L* Komplettes Sample
             Tools.FourthRankTensor constraintStiffness = new Tools.FourthRankTensor();
-            //Lc
-            List<List<Tools.FourthRankTensor>> grainStiffnesses = new List<List<Tools.FourthRankTensor>>();
-            //Ac
-            List<List<Tools.FourthRankTensor>> grainTransitionStiffnesses = new List<List<Tools.FourthRankTensor>>();
+
+            ////Lc
+            //List<List<Tools.FourthRankTensor>> grainStiffnesses = new List<List<Tools.FourthRankTensor>>();
+            ////Ac
+            //List<List<Tools.FourthRankTensor>> grainTransitionStiffnesses = new List<List<Tools.FourthRankTensor>>();
+            //Lc, Mc, Ac, Bc, Hardenning matrix
+            List<List<PlasticityTensor>> plasticTensorPhase = new List<List<PlasticityTensor>>();
+
             //gemittelten Phasen Nachgiebigkeiten
             List<Tools.FourthRankTensor> overallStiffnessesPhase = new List<Tools.FourthRankTensor>();
             //Grain Spannungen der Phasen und Orientierungen
             List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>> grainStressesOriented = new List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>>();
             //Grain Dehnungen der Phasen und Orientierungen
             List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>> grainStrainsOriented = new List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>>();
-            List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>> hardeningMatrixList = new List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>>();
+            //List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>> hardeningMatrixList = new List<List<MathNet.Numerics.LinearAlgebra.Matrix<double>>>();
 
             List<List<List<double>>> yieldChangeOriented = new List<List<List<double>>>();
+            List<List<List<double>>> shearRate = new List<List<List<double>>>();
             List<double[]> averageYieldChange = new List<double[]>();
 
             //Phasen werden in den Listen definiert
             for (int phase = 0; phase < actSample.CrystalData.Count; phase++)
             {
-                overallStiffnessesPhase.Add(actSample.HillTensorData[phase].GetFourtRankStiffnesses());
-                grainStiffnesses.Add(new List<Tools.FourthRankTensor>());
-                grainTransitionStiffnesses.Add(new List<Tools.FourthRankTensor>());
+                switch (elasticModel)
+                {
+                    case 0:
+                        //Reuss
+                        overallStiffnessesPhase.Add(actSample.ReussTensorData[phase].GetFourtRankStiffnesses());
+                        break;
+                    case 1:
+                        //Hill
+                        overallStiffnessesPhase.Add(actSample.HillTensorData[phase].GetFourtRankStiffnesses());
+                        break;
+                    case 2:
+                        //Kroener
+                        overallStiffnessesPhase.Add(actSample.KroenerTensorData[phase].GetFourtRankStiffnesses());
+                        break;
+                    case 3:
+                        //De Wit
+                        overallStiffnessesPhase.Add(actSample.DeWittTensorData[phase].GetFourtRankStiffnesses());
+                        break;
+                    case 4:
+                        //Matthies
+                        overallStiffnessesPhase.Add(actSample.GeometricHillTensorData[phase].GetFourtRankStiffnesses());
+                        break;
+                    default:
+                        //Hill
+                        overallStiffnessesPhase.Add(actSample.HillTensorData[phase].GetFourtRankStiffnesses());
+                        break;
+                }
                 potentialActiveGOriented.Add(new List<List<ReflexYield>>());
                 grainStressesOriented.Add(new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>());
                 grainStrainsOriented.Add(new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>());
-                hardeningMatrixList.Add(new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>());
+                //hardeningMatrixList.Add(new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>());
+                shearRate.Add(new List<List<double>>());
                 yieldChangeOriented.Add(new List<List<double>>());
                 averageYieldChange.Add(new double[5]);
+                plasticTensorPhase.Add(new List<PlasticityTensor>());
+                //grainStiffnesses.Add(new List<Tools.FourthRankTensor>());
+                //grainTransitionStiffnesses.Add(new List<Tools.FourthRankTensor>());
             }
 
             //Macroskopische Spannungsrate berechnen
@@ -800,572 +860,327 @@ namespace CalScec.Analysis.Stress.Plasticity
 
             //MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateS = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
             //MathNet.Numerics.LinearAlgebra.Matrix<double> stressS = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-            
+
 
             //Selbstkonsistente Rechung
             for (int actCycle = 0; actCycle < cycleLimit; actCycle++)
             {
+                bool allElastic = true;
+                actSample.SimulationData[experimentIndex].LastActiveSystems = 0;
+
                 Microsopic.ElasticityTensors eTmp = new Microsopic.ElasticityTensors();
                 eTmp._stiffnessTensor = overallStiffnesses.GetVoigtTensor();
                 eTmp.CalculateCompliances();
                 constraintStiffness = actSample.PlasticTensor[0].GetConstraintStiffnessCubicIsotropic(eTmp, 2);
-
-                //stressRateS = overallStiffnesses * strainRateS;
-
-                //if (n == 0)
-                //{
-                //    stressS += stressRateS;
-                //}
-                //else
-                //{
-                //    stressS = actSample.SimulationData[experimentIndex].StressSFHistory[n - 1] + stressRateS;
-                //}
+                actSample.SimulationData[experimentIndex].LastFailedGrains = 0;
 
                 //Berechnungen im Krystallsystem
                 for (int phase = 0; phase < actSample.CrystalData.Count; phase++)
                 {
-                    double maxPhi1 = 360;
-                    double maxPsi = 360;
-                    double maxPhi2 = 360;
-
-                    //Setzen der gemittelten Orientierungen
-                    if (actSample.CrystalData[phase].SymmetryGroupID == 225 || actSample.CrystalData[phase].SymmetryGroupID == 229)
-                    {
-                        //maxPhi1 = 45;
-                        //maxPsi = 45;
-                        //maxPhi2 = 45;
-                        maxPhi1 = 90;
-                        maxPsi = 90;
-                        maxPhi2 = 90;
-                    }
-                    if (actSample.CrystalData[phase].SymmetryGroupID == 194)
-                    {
-                        maxPhi1 = 60;
-                        maxPsi = 90;
-                        maxPhi2 = 60;
-                    }
-                    if (actSample.SimulationData[experimentIndex].GrainOrientations[phase].Count == 0)
-                    {
-                        for (double phi1 = 0.0; phi1 < maxPhi1; phi1 += 5.0)
-                        {
-                            for (double psi = 0.0; psi < maxPsi; psi += 5.0)
-                            {
-                                for (double phi2 = 0.0; phi2 < maxPhi2; phi2 += 5.0)
-                                {
-                                    actSample.SimulationData[experimentIndex].GrainOrientations[phase].Add(new GrainOrientationParameter(phi1, psi, phi2));
-                                }
-                            }
-                        }
-                    }
-
-                    //Alle Grain parameter für die verschiedenen Orientierungen werden gesetzt
-                    //Lc für aktuelle phase
-                    List<Tools.FourthRankTensor> grainInstStiffnessesOriented = new List<Tools.FourthRankTensor>();
-                    //Ac für die aktuelle Phase
-                    List<Tools.FourthRankTensor> grainTransitionStiffnessesOriented = new List<Tools.FourthRankTensor>();
+                    int grainIndexCounter = actSample.SimulationData[experimentIndex].GrainOrientations[phase].Count;
+                    //Lc, Mc, Ac, Bc der aktuellen Phase
+                    PlasticityTensor[] plasticTensororiented = new PlasticityTensor[grainIndexCounter];
                     //GrainSpanungen für alle orientierungen
-                    List<MathNet.Numerics.LinearAlgebra.Matrix<double>> grainStressesPhase = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
+                    MathNet.Numerics.LinearAlgebra.Matrix<double>[] grainStressesPhase = new MathNet.Numerics.LinearAlgebra.Matrix<double>[grainIndexCounter];
                     //Grain Dehnungen für alle orientierungen
-                    List<MathNet.Numerics.LinearAlgebra.Matrix<double>> grainStrainsPhase = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
+                    MathNet.Numerics.LinearAlgebra.Matrix<double>[] grainStrainsPhase = new MathNet.Numerics.LinearAlgebra.Matrix<double>[grainIndexCounter];
                     //Active Gleitsysteme
-                    List<List<ReflexYield>> potentialActiveGPhase = new List<List<ReflexYield>>();
-                    //Härtungsmatrix in den verschiedenen Orientierungen
-                    List<MathNet.Numerics.LinearAlgebra.Matrix<double>> hardeningMatrixOriented = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
+                    List<ReflexYield>[] potentialActiveGPhase = new List<ReflexYield>[grainIndexCounter];
+                    List<double>[] yieldChangePhase = new List<double>[grainIndexCounter];
+                    List<double>[] shearRateOriented = new List<double>[grainIndexCounter];
 
-                    List<List<double>> yieldChangePhase = new List<List<double>>();
-
-                    int grainIndexCounter = 0;
-
-                    for (double phi1 = 0.0; phi1 < maxPhi1; phi1 += 5.0)
+                    // Parallelize the outer loop to partition the source array by rows.
+                    //Parallel.For(0, grainIndexCounter, grainIndexTmp =>
+                    for (int grainIndexTmp = 0; grainIndexTmp < grainIndexCounter; grainIndexTmp++)
                     {
-                        for (double psi = 0.0; psi < maxPsi; psi += 5.0)
+                        int grainIndex = Convert.ToInt32(grainIndexTmp);
+                        PlasticityTensor plasticTensorGrain = new PlasticityTensor();
+
+                        if (grainIndex == 1000)
                         {
-                            for (double phi2 = 0.0; phi2 < maxPhi2; phi2 += 5.0)
+                            string test1 = "";
+                        }
+                        if (grainIndex == 2000)
+                        {
+                            string test1 = "";
+                        }
+                        //if (grainIndex == 632)
+                        //{
+                        //    string test1 = "";
+                        //}
+                        //if (grainIndex == 633)
+                        //{
+                        //    string test1 = "";
+                        //}
+
+                        if (singleCrystalTracking)
+                        {
+                            //Yield strength wird berechnet
+                            List<double> hardennedYield = new List<double>();
+                            for (int pS = 0; pS < actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems.Count; pS++)
                             {
-                                //Lc einzeln
-                                Tools.FourthRankTensor instGrainTensor = new Tools.FourthRankTensor();
-                                //Ac einzeln
-                                Tools.FourthRankTensor transitionGrainTensor = new Tools.FourthRankTensor();
-                                MathNet.Numerics.LinearAlgebra.Matrix<double> hardeningMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0);
+                                hardennedYield.Add(0.0);
+                                actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[pS].YieldMainHardennedStrength = actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[pS].YieldMainStrength;
+                            }
 
-                                //Drehen des Spannungstensor in die aktuelle Orientierung
-                                MathNet.Numerics.LinearAlgebra.Matrix<double> transformationMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0);
-
-                                transformationMatrix[0, 0] = -1 * Math.Cos(phi1 * (Math.PI / 180)) * Math.Cos(psi * (Math.PI / 180)) * Math.Sin(phi2 * (Math.PI / 180));
-                                transformationMatrix[0, 0] -= Math.Sin(phi1 * (Math.PI / 180)) * Math.Cos(phi2 * (Math.PI / 180));
-                                transformationMatrix[0, 1] = -1 * Math.Cos(psi * (Math.PI / 180)) * Math.Sin(phi1 * (Math.PI / 180)) * Math.Sin(phi2 * (Math.PI / 180));
-                                transformationMatrix[0, 1] -= Math.Cos(phi1 * (Math.PI / 180)) * Math.Cos(phi2 * (Math.PI / 180));
-                                transformationMatrix[0, 2] = Math.Sin(psi * (Math.PI / 180)) * Math.Sin(phi2 * (Math.PI / 180));
-                                transformationMatrix[1, 0] = -1 * Math.Cos(psi * (Math.PI / 180)) * Math.Cos(phi1 * (Math.PI / 180)) * Math.Cos(phi2 * (Math.PI / 180));
-                                transformationMatrix[1, 0] -= Math.Sin(phi1 * (Math.PI / 180)) * Math.Sin(phi2 * (Math.PI / 180));
-                                transformationMatrix[1, 1] = -1 * Math.Sin(phi1 * (Math.PI / 180)) * Math.Cos(psi * (Math.PI / 180)) * Math.Cos(phi2 * (Math.PI / 180));
-                                transformationMatrix[1, 1] -= Math.Cos(phi1 * (Math.PI / 180)) * Math.Sin(phi2 * (Math.PI / 180));
-                                transformationMatrix[1, 2] = Math.Sin(psi * (Math.PI / 180)) * Math.Cos(phi2 * (Math.PI / 180));
-                                transformationMatrix[2, 0] = Math.Cos(phi1 * (Math.PI / 180)) * Math.Sin(psi * (Math.PI / 180));
-                                transformationMatrix[2, 1] = Math.Sin(phi1 * (Math.PI / 180)) * Math.Sin(psi * (Math.PI / 180));
-                                transformationMatrix[2, 2] = Math.Cos(psi * (Math.PI / 180));
-
-                                //TODO: Achtung hier wird Bc berechnung getestet!!
-                                //for the self consistence the stress and stress rate are calculated from the last Bc if it exists
-                                MathNet.Numerics.LinearAlgebra.Matrix<double> actStressGrainBc = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-                                MathNet.Numerics.LinearAlgebra.Matrix<double> actStressRateGrainBc = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-
-                                if(actCycle == 0)
+                            if (actCycle != 0)
+                            {
+                                for (int k = 0; k < actSample.SimulationData[experimentIndex].YieldChangeCFHistory.Count; k++)
                                 {
-                                    for (int k = 0; k < n; k++)
+                                    for (int aS = 0; aS < actSample.SimulationData[experimentIndex].ActiveSystemsCFOrientedHistory[phase][k][grainIndex].Count; aS++)
                                     {
-                                        actStressGrainBc += actSample.SimulationData[experimentIndex].StressRateCFOrientedHistory[phase][k][grainIndexCounter];
-                                    }
-                                    actStressRateGrainBc = stressRateS;
-                                }
-                                else
-                                {
-                                    ///constraintStiffness ergibt sich für alle Phasen gleichermaßen und wird aktualisiert
-                                    ///instGrainTensor wird aus Orientierungen berechnet und muss aus vorherigen Schritt genommen werden
-                                    ///overallStiffnesses wird pro cycle aktualisiert
-                                    Tools.FourthRankTensor lastBc = actSample.PlasticTensor[phase].GetAc(constraintStiffness.InverseSC(), grainStiffnesses[phase][grainIndexCounter].InverseSC(), overallStiffnesses.InverseSC());
-
-                                    //actStressGrainBc = lastBc * actSample.SimulationData[experimentIndex].StressSFHistory[n];
-                                    for (int k = 0; k < n; k++)
-                                    {
-                                        actStressGrainBc += actSample.SimulationData[experimentIndex].StressRateCFOrientedHistory[phase][k][grainIndexCounter];
-                                    }
-                                    actStressRateGrainBc = lastBc * stressRateS;
-                                }
-
-                                //Spannungstensor in der aktuellen Orientierung
-                                MathNet.Numerics.LinearAlgebra.Matrix<double> actStressOriented = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-                                MathNet.Numerics.LinearAlgebra.Matrix<double> actStressRateOriented = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-                                for (int i = 0; i < 3; i++)
-                                {
-                                    for (int j = 0; j < 3; j++)
-                                    {
-                                        for (int k = 0; k < 3; k++)
+                                        for (int pS = 0; pS < actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems.Count; pS++)
                                         {
-                                            for (int l = 0; l < 3; l++)
+                                            if (actSample.SimulationData[experimentIndex].ActiveSystemsCFOrientedHistory[phase][k][grainIndex][aS].HKLString == actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[pS].HKLString)
                                             {
-                                                //actStressOriented[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * actStressGrainBc[k, l];
-                                                actStressRateOriented[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * actStressRateGrainBc[k, l];
-                                            }
-                                        }
-                                    }
-                                }
-                                actStressOriented = actStressGrainBc + actStressRateOriented;
-
-                                //Potentiell aktive Gleitsysteme werden ermittelt
-                                List<ReflexYield> potentialActive = actSample.SimulationData[experimentIndex].YieldInformation[phase].GetPotentiallyActiveSlipSystems(actStressOriented);
-
-                                if (potentialActive.Count != 0)
-                                {
-                                    List<ReflexYield> trialSystems = new List<ReflexYield>();
-                                    //List<bool> checkedSystems = new List<bool>();
-                                    //for (int i = 0; i < potentialActive.Count; i++)
-                                    //{
-                                    //    checkedSystems.Add(true);
-                                    //    trialSystems.Add(potentialActive[i]);
-                                    //}
-                                    List<int> checkedSystems = new List<int>();
-                                    for (int i = 0; i < potentialActive.Count; i++)
-                                    {
-                                        checkedSystems.Add(1);
-                                        trialSystems.Add(potentialActive[i]);
-                                    }
-
-                                    for (long systemTrial = 0; systemTrial < Convert.ToInt64(Math.Pow(2, potentialActive.Count)); systemTrial++)
-                                    {
-                                        //fi einzeln
-                                        List<MathNet.Numerics.LinearAlgebra.Matrix<double>> stiffnessFactorsOriented = new List<MathNet.Numerics.LinearAlgebra.Matrix<double>>();
-                                        //setzen der kombination aus möglichen Gleitsystemen
-                                        if (!invertSlipSystems)
-                                        {
-                                            trialSystems = GetActiveSystemCombination(potentialActive, systemTrial);
-                                        }
-                                        else
-                                        {
-                                            List<int> checkedSystemsRe = new List<int>();
-                                            trialSystems = GetActiveSystemCombination(trialSystems, checkedSystems);
-                                            for (int m = 0; m < checkedSystems.Count; m++)
-                                            {
-                                                switch (checkedSystems[m])
+                                                //Vorfaktorberechnung für die Härtung
+                                                if (actSample.SimulationData[experimentIndex].useYieldLimit)
                                                 {
-                                                    case 0:
-                                                        goto default;
-                                                    case 1:
-                                                        checkedSystemsRe.Add(1);
-                                                        break;
-                                                    case 2:
-                                                        checkedSystemsRe.Add(2);
-                                                        break;
-                                                    default:
-                                                        break;
-                                                }
-                                            }
-                                            checkedSystems = checkedSystemsRe;
-                                        }
-                                        //
-                                        //checkedSystems.Clear();
-                                        //for (int i = 0; i < trialSystems.Count; i++)
-                                        //{
-                                        //    checkedSystems.Add(true);
-                                        //}
-                                        //for (int i = 0; i < trialSystems.Count; i++)
-                                        //{
-                                        //    checkedSystems.Add(1);
-                                        //}
-                                        if (trialSystems.Count != 0)
-                                        {
-                                            hardeningMatrix = actSample.SimulationData[experimentIndex].YieldInformation[phase].HardeningMatrixSlipSystem(trialSystems);
-                                            if (useHardenningMatrix)
-                                            {
-                                                hardeningMatrix = actSample.SimulationData[experimentIndex].YieldInformation[phase].HardeningMatrixSlipSystem(trialSystems, actSample.SimulationData[experimentIndex]._hardenningTensor[phase]);
-                                            }
-                                            else
-                                            {
-                                                hardeningMatrix = actSample.SimulationData[experimentIndex].YieldInformation[phase].HardeningMatrixSlipSystem(trialSystems);
-                                            }
-
-                                            MathNet.Numerics.LinearAlgebra.Matrix<double> slipSystemX = actSample.SimulationData[experimentIndex].YieldInformation[phase].SlipSystemX(trialSystems, hardeningMatrix, actSample.HillTensorData[phase]);
-                                            MathNet.Numerics.LinearAlgebra.Matrix<double> slipSystemY = slipSystemX.Inverse();
-
-                                            //Shear rates
-                                            List<double> shearRatesSystems = new List<double>();
-                                            //shear stress change rates
-                                            List<double> shearStressChangeSystems = new List<double>();
-                                            //yield change rates
-                                            List<double> yieldChangeSystems = new List<double>();
-
-                                            for (int i = 0; i < trialSystems.Count; i++)
-                                            {
-                                                //Berechnung der instantanious Stiffness factors f^i
-                                                MathNet.Numerics.LinearAlgebra.Matrix<double> compeFactorsTmp = actSample.SimulationData[experimentIndex].YieldInformation[phase].GetInstStiffnessFactors(trialSystems, actSample.HillTensorData[phase], i, slipSystemY);
-                                                stiffnessFactorsOriented.Add(compeFactorsTmp);
-                                            }
-                                            //Lc
-                                            instGrainTensor = actSample.PlasticTensor[phase].GetInstantanousGrainSiffnessTensor(trialSystems, actSample.HillTensorData[phase], stiffnessFactorsOriented);
-
-                                            MathNet.Numerics.LinearAlgebra.Matrix<double> energyCheckMat = instGrainTensor.GetVoigtTensor();
-                                            bool inversionCheck = true;
-                                            bool energyCheck = true;
-
-                                            //Energy check for the calculated constants
-                                            if (actSample.CrystalData[phase].SymmetryGroupID == 225 || actSample.CrystalData[phase].SymmetryGroupID == 229)
-                                            {
-                                                //Cubic
-                                                if(energyCheckMat[3, 3] <= 0)
-                                                {
-                                                    energyCheck = false;
-                                                }
-                                                else if (energyCheckMat[0, 0] <= Math.Abs(energyCheckMat[0, 1]))
-                                                {
-                                                    energyCheck = false;
-                                                }
-                                                else if(energyCheckMat[0, 0] + (2 * energyCheckMat[0, 1]) <= 0)
-                                                {
-                                                    energyCheck = false;
-                                                }
-                                            }
-                                            else if (actSample.CrystalData[phase].SymmetryGroupID == 194)
-                                            {
-                                                //Hexagonal
-                                                if (energyCheckMat[3, 3] <= 0)
-                                                {
-                                                    energyCheck = false;
-                                                }
-                                                else if (energyCheckMat[0, 0] <= Math.Abs(energyCheckMat[0, 1]))
-                                                {
-                                                    energyCheck = false;
-                                                }
-                                                else if ((energyCheckMat[0, 0] + energyCheckMat[0, 1]) * energyCheckMat[2, 2] <= 0)
-                                                {
-                                                    energyCheck = false;
-                                                }
-                                            }
-
-                                            //berechung von Ac
-                                            transitionGrainTensor = actSample.PlasticTensor[phase].GetAc(constraintStiffness, instGrainTensor, overallStiffnesses);
-
-                                            MathNet.Numerics.LinearAlgebra.Matrix<double> testTensorAc = instGrainTensor.GetVoigtTensor();
-                                            //bzw Bc
-                                            Tools.FourthRankTensor Bc = actSample.PlasticTensor[phase].GetAc(constraintStiffness.InverseSC(), instGrainTensor.InverseSC(), overallStiffnesses.InverseSC());
-
-                                            //Check, ob die ausgewählten Gleitsysteme richtig sind
-                                            //berechnung der Grain Spannungsrate         actStrainOriented
-                                            //MathNet.Numerics.LinearAlgebra.Matrix<double> strainRateGrainComp = transitionGrainTensor * strainRateS;
-                                            MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateGrainNo = Bc * stressRateS;
-
-                                            MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateGrain = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0); ;
-                                            for (int i = 0; i < 3; i++)
-                                            {
-                                                for (int j = 0; j < 3; j++)
-                                                {
-                                                    for (int k = 0; k < 3; k++)
-                                                    {
-                                                        for (int l = 0; l < 3; l++)
-                                                        {
-                                                            stressRateGrain[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * stressRateGrainNo[k, l];
-                                                        }
-                                                    }
-                                                }
-                                            }
-
-                                            //MathNet.Numerics.LinearAlgebra.Matrix<double> symdif = strainRateGrainOrientedComp - strainRateGrain;
-
-                                            //Berechnung der Yieldstressänderung
-                                            //Mc wird aus dem Inversen von Lc berechnet
-                                            Tools.FourthRankTensor Mc = instGrainTensor.InverseSC();
-                                            Tools.FourthRankTensor invCheckTensor = Tools.FourthRankTensor.InnerProduct(instGrainTensor, Mc);
-                                            MathNet.Numerics.LinearAlgebra.Matrix<double> testTensorInverse = invCheckTensor.GetVoigtTensor();
-                                            double invDifference = invCheckTensor.GetDifference(Tools.FourthRankTensor.GetUnityTensor());
-                                            if(invDifference > 0.0001)
-                                            {
-                                                inversionCheck = false;
-                                            }
-                                            //Invertierungstestbereich
-                                            //Tools.FourthRankTensor unityTest = instGrainTensor * Mc;
-                                            //Tools.FourthRankTensor unity = Tools.FourthRankTensor.GetUnityTensor();
-
-                                            //double inversionDifference = unityTest.GetDifference(unity);
-
-
-                                            MathNet.Numerics.LinearAlgebra.Matrix<double> strainRateGrain = Mc * stressRateGrain;
-
-
-                                            //Berechnung der shear rates und der spannungsänderung
-                                            for (int i = 0; i < trialSystems.Count; i++)
-                                            {
-                                                double actShearRate = 0.0;
-                                                double shearstress = 0.0;
-
-                                                MathNet.Numerics.LinearAlgebra.Matrix<double> resolvingMatrix = Tools.Calculation.GetResolvingParameter(trialSystems[i].SlipPlane, trialSystems[i].MainSlipDirection);
-
-                                                for (int j = 0; j < 3; j++)
-                                                {
-                                                    for (int k = 0; k < 3; k++)
-                                                    {
-                                                        actShearRate += stiffnessFactorsOriented[i][j, k] * strainRateGrain[j, k];
-                                                        shearstress += stressRateGrain[j, k] * resolvingMatrix[j, k];
-                                                    }
-                                                }
-
-                                                shearRatesSystems.Add(actShearRate);
-                                                shearStressChangeSystems.Add(shearstress);
-                                            }
-
-                                            //Berechung der yield changes
-                                            for (int i = 0; i < trialSystems.Count; i++)
-                                            {
-                                                double yieldChangeTmp = 0.0;
-                                                for (int j = 0; j < trialSystems.Count; j++)
-                                                {
-                                                    yieldChangeTmp += hardeningMatrix[i, j] * shearRatesSystems[j];
-                                                }
-                                                yieldChangeSystems.Add(yieldChangeTmp);
-                                            }
-
-                                            bool repeat = false;
-                                            if (invertSlipSystems)
-                                            {
-                                                //Checkt ob die Scherraten positiv sind und markiert diejenigen, deren Gleitrichtung umgedreht werden muss
-                                                for (int sys = 0; sys < shearRatesSystems.Count; sys++)
-                                                {
-                                                    //Check ob die scherraten positiv oder negativ sind
-                                                    if (shearRatesSystems[sys] < 0)
-                                                    {
-                                                        //Falls negativ wird die Gleitrichtung umgedreht
-                                                        //Falls
-                                                        if (checkedSystems[sys] == 1)
-                                                        {
-                                                            checkedSystems[sys] = 2;
-                                                        }
-                                                        else if (checkedSystems[sys] == 2)
-                                                        {
-                                                            //trialSystems[sys].MainSlipDirection.H *= -1;
-                                                            //trialSystems[sys].MainSlipDirection.K *= -1;
-                                                            //trialSystems[sys].MainSlipDirection.L *= -1;
-                                                            checkedSystems[sys] = 0;
-                                                        }
-                                                        //checkedSystems[sys] = false;
-                                                        repeat = true;
-                                                    }
-                                                }
-                                            }
-                                            if (inversionCheck && !repeat && energyCheck)
-                                            {
-                                                //Vergleich zwischen shear rates und yield changes
-                                                double difference = 0.0;
-                                                for (int i = 0; i < trialSystems.Count; i++)
-                                                {
-                                                    difference = Math.Abs(yieldChangeSystems[i] - shearStressChangeSystems[i]);
-                                                }
-
-                                                if (difference < 1)
-                                                {
-                                                    //Speichern der Parameter
-                                                    grainInstStiffnessesOriented.Add(instGrainTensor);
-                                                    grainTransitionStiffnessesOriented.Add(transitionGrainTensor);
-                                                    potentialActiveGPhase.Add(trialSystems);
-                                                    hardeningMatrixOriented.Add(hardeningMatrix);
-                                                    grainStrainsPhase.Add(strainRateGrain);
-                                                    grainStressesPhase.Add(stressRateGrain);
-                                                    yieldChangePhase.Add(yieldChangeSystems);
-                                                    break;
+                                                    double hardeningSaturation = 1;
+                                                    hardeningSaturation -= (actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[pS].YieldMainStrength + hardennedYield[pS]) / actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[pS].YieldLimit;
+                                                    //[k] und [phase] sind mit absicht vertauscht
+                                                    hardennedYield[pS] += hardeningSaturation * actSample.SimulationData[experimentIndex].YieldChangeCFHistory[k][phase][grainIndex][aS];
                                                 }
                                                 else
                                                 {
-                                                    //grainInstStiffnessesOriented.Add(instGrainTensor);
-                                                    //grainTransitionStiffnessesOriented.Add(transitionGrainTensor);
-                                                    //potentialActiveGPhase.Add(trialSystems);
-                                                    //hardeningMatrixOriented.Add(hardeningMatrix);
-                                                    //grainStrainsPhase.Add(strainRateGrain);
-                                                    //grainStressesPhase.Add(stressRateGrain);
-                                                    //yieldChangePhase.Add(yieldChangeSystems);
-                                                    //break;
-                                                    if (trialSystems.Count == 0)
-                                                    {
-                                                        //Speichern der Parameter nach elastischen rechnung
-                                                        instGrainTensor = actSample.HillTensorData[phase].GetFourtRankStiffnesses();
-
-                                                        //berechung von Ac
-                                                        transitionGrainTensor = actSample.PlasticTensor[phase].GetAc(constraintStiffness, instGrainTensor, overallStiffnesses);
-                                                        //bzw Bc
-                                                        Bc = actSample.PlasticTensor[phase].GetAc(constraintStiffness.InverseSC(), instGrainTensor.InverseSC(), overallStiffnesses.InverseSC());
-
-                                                        //Check, ob die ausgewählten Gleitsysteme richtig sind
-                                                        //berechnung der Grain Spannungsrate   actStrainOriented
-                                                        //MathNet.Numerics.LinearAlgebra.Matrix<double> strainRateGrainComp = transitionGrainTensor * strainRateS;
-
-
-
-                                                        //Berechnung der Yieldstressänderung
-                                                        //Mc wird aus dem Inversen von Lc berechnet
-                                                        Mc = instGrainTensor.InverseSC();
-                                                        MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateGrainSave = Bc * stressRateS;
-                                                        MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateOrientedSave = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-                                                        for (int i = 0; i < 3; i++)
-                                                        {
-                                                            for (int j = 0; j < 3; j++)
-                                                            {
-                                                                for (int k = 0; k < 3; k++)
-                                                                {
-                                                                    for (int l = 0; l < 3; l++)
-                                                                    {
-                                                                        //actStressOriented[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * actStressGrainBc[k, l];
-                                                                        stressRateOrientedSave[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * stressRateGrainSave[k, l];
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        MathNet.Numerics.LinearAlgebra.Matrix<double> strainRateGrainSave = Mc * stressRateOrientedSave;
-
-                                                        //Speichern der Parameter
-                                                        grainInstStiffnessesOriented.Add(instGrainTensor);
-                                                        grainTransitionStiffnessesOriented.Add(transitionGrainTensor);
-                                                        potentialActiveGPhase.Add(trialSystems);
-                                                        hardeningMatrixOriented.Add(hardeningMatrix);
-                                                        grainStrainsPhase.Add(strainRateGrainSave);
-                                                        grainStressesPhase.Add(stressRateOrientedSave);
-                                                        yieldChangePhase.Add(new List<double>());
-
-                                                        break;
-                                                    }
-                                                    //for (int sys = 0; sys < shearRatesSystems.Count; sys++)
-                                                    //{
-                                                    //    if (shearRatesSystems[sys] < 0)
-                                                    //    {
-                                                    //        checkedSystems[sys] = false;
-                                                    //    }
-                                                    //}
+                                                    //[k] und [phase] sind mit absicht vertauscht
+                                                    hardennedYield[pS] += actSample.SimulationData[experimentIndex].YieldChangeCFHistory[k][phase][grainIndex][aS];
                                                 }
                                             }
-                                        }
-                                        else
-                                        {
-                                            instGrainTensor = actSample.HillTensorData[phase].GetFourtRankStiffnesses();
-
-                                            //berechung von Ac
-                                            transitionGrainTensor = actSample.PlasticTensor[phase].GetAc(constraintStiffness, instGrainTensor, overallStiffnesses);
-                                            //bzw Bc
-                                            Tools.FourthRankTensor Bc = actSample.PlasticTensor[phase].GetAc(constraintStiffness.InverseSC(), instGrainTensor.InverseSC(), overallStiffnesses.InverseSC());
-
-                                            //Check, ob die ausgewählten Gleitsysteme richtig sind
-                                            //berechnung der Grain Spannungsrate   actStrainOriented
-                                            //MathNet.Numerics.LinearAlgebra.Matrix<double> strainRateGrainComp = transitionGrainTensor * strainRateS;
-
-
-
-                                            //Berechnung der Yieldstressänderung
-                                            //Mc wird aus dem Inversen von Lc berechnet
-                                            Tools.FourthRankTensor Mc = instGrainTensor.InverseSC();
-                                            MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateGrainSave = Bc * stressRateS;
-                                            MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateOrientedSave = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
-                                            for (int i = 0; i < 3; i++)
-                                            {
-                                                for (int j = 0; j < 3; j++)
-                                                {
-                                                    for (int k = 0; k < 3; k++)
-                                                    {
-                                                        for (int l = 0; l < 3; l++)
-                                                        {
-                                                            //actStressOriented[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * actStressGrainBc[k, l];
-                                                            stressRateOrientedSave[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * stressRateGrainSave[k, l];
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            MathNet.Numerics.LinearAlgebra.Matrix<double> strainRateGrainSave = Mc * stressRateOrientedSave;
-
-                                            //Speichern der Parameter
-                                            grainInstStiffnessesOriented.Add(instGrainTensor);
-                                            grainTransitionStiffnessesOriented.Add(transitionGrainTensor);
-                                            potentialActiveGPhase.Add(trialSystems);
-                                            hardeningMatrixOriented.Add(hardeningMatrix);
-                                            grainStrainsPhase.Add(strainRateGrainSave);
-                                            grainStressesPhase.Add(stressRateOrientedSave);
-                                            yieldChangePhase.Add(new List<double>());
-
-                                            break;
                                         }
                                     }
                                 }
-                                else
+                            }
+
+                            for (int pS = 0; pS < actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems.Count; pS++)
+                            {
+                                actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[pS].YieldMainHardennedStrength += Math.Abs(hardennedYield[pS]);
+
+                                //if (actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[pS].YieldMainHardennedStrength > actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[pS].YieldLimit)
+                                //{
+                                //    actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[pS].YieldMainHardennedStrength = actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[pS].YieldLimit;
+                                //}
+                            }
+
+                        }
+
+                        //Drehen des Spannungstensor in die aktuelle Orientierung
+                        MathNet.Numerics.LinearAlgebra.Matrix<double> transformationMatrix = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0);
+
+                        transformationMatrix[0, 0] = -1 * Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi1 * (Math.PI / 180)) * Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Psi * (Math.PI / 180)) * Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi2 * (Math.PI / 180));
+                        transformationMatrix[0, 0] -= Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi1 * (Math.PI / 180)) * Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi2 * (Math.PI / 180));
+                        transformationMatrix[0, 1] = -1 * Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Psi * (Math.PI / 180)) * Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi1 * (Math.PI / 180)) * Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi2 * (Math.PI / 180));
+                        transformationMatrix[0, 1] -= Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi1 * (Math.PI / 180)) * Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi2 * (Math.PI / 180));
+                        transformationMatrix[0, 2] = Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Psi * (Math.PI / 180)) * Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi2 * (Math.PI / 180));
+                        transformationMatrix[1, 0] = -1 * Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Psi * (Math.PI / 180)) * Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi1 * (Math.PI / 180)) * Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi2 * (Math.PI / 180));
+                        transformationMatrix[1, 0] -= Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi1 * (Math.PI / 180)) * Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi2 * (Math.PI / 180));
+                        transformationMatrix[1, 1] = -1 * Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi1 * (Math.PI / 180)) * Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Psi * (Math.PI / 180)) * Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi2 * (Math.PI / 180));
+                        transformationMatrix[1, 1] -= Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi1 * (Math.PI / 180)) * Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi2 * (Math.PI / 180));
+                        transformationMatrix[1, 2] = Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Psi * (Math.PI / 180)) * Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi2 * (Math.PI / 180));
+                        transformationMatrix[2, 0] = Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi1 * (Math.PI / 180)) * Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Psi * (Math.PI / 180));
+                        transformationMatrix[2, 1] = Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Phi1 * (Math.PI / 180)) * Math.Sin(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Psi * (Math.PI / 180));
+                        transformationMatrix[2, 2] = Math.Cos(actSample.SimulationData[experimentIndex].GrainOrientations[phase][grainIndex].Psi * (Math.PI / 180));
+
+                        //for the self consistence the stress and stress rate are calculated from the last Bc if it exists
+                        MathNet.Numerics.LinearAlgebra.Matrix<double> actStressGrainBc = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+                        MathNet.Numerics.LinearAlgebra.Matrix<double> actStressRateGrainBc = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+
+                        if (actCycle == 0)
+                        {
+                            for (int k = 0; k < n; k++)
+                            {
+                                actStressGrainBc += actSample.SimulationData[experimentIndex].StressRateCFOrientedHistory[phase][k][grainIndex];
+                            }
+                            actStressRateGrainBc = stressRateS;
+                        }
+                        else
+                        {
+                            ///constraintStiffness ergibt sich für alle Phasen gleichermaßen und wird aktualisiert
+                            ///instGrainTensor wird aus Orientierungen berechnet und muss aus vorherigen Schritt genommen werden
+                            ///overallStiffnesses wird pro cycle aktualisiert
+                            Tools.FourthRankTensor lastBc = actSample.PlasticTensor[phase].GetAc(constraintStiffness.InverseSC(), plasticTensorPhase[phase][grainIndex].GrainCompliance, overallStiffnesses.InverseSC());
+
+                            //actStressGrainBc = lastBc * actSample.SimulationData[experimentIndex].StressSFHistory[n];
+                            for (int k = 0; k < n; k++)
+                            {
+                                actStressGrainBc += actSample.SimulationData[experimentIndex].StressRateCFOrientedHistory[phase][k][grainIndex];
+                            }
+                            actStressRateGrainBc = lastBc * stressRateS;
+                        }
+
+                        //Spannungstensor in der aktuellen Orientierung
+                        MathNet.Numerics.LinearAlgebra.Matrix<double> actStressOriented = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+                        MathNet.Numerics.LinearAlgebra.Matrix<double> actStressRateOriented = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+                        for (int i = 0; i < 3; i++)
+                        {
+                            for (int j = 0; j < 3; j++)
+                            {
+                                for (int k = 0; k < 3; k++)
                                 {
-                                    instGrainTensor = actSample.HillTensorData[phase].GetFourtRankStiffnesses();
+                                    for (int l = 0; l < 3; l++)
+                                    {
+                                        //actStressOriented[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * actStressGrainBc[k, l];
+                                        actStressRateOriented[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * actStressRateGrainBc[k, l];
+                                    }
+                                }
+                            }
+                        }
+                        actStressOriented = actStressGrainBc + actStressRateOriented;
 
-                                    MathNet.Numerics.LinearAlgebra.Matrix<double> testTensor2 = instGrainTensor.GetVoigtTensor();
-                                    MathNet.Numerics.LinearAlgebra.Matrix<double> testTensor3 = constraintStiffness.GetVoigtTensor();
+
+                        List<double> potentialActiveStress = actSample.SimulationData[experimentIndex].YieldInformation[phase].GetResolvedStressList(actStressOriented);
+
+                        //Potentiell aktive Gleitsysteme werden ermittelt
+                        List<ReflexYield> potentialActive = actSample.SimulationData[experimentIndex].YieldInformation[phase].GetPotentiallyActiveSlipSystems(actStressOriented, slipCriterion);
+                        bool noValidCombination = true;
+
+                        if (potentialActive.Count != 0)
+                        {
+                            noValidCombination = false;
+                            allElastic = false;
+                            //Liste mit den Testsystemen wird erstell und Indiziert
+                            List<ReflexYield> trialSystems = potentialActive;
+                            List<int> checkedSystems = new List<int>();
+                            for (int i = 0; i < trialSystems.Count; i++)
+                            {
+                                checkedSystems.Add(0);
+                            }
+
+                            //Filterung von Abhängigkeiten
+                            actSample.SimulationData[experimentIndex].YieldInformation[phase].CheckDependencies(potentialActive, actStressOriented, checkedSystems);
+
+                            //Schleife für die Finale Selection der Gleitsysteme
+                            while (trialSystems.Count != 0)
+                            {
+                                #region Direction Switch
+
+                                //Check ob die Scherraten positiv sind
+                                List<int> checkedSystemsRe = new List<int>();
+                                trialSystems = GetActiveSystemCombination(potentialActive, checkedSystems);
+                                if (trialSystems.Count == 0)
+                                {
+                                    noValidCombination = true;
+                                    break;
+                                }
+                                //bool resetSystems = false;
+                                //for (int m = 0; m < checkedSystems.Count; m++)
+                                //{
+                                //    switch (checkedSystems[m])
+                                //    {
+                                //        case 0:
+                                //            goto default;
+                                //        case 1:
+                                //            checkedSystemsRe.Add(1);
+                                //            break;
+                                //        case 2:
+                                //            checkedSystemsRe.Add(2);
+                                //            break;
+                                //        default:
+                                //            resetSystems = true;
+                                //            break;
+                                //    }
+                                //}
+                                //checkedSystems = checkedSystemsRe;
+
+                                //if (resetSystems)
+                                //{
+                                //    for (int m = 0; m < checkedSystems.Count; m++)
+                                //    {
+                                //        checkedSystems[m] = 1;
+                                //    }
+                                //}
+
+                                #endregion
+
+                                //Härtungsmatrix wird berechnet
+                                plasticTensorGrain.HardeningMatrix = actSample.SimulationData[experimentIndex].YieldInformation[phase].HardeningMatrixSlipSystem(trialSystems);
+
+                                //Shear rates
+                                List<double> shearRatesSystems = new List<double>();
+                                //shear stress change rates
+                                List<double> shearStressChangeSystems = new List<double>();
+                                //yield change rates
+                                List<double> yieldChangeSystems = new List<double>();
+
+                                //Berechnung der instantanious Stiffness factors f^i
+                                switch (elasticModel)
+                                {
+                                    case 0:
+                                        //Reuss
+                                        plasticTensorGrain.ConditionX = actSample.SimulationData[experimentIndex].YieldInformation[phase].SlipSystemX(trialSystems, plasticTensorGrain.HardeningMatrix, actSample.ReussTensorData[phase]);
+                                        for (int i = 0; i < trialSystems.Count; i++)
+                                        {
+                                            plasticTensorGrain.InstantStiffnessFactors.Add(actSample.SimulationData[experimentIndex].YieldInformation[phase].GetInstStiffnessFactors(trialSystems, actSample.ReussTensorData[phase], i, plasticTensorGrain.ConditionY));
+                                        }
+                                        //Lc und Mc 
+                                        plasticTensorGrain.GrainStiffness = actSample.PlasticTensor[phase].GetInstantanousGrainSiffnessTensor(trialSystems, actSample.ReussTensorData[phase], plasticTensorGrain.InstantStiffnessFactors);
+                                        break;
+                                    case 1:
+                                        //Hill
+                                        plasticTensorGrain.ConditionX = actSample.SimulationData[experimentIndex].YieldInformation[phase].SlipSystemX(trialSystems, plasticTensorGrain.HardeningMatrix, actSample.HillTensorData[phase]);
+                                        for (int i = 0; i < trialSystems.Count; i++)
+                                        {
+                                            plasticTensorGrain.InstantStiffnessFactors.Add(actSample.SimulationData[experimentIndex].YieldInformation[phase].GetInstStiffnessFactors(trialSystems, actSample.HillTensorData[phase], i, plasticTensorGrain.ConditionY));
+                                        }
+                                        //Lc und Mc 
+                                        plasticTensorGrain.GrainStiffness = actSample.PlasticTensor[phase].GetInstantanousGrainSiffnessTensor(trialSystems, actSample.HillTensorData[phase], plasticTensorGrain.InstantStiffnessFactors);
+                                        break;
+                                    case 2:
+                                        //Kroener
+                                        plasticTensorGrain.ConditionX = actSample.SimulationData[experimentIndex].YieldInformation[phase].SlipSystemX(trialSystems, plasticTensorGrain.HardeningMatrix, actSample.KroenerTensorData[phase]);
+                                        for (int i = 0; i < trialSystems.Count; i++)
+                                        {
+                                            plasticTensorGrain.InstantStiffnessFactors.Add(actSample.SimulationData[experimentIndex].YieldInformation[phase].GetInstStiffnessFactors(trialSystems, actSample.KroenerTensorData[phase], i, plasticTensorGrain.ConditionY));
+                                        }
+                                        //Lc und Mc 
+                                        plasticTensorGrain.GrainStiffness = actSample.PlasticTensor[phase].GetInstantanousGrainSiffnessTensor(trialSystems, actSample.KroenerTensorData[phase], plasticTensorGrain.InstantStiffnessFactors);
+                                        break;
+                                    case 3:
+                                        //De Wit
+                                        plasticTensorGrain.ConditionX = actSample.SimulationData[experimentIndex].YieldInformation[phase].SlipSystemX(trialSystems, plasticTensorGrain.HardeningMatrix, actSample.DeWittTensorData[phase]);
+                                        for (int i = 0; i < trialSystems.Count; i++)
+                                        {
+                                            plasticTensorGrain.InstantStiffnessFactors.Add(actSample.SimulationData[experimentIndex].YieldInformation[phase].GetInstStiffnessFactors(trialSystems, actSample.DeWittTensorData[phase], i, plasticTensorGrain.ConditionY));
+                                        }
+                                        //Lc und Mc 
+                                        plasticTensorGrain.GrainStiffness = actSample.PlasticTensor[phase].GetInstantanousGrainSiffnessTensor(trialSystems, actSample.DeWittTensorData[phase], plasticTensorGrain.InstantStiffnessFactors);
+                                        break;
+                                    case 4:
+                                        //Matthies
+                                        plasticTensorGrain.ConditionX = actSample.SimulationData[experimentIndex].YieldInformation[phase].SlipSystemX(trialSystems, plasticTensorGrain.HardeningMatrix, actSample.GeometricHillTensorData[phase]);
+                                        for (int i = 0; i < trialSystems.Count; i++)
+                                        {
+                                            plasticTensorGrain.InstantStiffnessFactors.Add(actSample.SimulationData[experimentIndex].YieldInformation[phase].GetInstStiffnessFactors(trialSystems, actSample.GeometricHillTensorData[phase], i, plasticTensorGrain.ConditionY));
+                                        }
+                                        //Lc und Mc 
+                                        plasticTensorGrain.GrainStiffness = actSample.PlasticTensor[phase].GetInstantanousGrainSiffnessTensor(trialSystems, actSample.GeometricHillTensorData[phase], plasticTensorGrain.InstantStiffnessFactors);
+                                        break;
+                                    default:
+                                        //Hill
+                                        plasticTensorGrain.ConditionX = actSample.SimulationData[experimentIndex].YieldInformation[phase].SlipSystemX(trialSystems, plasticTensorGrain.HardeningMatrix, actSample.HillTensorData[phase]);
+                                        for (int i = 0; i < trialSystems.Count; i++)
+                                        {
+                                            plasticTensorGrain.InstantStiffnessFactors.Add(actSample.SimulationData[experimentIndex].YieldInformation[phase].GetInstStiffnessFactors(trialSystems, actSample.HillTensorData[phase], i, plasticTensorGrain.ConditionY));
+                                        }
+                                        //Lc und Mc 
+                                        plasticTensorGrain.GrainStiffness = actSample.PlasticTensor[phase].GetInstantanousGrainSiffnessTensor(trialSystems, actSample.HillTensorData[phase], plasticTensorGrain.InstantStiffnessFactors);
+                                        break;
+                                }
+
+
+                                //InversionCheck, ob alles richtig Invertiert wurde
+                                Tools.FourthRankTensor invCheckTensor = Tools.FourthRankTensor.InnerProduct(plasticTensorGrain.GrainStiffness, plasticTensorGrain.GrainCompliance);
+                                double invDifference = invCheckTensor.GetDifference(Tools.FourthRankTensor.GetUnityTensor());
+                                if (invDifference < 0.0001)
+                                {
                                     //berechung von Ac
-                                    transitionGrainTensor = actSample.PlasticTensor[phase].GetAc(constraintStiffness, instGrainTensor, overallStiffnesses);
+                                    plasticTensorGrain.GrainTransitionStiffness = actSample.PlasticTensor[phase].GetAc(constraintStiffness, plasticTensorGrain.GrainStiffness, overallStiffnesses);
                                     //bzw Bc
-                                    Tools.FourthRankTensor Bc = actSample.PlasticTensor[phase].GetAc(constraintStiffness.InverseSC(), instGrainTensor.InverseSC(), overallStiffnesses.InverseSC());
+                                    plasticTensorGrain.GrainTransitionCompliance = actSample.PlasticTensor[phase].GetAc(constraintStiffness.InverseSC(), plasticTensorGrain.GrainCompliance, overallStiffnesses.InverseSC());
 
-                                    //Check, ob die ausgewählten Gleitsysteme richtig sind
-                                    //berechnung der Grain Spannungsrate
-                                    // actStrainOriented
-                                    //MathNet.Numerics.LinearAlgebra.Matrix<double> strainRateGrainComp = transitionGrainTensor * strainRateS;
-
-                                    //MathNet.Numerics.LinearAlgebra.Matrix<double> strainRateGrainOrientedComp = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0); ;
-                                    //for (int i = 0; i < 3; i++)
-                                    //{
-                                    //    for (int j = 0; j < 3; j++)
-                                    //    {
-                                    //        for (int k = 0; k < 3; k++)
-                                    //        {
-                                    //            for (int l = 0; l < 3; l++)
-                                    //            {
-                                    //                strainRateGrainOrientedComp[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * strainRateGrainComp[k, l];
-                                    //            }
-                                    //        }
-                                    //    }
-                                    //}
-
-                                    //MathNet.Numerics.LinearAlgebra.Matrix<double> symdif = strainRateGrainOrientedComp - strainRateGrain;
-
-                                    //Berechnung der Yieldstressänderung
-                                    //Mc wird aus dem Inversen von Lc berechnet
-                                    //!!!!!!!!!!!!!!Inverse checken!!!!!!!!!!!!!!!!!!!!!
-                                    Tools.FourthRankTensor Mc = instGrainTensor.InverseSC();
-                                    MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateGrainSave = Bc * stressRateS;
-                                    MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateOrientedSave = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+                                    MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateGrainNo = plasticTensorGrain.GrainTransitionCompliance * stressRateS;
+                                    //MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateGrain = plasticTensorGrain.GrainTransitionCompliance * actStressOriented;
+                                    MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateGrain = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense<double>(3, 3, 0); ;
                                     for (int i = 0; i < 3; i++)
                                     {
                                         for (int j = 0; j < 3; j++)
@@ -1374,36 +1189,222 @@ namespace CalScec.Analysis.Stress.Plasticity
                                             {
                                                 for (int l = 0; l < 3; l++)
                                                 {
-                                                    //actStressOriented[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * actStressGrainBc[k, l];
-                                                    stressRateOrientedSave[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * stressRateGrainSave[k, l];
+                                                    stressRateGrain[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * stressRateGrainNo[k, l];
                                                 }
                                             }
                                         }
                                     }
-                                    MathNet.Numerics.LinearAlgebra.Matrix<double> strainRateGrainSave = Mc * stressRateOrientedSave;
 
-                                    //Speichern der Parameter
-                                    grainInstStiffnessesOriented.Add(instGrainTensor);
-                                    grainTransitionStiffnessesOriented.Add(transitionGrainTensor);
-                                    potentialActiveGPhase.Add(new List<ReflexYield>());
-                                    hardeningMatrixOriented.Add(hardeningMatrix);
-                                    grainStrainsPhase.Add(strainRateGrainSave);
-                                    grainStressesPhase.Add(stressRateOrientedSave);
-                                    yieldChangePhase.Add(new List<double>());
+                                    MathNet.Numerics.LinearAlgebra.Matrix<double> strainRateGrain = plasticTensorGrain.GrainCompliance * stressRateGrain;
+
+                                    //Berechnung der shear rates und der spannungsänderung
+                                    for (int i = 0; i < trialSystems.Count; i++)
+                                    {
+                                        double actShearRate = 0.0;
+                                        double shearstress = 0.0;
+                                        MathNet.Numerics.LinearAlgebra.Matrix<double> resolvingMatrix = Tools.Calculation.GetResolvingParameter(trialSystems[i].SlipPlane, trialSystems[i].MainSlipDirection);
+
+                                        for (int j = 0; j < 3; j++)
+                                        {
+                                            for (int k = 0; k < 3; k++)
+                                            {
+                                                actShearRate += plasticTensorGrain.InstantStiffnessFactors[i][j, k] * strainRateGrain[j, k];
+                                                shearstress += stressRateGrain[j, k] * resolvingMatrix[j, k];
+                                            }
+                                        }
+
+                                        shearRatesSystems.Add(actShearRate);
+                                        shearStressChangeSystems.Add(shearstress);
+                                    }
+
+                                    bool negativeShear = false;
+
+                                    #region direction check
+
+                                    ////Checkt ob die Scherraten positiv sind und markiert diejenigen, deren Gleitrichtung umgedreht werden muss
+                                    //for (int sys = 0; sys < shearRatesSystems.Count; sys++)
+                                    //{
+                                    //    //Check ob die scherraten positiv oder negativ sind
+                                    //    if (shearRatesSystems[sys] < 0)
+                                    //    {
+                                    //        //Falls negativ wird die Gleitrichtung umgedreht
+                                    //        if (checkedSystems[sys] == 1)
+                                    //        {
+                                    //            checkedSystems[sys] = 2;
+                                    //        }
+                                    //        else if (checkedSystems[sys] == 2)
+                                    //        {
+                                    //            checkedSystems[sys] = 0;
+                                    //        }
+                                    //        negativeShear = true;
+                                    //    }
+                                    //}
+
+                                    #endregion
+
+                                    if (!negativeShear)
+                                    {
+                                        //Berechung der yield changes
+                                        for (int i = 0; i < trialSystems.Count; i++)
+                                        {
+                                            double yieldChangeTmp = 0.0;
+                                            for (int j = 0; j < trialSystems.Count; j++)
+                                            {
+                                                yieldChangeTmp += plasticTensorGrain.HardeningMatrix[i, j] * shearRatesSystems[j];
+                                            }
+                                            yieldChangeSystems.Add(yieldChangeTmp);
+                                        }
+
+                                        //Vergleich zwischen shear rates und yield changes
+                                        double difference = 0.0;
+                                        double norm = 0.0;
+                                        for (int i = 0; i < trialSystems.Count; i++)
+                                        {
+                                            difference = (Math.Abs(yieldChangeSystems[i]) - Math.Abs(shearStressChangeSystems[i])) / Math.Abs(yieldChangeSystems[i]);
+                                            norm += Math.Abs(yieldChangeSystems[i]);
+                                        }
+
+                                        difference /= norm;
+
+                                        if (difference < 1)
+                                        {
+                                            //Speichern der Parameter
+                                            potentialActiveGPhase[grainIndex] = trialSystems;
+                                            grainStrainsPhase[grainIndex] = strainRateGrain;
+                                            grainStressesPhase[grainIndex] = stressRateGrain;
+                                            yieldChangePhase[grainIndex] = yieldChangeSystems;
+
+                                            plasticTensororiented[grainIndex] = plasticTensorGrain;
+
+                                            actSample.SimulationData[experimentIndex].LastActiveSystems += trialSystems.Count;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            //System mit kleinsten Shearstress wird herausgesucht
+                                            int smallestIndex = actSample.SimulationData[experimentIndex].YieldInformation[phase].GetSmallesSchearStressIndex(trialSystems, actStressOriented);
+
+                                            //System mit kleinsten Shearstress wird aussortiert
+                                            for (int k = 0; k < potentialActive.Count; k++)
+                                            {
+                                                if (potentialActive[k].SlipPlane.HKLString == trialSystems[smallestIndex].SlipPlane.HKLString && potentialActive[k].MainSlipDirection.HKLString == trialSystems[smallestIndex].MainSlipDirection.HKLString)
+                                                {
+                                                    checkedSystems[k] = 3;
+                                                    break;
+                                                }
+                                            }
+
+                                            //Das nächste noch nicht getestete System wird aktiviert
+                                            for (int k = 0; k < checkedSystems.Count; k++)
+                                            {
+                                                if (checkedSystems[k] == 0)
+                                                {
+                                                    checkedSystems[k] = 1;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
+                                else
+                                {
+                                    //System mit kleinsten Shearstress wird herausgesucht
+                                    int smallestIndex = actSample.SimulationData[experimentIndex].YieldInformation[phase].GetSmallesSchearStressIndex(trialSystems, actStressOriented);
 
-                                grainIndexCounter++;
+                                    //System mit kleinsten Shearstress wird aussortiert
+                                    for (int k = 0; k < potentialActive.Count; k++)
+                                    {
+                                        if (potentialActive[k].SlipPlane.HKLString == trialSystems[smallestIndex].SlipPlane.HKLString && potentialActive[k].MainSlipDirection.HKLString == trialSystems[smallestIndex].MainSlipDirection.HKLString)
+                                        {
+                                            checkedSystems[k] = 3;
+                                            break;
+                                        }
+                                    }
+
+                                    //Das nächste noch nicht getestete System wird aktiviert
+                                    for (int k = 0; k < checkedSystems.Count; k++)
+                                    {
+                                        if (checkedSystems[k] == 0)
+                                        {
+                                            checkedSystems[k] = 1;
+                                            break;
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
+
+                        if (noValidCombination)
+                        {
+                            actSample.SimulationData[experimentIndex].LastFailedGrains++;
+                            switch (elasticModel)
+                            {
+                                case 0:
+                                    //Reuss
+                                    plasticTensorGrain.GrainStiffness = actSample.ReussTensorData[phase].GetFourtRankStiffnesses();
+                                    break;
+                                case 1:
+                                    //Hill
+                                    plasticTensorGrain.GrainStiffness = actSample.HillTensorData[phase].GetFourtRankStiffnesses();
+                                    break;
+                                case 2:
+                                    //Kroener
+                                    plasticTensorGrain.GrainStiffness = actSample.KroenerTensorData[phase].GetFourtRankStiffnesses();
+                                    break;
+                                case 3:
+                                    //De Wit
+                                    plasticTensorGrain.GrainStiffness = actSample.DeWittTensorData[phase].GetFourtRankStiffnesses();
+                                    break;
+                                case 4:
+                                    //Matthies
+                                    plasticTensorGrain.GrainStiffness = actSample.GeometricHillTensorData[phase].GetFourtRankStiffnesses();
+                                    break;
+                                default:
+                                    //Hill
+                                    plasticTensorGrain.GrainStiffness = actSample.HillTensorData[phase].GetFourtRankStiffnesses();
+                                    break;
+                            }
+
+                            //berechung von Ac
+                            plasticTensorGrain.GrainTransitionStiffness = actSample.PlasticTensor[phase].GetAc(constraintStiffness, plasticTensorGrain.GrainStiffness, overallStiffnesses);
+                            //bzw Bc
+                            plasticTensorGrain.GrainTransitionCompliance = actSample.PlasticTensor[phase].GetAc(constraintStiffness.InverseSC(), plasticTensorGrain.GrainCompliance, overallStiffnesses.InverseSC());
+
+                            MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateGrainSave = plasticTensorGrain.GrainTransitionCompliance * stressRateS;
+                            MathNet.Numerics.LinearAlgebra.Matrix<double> stressRateOrientedSave = MathNet.Numerics.LinearAlgebra.CreateMatrix.Dense(3, 3, 0.0);
+                            for (int i = 0; i < 3; i++)
+                            {
+                                for (int j = 0; j < 3; j++)
+                                {
+                                    for (int k = 0; k < 3; k++)
+                                    {
+                                        for (int l = 0; l < 3; l++)
+                                        {
+                                            stressRateOrientedSave[i, j] += transformationMatrix[i, k] * transformationMatrix[j, l] * stressRateGrainSave[k, l];
+                                        }
+                                    }
+                                }
+                            }
+                            MathNet.Numerics.LinearAlgebra.Matrix<double> strainRateGrainSave = plasticTensorGrain.GrainCompliance * stressRateOrientedSave;
+
+                            //Speichern der Parameter
+                            potentialActiveGPhase[grainIndex] = new List<ReflexYield>();
+                            grainStrainsPhase[grainIndex] = strainRateGrainSave;
+                            grainStressesPhase[grainIndex] = stressRateOrientedSave;
+                            yieldChangePhase[grainIndex] = new List<double>();
+
+                            plasticTensororiented[grainIndex] = plasticTensorGrain;
+                        }
+
+                    }//); // Parallel.For
+
                     //Überschreiben der Phasendaten
-                    grainStiffnesses[phase] = grainInstStiffnessesOriented;
-                    grainTransitionStiffnesses[phase] = grainTransitionStiffnessesOriented;
-                    potentialActiveGOriented[phase] = potentialActiveGPhase;
-                    grainStressesOriented[phase] = grainStressesPhase;
-                    grainStrainsOriented[phase] = grainStrainsPhase;
-                    hardeningMatrixList[phase] = hardeningMatrixOriented;
-                    yieldChangeOriented[phase] = yieldChangePhase;
+                    plasticTensorPhase[phase] = plasticTensororiented.ToList();
+
+                    potentialActiveGOriented[phase] = potentialActiveGPhase.ToList();
+                    grainStressesOriented[phase] = grainStressesPhase.ToList();
+                    grainStrainsOriented[phase] = grainStrainsPhase.ToList();
+                    yieldChangeOriented[phase] = yieldChangePhase.ToList();
 
                     //Mittelung des neuen Phasenmoduls
                     if (textureActive)
@@ -1412,15 +1413,7 @@ namespace CalScec.Analysis.Stress.Plasticity
                     }
                     else
                     {
-                        //for(int orientation = 0; orientation < actSample.SimulationData[experimentIndex].GrainOrientations[phase].Count; orientation++)
-                        //{
-                        //    double phi1Angle = actSample.SimulationData[experimentIndex].GrainOrientations[phase][orientation].Phi1 * (Math.PI / 180);
-                        //    double psiAngle = actSample.SimulationData[experimentIndex].GrainOrientations[phase][orientation].Psi * (Math.PI / 180);
-                        //    double phi2Angle = actSample.SimulationData[experimentIndex].GrainOrientations[phase][orientation].Phi2 * (Math.PI / 180);
-                        //    overallStiffnessesPhase[phase] += Tools.FourthRankTensor.InnerProduct(grainTransitionStiffnessesOriented[orientation].FrameTransformation(phi1Angle, psiAngle, phi2Angle), grainInstStiffnessesOriented[orientation].FrameTransformation(phi1Angle, psiAngle, phi2Angle));
-                        //}
-                        //overallStiffnessesPhase[phase] /= actSample.SimulationData[experimentIndex].GrainOrientations[phase].Count;
-                        overallStiffnessesPhase[phase] = Tools.FourthRankTensor.AverageInnerProduct(grainTransitionStiffnessesOriented, grainInstStiffnessesOriented);
+                        overallStiffnessesPhase[phase] = Tools.FourthRankTensor.AverageInnerProduct(plasticTensorPhase[phase]);
                         overallStiffnessesPhase[phase].SetHexagonalSymmetryCorrection();
                     }
 
@@ -1435,20 +1428,21 @@ namespace CalScec.Analysis.Stress.Plasticity
                             {
                                 if (potentialActiveGOriented[phase][i][j].HKLString == actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[k].HKLString && potentialActiveGOriented[phase][i][j].HKLStringSlipDirection == actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[k].HKLStringSlipDirection)
                                 {
-                                    //ODO: hier aufpassen wegen des Betrags
                                     averageYieldChange[phase][k] += Math.Abs(yieldChangeOriented[phase][i][j]);
+                                    //if (actSample.SimulationData[experimentIndex].invertSlipDirections)
+                                    //{
+
+                                    //    averageYieldChange[phase][k] += Math.Abs(yieldChangeOriented[phase][i][j]);
+                                    //}
+                                    //else
+                                    //{
+                                    //    averageYieldChange[phase][k] += yieldChangeOriented[phase][i][j];
+                                    //}
                                 }
                             }
                         }
                     }
-                    //verlegt ans ende, weil sonst auch bei jedem Cycle härtung berechnet wird
-                    //for (int k = 0; k < actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems.Count; k++)
-                    //{
-                    //    actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[k].YieldMainHardennedStrength += averageYieldChange[k] / potentialActiveGOriented[phase].Count;
-                    //}
-
                 }
-
                 //Ab hier berechung der Makrodaten
                 //Resetting the overall Stiffnesses
 
@@ -1458,16 +1452,42 @@ namespace CalScec.Analysis.Stress.Plasticity
                     overallStiffnesses += actSample.CrystalData[phase].PhaseFraction * overallStiffnessesPhase[phase];
                 }
 
-                double overallDifference = overallStiffnesses.GetDifference(overallStiffnessesComp);
-                MathNet.Numerics.LinearAlgebra.Matrix<double> testTensor1 = overallStiffnesses.GetVoigtTensor();
+                MathNet.Numerics.LinearAlgebra.Matrix<double> energyCheckMat = overallStiffnesses.GetVoigtTensor();
+                bool energyCheck = true;
 
-                if (overallDifference < 100)
+                //Energy check for the calculated constants
+                if (energyCheckMat[3, 3] <= 0)
                 {
-                    break;
+                    energyCheck = false;
+                }
+                else if (energyCheckMat[0, 0] <= Math.Abs(energyCheckMat[0, 1]))
+                {
+                    energyCheck = false;
+                }
+                else if ((energyCheckMat[0, 0] + energyCheckMat[0, 1]) * energyCheckMat[2, 2] <= 0)
+                {
+                    energyCheck = false;
+                }
+
+                if (energyCheck)
+                {
+                    double overallDifference = overallStiffnesses.GetDifference(overallStiffnessesComp);
+
+                    MathNet.Numerics.LinearAlgebra.Matrix<double> DebugComp = overallStiffnessesComp.GetVoigtTensor();
+                    MathNet.Numerics.LinearAlgebra.Matrix<double> DebugDiff = DebugComp - energyCheckMat;
+                    if (overallDifference < CalScec.Properties.Settings.Default.EPSCSimulationLimit)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        overallStiffnessesComp = overallStiffnesses.Clone() as Tools.FourthRankTensor;
+                    }
                 }
                 else
                 {
-                    overallStiffnessesComp = overallStiffnesses.Clone() as Tools.FourthRankTensor;
+                    overallStiffnesses = overallStiffnessesComp;
+                    break;
                 }
             }
 
@@ -1508,6 +1528,10 @@ namespace CalScec.Analysis.Stress.Plasticity
             }
             actSample.SimulationData[experimentIndex].StrainSFHistory.Add(actStrainS.Clone());
 
+
+            //YieldChange yieldChangeCFHistory
+            actSample.SimulationData[experimentIndex].YieldChangeCFHistory.Add(yieldChangeOriented);
+
             //5.
             for (int phase = 0; phase < actSample.CrystalData.Count; phase++)
             {
@@ -1517,10 +1541,17 @@ namespace CalScec.Analysis.Stress.Plasticity
                 actSample.SimulationData[experimentIndex].StrainRateCFOrientedHistory[phase].Add(grainStrainsOriented[phase]);
                 ////10.
                 actSample.SimulationData[experimentIndex].ActiveSystemsCFOrientedHistory[phase].Add(potentialActiveGOriented[phase]);
-                ////11. Härtung berechnen
+                ////11. Härtung berechnen (Anzeige)
                 for (int k = 0; k < actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems.Count; k++)
                 {
-                    actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[k].YieldMainHardennedStrength += averageYieldChange[phase][k] / potentialActiveGOriented[phase].Count;
+                    if (singleCrystalTracking)
+                    {
+                        actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[k].YieldMainAvgHardenning = averageYieldChange[phase][k] / potentialActiveGOriented[phase].Count;
+                    }
+                    else
+                    {
+                        actSample.SimulationData[experimentIndex].YieldInformation[phase].PotentialSlipSystems[k].YieldMainAvgHardenning += averageYieldChange[phase][k] / potentialActiveGOriented[phase].Count;
+                    }
                 }
             }
 
@@ -3046,7 +3077,8 @@ namespace CalScec.Analysis.Stress.Plasticity
                     //Mittelung des neuen Phasenmoduls
                     if (textureActive)
                     {
-
+                        overallStiffnessesPhase[phase] = Tools.FourthRankTensor.AverageInnerProduct(plasticTensorPhase[phase], actSample.SimulationData[experimentIndex].GrainOrientations[phase]);
+                        overallStiffnessesPhase[phase].SetHexagonalSymmetryCorrection();
                     }
                     else
                     {
@@ -3209,6 +3241,7 @@ namespace CalScec.Analysis.Stress.Plasticity
             //}
 
         }
+        
 
 
 

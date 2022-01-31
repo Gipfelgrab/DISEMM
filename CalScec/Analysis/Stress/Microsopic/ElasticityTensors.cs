@@ -109,6 +109,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             }
         }
 
+        //OBSOLETE TODO: ODF mussd dringend von den Tensoren weg!
         public Texture.OrientationDistributionFunction ODF;
 
         public List<REK> DiffractionConstants = new List<REK>();

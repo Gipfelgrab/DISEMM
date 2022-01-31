@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CalScec.Analysis.Stress.Microsopic"
+        xmlns:oxycore="clr-namespace:OxyPlot;assembly=OxyPlot"
+        xmlns:oxy="clr-namespace:OxyPlot.Wpf;assembly=OxyPlot.Wpf"
         mc:Ignorable="d"
         Title="ElasticityCalculationWindow" Height="900" Width="1400">
     <Grid>
@@ -437,7 +439,7 @@
                                 <ComboBox Name="StiffnessComlplianceSwitchBox" MaxWidth="350" MaxHeight="30" SelectionChanged="SwitchBox_SelectionChanged"/>
                             </GroupBox>
                             <GroupBox Grid.Row="0" Grid.Column="3" Header="Fitting Mode">
-                                <ComboBox Name="REKSwitchBox" MaxWidth="350" MaxHeight="30"/>
+                                <ComboBox Name="REKSwitchBox" MaxWidth="350" MaxHeight="30" SelectionChanged="REKSwitchBox_SelectionChanged"/>
                             </GroupBox>
                             <Button Grid.Row="0" Grid.Column="4" Name="RefitConstants" Content="Fit tensor" MaxHeight="30" MaxWidth="150" Click="RefitConstants_Click"/>
                         </Grid>
@@ -453,14 +455,12 @@
                                     <ListView.View>
                                         <GridView>
                                             <GridViewColumn Width="100" Header="(H K L)" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
-                                            <GridViewColumn Width="100" Header="S1" DisplayMemberBinding="{Binding Path=ClassicS1}"/>
-                                            <GridViewColumn Width="100" Header="S1 Error" DisplayMemberBinding="{Binding Path=ClassicS1Error}"/>
-                                            <GridViewColumn Width="100" Header="S2" DisplayMemberBinding="{Binding Path=ClassicHS2}"/>
-                                            <GridViewColumn Width="100" Header="S2 Error" DisplayMemberBinding="{Binding Path=ClassicHS2Error}"/>
-                                            <GridViewColumn Width="120" Header="E(hkl)" DisplayMemberBinding="{Binding Path=ClassicEModulus}"/>
-                                            <GridViewColumn Width="120" Header="Nu(hkl)" DisplayMemberBinding="{Binding Path=ClassicTransverseContraction}"/>
-                                            <GridViewColumn Width="120" Header="G(hkl)" DisplayMemberBinding="{Binding Path=ClassicShearModulus}"/>
-                                            <GridViewColumn Width="120" Header="Kappa(hkl)" DisplayMemberBinding="{Binding Path=ClassicBulkModulus}"/>
+                                            <GridViewColumn Width="100" Header="S1" DisplayMemberBinding="{Binding Path=ViewS1}"/>
+                                            <GridViewColumn Width="100" Header="½S2" DisplayMemberBinding="{Binding Path=ViewHS2}"/>
+                                            <GridViewColumn Width="120" Header="E(hkl)" DisplayMemberBinding="{Binding Path=ViewEModulus}"/>
+                                            <GridViewColumn Width="120" Header="γ(hkl)" DisplayMemberBinding="{Binding Path=ViewShearModulus}"/>
+                                            <GridViewColumn Width="120" Header="ν(hkl)" DisplayMemberBinding="{Binding Path=ViewTransverseContraction}"/>
+                                            <GridViewColumn Width="120" Header="μ(hkl)" DisplayMemberBinding="{Binding Path=ViewBulkModulus}"/>
                                         </GridView>
                                     </ListView.View>
                                 </ListView>
@@ -478,9 +478,10 @@
                             <GroupBox Grid.Column="0" Header="Bulk parameters">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="0.55*"/>
                                         <ColumnDefinition Width="0.45*"/>
-                                        <ColumnDefinition Width="0.15*"/>
+                                        <ColumnDefinition Width="0.45*"/>
+                                        <ColumnDefinition Width="0.45*"/>
+                                        <ColumnDefinition Width="0.25*"/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="*"/>
@@ -488,79 +489,33 @@
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="*"/>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="4*"/>
                                     </Grid.RowDefinitions>
-                                    <Label Grid.Column="0" Grid.Row="0" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg E-Modulus:"/>
-                                    <Label Grid.Column="1" Grid.Row="0" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AEModulusLabel"/>
-                                    <Label Grid.Column="2" Grid.Row="0" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
-                                    <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg nu:"/>
-                                    <Label Grid.Column="1" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ANuLabel"/>
-                                    <Label Grid.Column="0" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg G-Modulus:"/>
-                                    <Label Grid.Column="1" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AShearModulusLabel"/>
-                                    <Label Grid.Column="2" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
-                                    <Label Grid.Column="0" Grid.Row="6" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg Bulk-Modulus:"/>
-                                    <Label Grid.Column="1" Grid.Row="6" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ABulkModulusLabel"/>
-                                    <Label Grid.Column="2" Grid.Row="6" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
-                                    <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg E-Modulus fit:"/>
-                                    <Label Grid.Column="1" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AEModulusFitLabel"/>
-                                    <Label Grid.Column="2" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
-                                    <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg nu fit:"/>
-                                    <Label Grid.Column="1" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ANuFitLabel"/>
-                                    <Label Grid.Column="0" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg G-Modulus fit:"/>
-                                    <Label Grid.Column="1" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AShearModulusFitLabel"/>
-                                    <Label Grid.Column="2" Grid.Row="5" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
-                                    <Label Grid.Column="0" Grid.Row="7" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg Bulk-Modulus fit:"/>
-                                    <Label Grid.Column="1" Grid.Row="7" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ABulkModulusFitLabel"/>
-                                    <Label Grid.Column="2" Grid.Row="7" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
-                                    <Label Grid.Column="0" Grid.Row="8" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Chi2:"/>
-                                    <Label Grid.Column="1" Grid.Row="8" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="Chi2TensorFitLabel"/>
+                                    <Label Grid.Column="0" Grid.Row="0" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg. E:" ToolTip="Averaged Young's modulus. Represents the Young's modulus obtained by simple tensile tests."/>
+                                    <Label Grid.Column="1" Grid.Row="0" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AEModulusLabel" ToolTip="Calculated from the selected single crystal elastic constants."/>
+                                    <Label Grid.Column="2" Grid.Row="0" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AEModulusFitLabel" Foreground="DarkGray" ToolTip="Calculated from the experimental strain data."/>
+                                    <Label Grid.Column="3" Grid.Row="0" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
+
+                                    <Label Grid.Column="0" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg. ν:" ToolTip="Averaged poissons value."/>
+                                    <Label Grid.Column="1" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ANuLabel" ToolTip="Calculated from the selected single crystal elastic constants."/>
+                                    <Label Grid.Column="2" Grid.Row="1" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ANuFitLabel" Foreground="DarkGray" ToolTip="Calculated from the experimental strain data."/>
+
+                                    <Label Grid.Column="0" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg. γ:"  ToolTip="Averaged Young's modulus. Represents the shear modulus obtained by simple tensile tests."/>
+                                    <Label Grid.Column="1" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AShearModulusLabel" ToolTip="Calculated from the selected single crystal elastic constants."/>
+                                    <Label Grid.Column="2" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="AShearModulusFitLabel" Foreground="DarkGray" ToolTip="Calculated from the experimental strain data."/>
+                                    <Label Grid.Column="3" Grid.Row="2" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
+
+                                    <Label Grid.Column="0" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Avg. μ:" ToolTip="Averaged Bulk modulus."/>
+                                    <Label Grid.Column="1" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ABulkModulusLabel" ToolTip="Calculated from the selected single crystal elastic constants."/>
+                                    <Label Grid.Column="2" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="ABulkModulusFitLabel" Foreground="DarkGray" ToolTip="Calculated from the experimental strain data."/>
+                                    <Label Grid.Column="3" Grid.Row="3" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="MPa"/>
+
+                                    <Label Grid.Column="0" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="Χ²:"/>
+                                    <Label Grid.Column="1" Grid.Row="4" VerticalContentAlignment="Center" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Content="" Name="Chi2TensorFitLabel"/>
+
+                                    
                                 </Grid>
                             </GroupBox>
-                            <!--<GroupBox Grid.Column="1" Grid.Row="1" Header="Texture">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"/>
-                                        <RowDefinition Height="*"/>
-                                    </Grid.RowDefinitions>
-                                    --><!--<Grid Grid.Row="0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        --><!--<CheckBox Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Activate" Name="ActivateTexture" Checked="ActivateTexture_Checked" Unchecked="ActivateTexture_Unchecked"/>-->
-                                        <!--<Button Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Set fitting data" Name="SetTextureTensor" Click="SetTextureTensor_Click"/>--><!--
-                                    </Grid>--><!--
-                                    <Grid Grid.Row="0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <CheckBox Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Center" Content="Show weighted tensor" Name="ActivateWeightedTensor" Checked="ActivateWeightedTensor_Checked" Unchecked="ActivateWeightedTensor_Unchecked"/>
-                                        <Button Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Set weights" Name="SetWeightedTensor" Click="SetTextureTensor_Click"/>
-                                    </Grid>
-                                    --><!--<GroupBox Grid.Row="2" Header="Texture Fit Queque">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="*"/>
-                                                <RowDefinition Height="4*"/>
-                                            </Grid.RowDefinitions>
-                                            <ProgressBar MaxHeight="32" Name="TextureProgress"/>
-                                            <ListView Grid.Row="1" Name="TextureFittingPoolList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
-                                                <ListView.View>
-                                                    <GridView>
-                                                        <GridViewColumn Width="100" Header="Model" DisplayMemberBinding="{Binding Path=ModelName}"/>
-                                                        <GridViewColumn Width="100" Header="Started" DisplayMemberBinding="{Binding Path=TimeAdded}"/>
-                                                        <GridViewColumn Width="100" Header="Trial" DisplayMemberBinding="{Binding Path=LMATrial}"/>
-                                                    </GridView>
-                                                </ListView.View>
-                                            </ListView>
-                                        </Grid>
-                                    </GroupBox>--><!--
-                                </Grid>
-                            </GroupBox>-->
                         </Grid>
                     </Grid>
                 </Grid>
@@ -568,16 +523,16 @@
                     <ListView Name="REKClassicCalculationList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Width="100" Header="(H K L)" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
-                                <GridViewColumn Width="100" Header="S1" DisplayMemberBinding="{Binding Path=ClassicS1}"/>
-                                <GridViewColumn Width="100" Header="S1 Error" DisplayMemberBinding="{Binding Path=ClassicS1Error}"/>
-                                <GridViewColumn Width="100" Header="S2" DisplayMemberBinding="{Binding Path=ClassicHS2}"/>
-                                <GridViewColumn Width="100" Header="S2 Error" DisplayMemberBinding="{Binding Path=ClassicHS2Error}"/>
-                                <GridViewColumn Width="120" Header="E(hkl) [MPa]" DisplayMemberBinding="{Binding Path=ClassicEModulus}"/>
-                                <GridViewColumn Width="120" Header="Nu(hkl)" DisplayMemberBinding="{Binding Path=ClassicTransverseContraction}"/>
-                                <GridViewColumn Width="120" Header="G(hkl) [MPa]" DisplayMemberBinding="{Binding Path=ClassicShearModulus}"/>
-                                <GridViewColumn Width="120" Header="Kappa(hkl) [MPa]" DisplayMemberBinding="{Binding Path=ClassicBulkModulus}"/>
-                                <GridViewColumn Width="100" Header="Chi2" DisplayMemberBinding="{Binding Path=ClassicChi2}"/>
+                                <GridViewColumn Width="120" Header="(H K L)" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
+                                <GridViewColumn Width="100" Header="S1" DisplayMemberBinding="{Binding Path=ViewS1}"/>
+                                <GridViewColumn Width="100" Header="ΔS1" DisplayMemberBinding="{Binding Path=ViewS1Error}"/>
+                                <GridViewColumn Width="100" Header="½S2" DisplayMemberBinding="{Binding Path=ViewHS2}"/>
+                                <GridViewColumn Width="100" Header="Δ½S2" DisplayMemberBinding="{Binding Path=ViewHS2Error}"/>
+                                <GridViewColumn Width="100" Header="E(hkl) [MPa]" DisplayMemberBinding="{Binding Path=ViewEModulus}"/>
+                                <GridViewColumn Width="120" Header="γ(hkl)" DisplayMemberBinding="{Binding Path=ViewShearModulus}"/>
+                                <GridViewColumn Width="120" Header="ν(hkl)" DisplayMemberBinding="{Binding Path=ViewTransverseContraction}"/>
+                                <GridViewColumn Width="120" Header="μ(hkl)" DisplayMemberBinding="{Binding Path=ViewBulkModulus}"/>
+                                <GridViewColumn Width="100" Header="Χ²" DisplayMemberBinding="{Binding Path=ClassicChi2}"/>
                             </GridView>
                         </ListView.View>
                     </ListView>
@@ -695,8 +650,26 @@
                                 <ComboBoxItem Content="Orange"/>
                                 <ComboBoxItem Content="Yellow"/>
                             </ComboBox>
+                            
                         </Grid>
-                        <Grid Grid.Row="1">
+                        <GroupBox Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4" Header="Stress distribution" Name="StressDistributionGroup">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.5*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <oxy:PlotView Name="StressDistributionPlot" Grid.RowSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5"/>
+                                <Button Grid.Column="1" Grid.Row="1" Content="Set transition factors" MaxHeight="32" Margin="5,5,5,5" Click="SetTransitionFactors_Click"></Button>
+                                <Button Grid.Column="1" Grid.Row="0" Content="Self Consistent Fit" MaxHeight="32" Margin="5,5,5,5" Click="FitConstantsSelfConsistent_Click"></Button>
+                            </Grid>
+                        </GroupBox>
+                        <!--<Grid Grid.Row="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="0.6*"/>
                                 <RowDefinition Height="0.4*"/>
@@ -725,10 +698,8 @@
                                 </Grid.RowDefinitions>
                                 <Button Grid.Column="0" Grid.Row="0" Content="Reset Stress" MaxHeight="32" Margin="5,5,5,5" Click="ResetPhaseStresses_Click"></Button>
                                 <Button Grid.Column="1" Grid.Row="0" Content="Refit DEC" MaxHeight="32" Margin="5,5,5,5" Click="RefitAllDEC_Click"></Button>
-                                <Button Grid.Column="2" Grid.Row="0" Content="Set transition factors" MaxHeight="32" Margin="5,5,5,5" Click="SetTransitionFactors_Click"></Button>
-                                <Button Grid.Column="2" Grid.Row="1" Content="Self Consistent Fit" MaxHeight="32" Margin="5,5,5,5" Click="SetTransitionFactors_Click"></Button>
                             </Grid>
-                        </Grid>
+                        </Grid>-->
                     </Grid>
                 </GroupBox>
             </Grid>

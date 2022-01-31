@@ -372,7 +372,7 @@ namespace CalScec.Analysis.Texture
 
                 for (int i = 0; i < IntegrationAngles.Count; i++)
                 {
-                    double ODFValue = this[IntegrationAngles[n][0], IntegrationAngles[n][1], IntegrationAngles[n][2]];
+                    double ODFValue = this[IntegrationAngles[i][0], IntegrationAngles[i][1], IntegrationAngles[i][2]];
                     PSA[n].MRDValue += ODFValue;
                 }
             }

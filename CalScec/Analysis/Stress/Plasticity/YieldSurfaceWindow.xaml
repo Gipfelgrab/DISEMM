@@ -84,7 +84,7 @@
                     <ListView Name="ReflexList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5" SelectionChanged="ReflexList_SelectionChanged">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Width="200" Header="Reflex" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
+                                <GridViewColumn Width="200" Header="(H K L)" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
                                 <!--<GridViewColumn Width="100" Header="Yield strength" DisplayMemberBinding="{Binding Path=YieldMainStrength}"/>
                         <GridViewColumn Width="100" Header="Slip Direction" DisplayMemberBinding="{Binding Path=HKLStringSlipDirection}"/>
                         <GridViewColumn Width="70" Header="Plains" DisplayMemberBinding="{Binding Path=PlainMainMultiplizity}"/>
@@ -95,10 +95,10 @@
                     <ListView Grid.Row="1" Name="ReflexListPsi" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Extended" Margin="5">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Width="100" Header="Reflex" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
-                                <GridViewColumn Width="100" Header="Psy Angle" DisplayMemberBinding="{Binding Path=psiAngle}"/>
-                                <GridViewColumn Width="100" Header="Strain" DisplayMemberBinding="{Binding Path=Strain}"/>
-                                <GridViewColumn Width="100" Header="Stress" DisplayMemberBinding="{Binding Path=stress}"/>
+                                <GridViewColumn Width="120" Header="(H K L)" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
+                                <GridViewColumn Width="90" Header="ε" DisplayMemberBinding="{Binding Path=strainView}"/>
+                                <GridViewColumn Width="90" Header="σ" DisplayMemberBinding="{Binding Path=stress}"/>
+                                <GridViewColumn Width="90" Header="ψ" DisplayMemberBinding="{Binding Path=psiAngleView}"/>
                             </GridView>
                         </ListView.View>
                     </ListView>
@@ -111,10 +111,10 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Psi Angle:"/>
+                        <Label Grid.Column="0" Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="ψ:"/>
                         <ComboBox Grid.Column="1" Grid.Row="0" Name="PsiAnglem" MaxWidth="350" MaxHeight="30" Margin="5,5,5,5" SelectionChanged="PsiAnglem_SelectionChanged"/>
                         <Button Grid.Row="1" Grid.Column="1" Margin="5,5,5,5" MaxHeight="28" Name="ShowData" Content="Plot" Click="ShowTestData_Click"/>
-                        <Button Grid.Row="1" MaxHeight="28" Margin="5,5,5,5" Name="ReflexGroup" Content="Regroup Reflexes" Click="ReflexGroup_Click"/>
+                        <Button Grid.Row="1" MaxHeight="28" Margin="5,5,5,5" Name="ReflexGroup" Content="Regroup Peaks" Click="ReflexGroup_Click"/>
                     </Grid>
                     <Grid Grid.Row="3">
                         <Grid.ColumnDefinitions>
@@ -132,8 +132,8 @@
             <GroupBox Grid.Row="3" Header="Grain Orientation">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="0.4*"/>
-                        <RowDefinition Height="0.6*"/>
+                        <RowDefinition Height="0.2*"/>
+                        <RowDefinition Height="0.8*"/>
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
@@ -144,11 +144,9 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <TextBox Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="Phi1Start" ToolTip="Starting angle of Phi1" Margin="5,0,5,0" TextChanged="GrainOrientation_TextChanged"/>
+                        <Button Visibility="Hidden" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" MaxHeight="28"  Margin="5,0,5,0" Name="PlotSimulationGrain" Content="Plot Selected HKL" Click="PlotSimulationGrain_Click" ToolTip="Plots the simulation data for the selected (H K L) peak and ψ from Diffraction Data."/>
+                        <!--<TextBox Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="Phi1Start" ToolTip="Starting angle of Phi1" Margin="5,0,5,0" TextChanged="GrainOrientation_TextChanged"/>
                         <TextBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="Phi1End" ToolTip="Last angle of Phi1" Margin="5,0,5,0" TextChanged="GrainOrientation_TextChanged"/>
                         <TextBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="Phi1Step" ToolTip="Step width of Phi1" Margin="5,0,5,0" TextChanged="GrainOrientation_TextChanged"/>
                         <TextBox Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="PsiStart" ToolTip="Starting angle of Psi" Margin="5,0,5,0" TextChanged="GrainOrientation_TextChanged"/>
@@ -156,20 +154,20 @@
                         <TextBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="PsiStep" ToolTip="Step width of Psi" Margin="5,0,5,0" TextChanged="GrainOrientation_TextChanged"/>
                         <TextBox Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="Phi2Start" ToolTip="Starting angle of Phi2" Margin="5,0,5,0" TextChanged="GrainOrientation_TextChanged"/>
                         <TextBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="Phi2End" ToolTip="Last angle of Phi2" Margin="5,0,5,0" TextChanged="GrainOrientation_TextChanged"/>
-                        <TextBox Grid.Row="2" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="Phi2Step" ToolTip="Step width of Phi2" Margin="5,0,5,0" TextChanged="GrainOrientation_TextChanged"/>
+                        <TextBox Grid.Row="2" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="Phi2Step" ToolTip="Step width of Phi2" Margin="5,0,5,0" TextChanged="GrainOrientation_TextChanged"/>-->
 
-                        <Label Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Number of Grains:"/>
-                        <Label Grid.Column="2" Grid.Row="3" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="" HorizontalContentAlignment="Center" Name="GrainCountLabel"/>
+                        <Label Grid.Column="0" Grid.Row="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="Number of Grains:"/>
+                        <Label Grid.Column="1" Grid.Row="4" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" Content="" HorizontalContentAlignment="Center" Name="GrainCountLabel"/>
 
-                        <CheckBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Name="GrainTextureBox">Texture</CheckBox>
-                        <Button Grid.Row="4" Grid.Column="2" MaxHeight="28"  Margin="5,0,5,0" Name="SetGrains" Content="Set" Click="SetGrainsForExperiment_Click"/>
+                        <Button Grid.Row="4" Grid.Column="2" MaxHeight="28"  Margin="5,0,5,0" Name="SetGrains" Content="Set Texure" Click="SetGrainsForExperiment_Click"/>
                     </Grid>
                     <ListView Grid.Column="3" Grid.Row="2" Grid.RowSpan="5" Name="GrainorientationList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,5,10,5" ToolTip="List of grains with different orientation to the load axis." SelectionChanged="GrainorientationList_SelectionChanged">
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Width="80" Header="Phi1" DisplayMemberBinding="{Binding Path=Phi1}"/>
-                                <GridViewColumn Width="80" Header="Psi" DisplayMemberBinding="{Binding Path=Psi}"/>
-                                <GridViewColumn Width="80" Header="Phi2" DisplayMemberBinding="{Binding Path=Phi2}"/>
+                                <GridViewColumn Width="65" Header="φ1" DisplayMemberBinding="{Binding Path=Phi1}"/>
+                                <GridViewColumn Width="65" Header="Φ" DisplayMemberBinding="{Binding Path=Psi}"/>
+                                <GridViewColumn Width="65" Header="φ2" DisplayMemberBinding="{Binding Path=Phi2}"/>
+                                <GridViewColumn Width="65" Header="m.r.d." DisplayMemberBinding="{Binding Path=MRD}"/>
                             </GridView>
                         </ListView.View>
                     </ListView>
@@ -239,6 +237,7 @@
                                     <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" MaxHeight="28" Margin="0,0,0,0" Name="DriveToStress" Content="Drive to Value" Click="DriveToStress_Click"/>
                                     <!--<CheckBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Name="CrystalFrameSimulation" Checked="CrystalFrameSimulation_Checked" Unchecked="CrystalFrameSimulation_Unchecked">Crystal Frame</CheckBox>-->
 
+                                    <TextBox Grid.Row="0" Grid.Column="4" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentNameBox" ToolTip="Starting angle of Phi1" Margin="5,0,5,0" TextChanged="ExperimentNameBox_TextChanged"/>
                                     <TextBox Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalTicks" ToolTip="Ticks to drive" Margin="5,2,5,36" Grid.RowSpan="2"/>
                                     <TextBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalChiAngle" ToolTip="chi Angle" Margin="5,0,5,0" TextChanged="ExperimentalChiAngle_TextChanged"/>
                                     <TextBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalOmegaAngle" ToolTip="omega" Margin="5,0,5,0" TextChanged="ExperimentalOmegaAngle_TextChanged"/>
@@ -250,10 +249,11 @@
                                     <TextBox Grid.Row="3" Grid.Column="2" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentalValue23" ToolTip="Drive to Value in 23 direction" Margin="5,0,5,0"/>
                                     <Button Grid.Row="0" Grid.Column="5" MaxHeight="28"  Margin="5,0,5,0" Name="AddNewExperiment" Content="Add new experiment" Click="AddNewExperiment_Click"/>
                                     <!--<ComboBox Grid.Row="3" Grid.Column="3" HorizontalAlignment="Stretch" MaxHeight="30" Name="ExperimentSelection" Margin="5,0,5,0" SelectionChanged="ExperimentSelection_SelectionChanged"/>-->
-                                    <Button Grid.Row="1" Grid.Column="4" MaxHeight="28"  Margin="5,0,5,0" Name="SaveExperiment" Content="Save experiment" Click="SaveExperiment_Click"/>
-                                    <Button Grid.Row="0" Grid.Column="4" MaxHeight="28"  Margin="5,0,5,0" Name="LoadExperiment" Content="Load experiment" Click="LoadExperiment_Click"/>
-                                    <CheckBox Grid.Row="1" Grid.Column="5" HorizontalAlignment="Center" VerticalAlignment="Center" Name="OldDataScheme" ToolTip="Check to use the old file Formats">Old File Format</CheckBox>
-                                    <ProgressBar Name="FileHandleProgress" Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="2" Minimum="0" Maximum="100" Value="0" Height="20"></ProgressBar>
+                                    <Button Grid.Row="1" Grid.Column="5" MaxHeight="28"  Margin="5,0,5,0" Name="SaveExperiment" Content="Save experiment" Click="SaveExperiment_Click"/>
+                                    <Button Grid.Row="1" Grid.Column="4" MaxHeight="28"  Margin="5,0,5,0" Name="LoadExperiment" Content="Load experiment" Click="LoadExperiment_Click"/>
+                                    <CheckBox Grid.Row="2" Grid.Column="5" HorizontalAlignment="Left" VerticalAlignment="Center" Name="OldDataScheme" ToolTip="Check to use the old file Formats">Old Format</CheckBox>
+                                    <CheckBox Grid.Row="2" Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Name="JSONDataScheme" ToolTip="Check to use the JSON file Formats">JSON Format</CheckBox>
+                                    <ProgressBar Name="FileHandleProgress" Grid.Row="3" Grid.Column="4" Grid.ColumnSpan="2" Minimum="0" Maximum="100" Value="0" Height="20"></ProgressBar>
                                     <ListView Grid.Row="0" Grid.RowSpan="4" Grid.Column="3" Name="ExperimentSelection" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" SelectionChanged="ExperimentSelection_SelectionChanged">
                                         <ListView.View>
                                             <GridView>
@@ -350,7 +350,7 @@
                             <TextBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="SlipFamilyModificationYieldStrength" Margin="5,2,5,2" TextChanged="SlipFamilyModification_TextChanged"/>
                             <TextBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="SlipFamilyModificationHardenning" Margin="5,2,5,2" TextChanged="SlipFamilyModification_TextChanged"/>
                             <TextBox Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Name="SlipFamilyModificationYieldLimit" Margin="5,2,5,2" TextChanged="SlipFamilyModification_TextChanged"/>
-                            <CheckBox Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="1" HorizontalAlignment="Center" VerticalAlignment="Center" Name="SlipFamilyActive" Checked="SlipFamilyActive_Changed" Unchecked="SlipFamilyActive_Changed">Active family</CheckBox>
+                            <CheckBox Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="1" HorizontalAlignment="Center" VerticalAlignment="Center" Name="SlipFamilyActive" Checked="SlipFamilyActive_Changed" Unchecked="SlipFamilyActive_Changed">Active family</CheckBox>
                         </Grid>
                     </Grid>
                 </Grid>
@@ -397,6 +397,7 @@
                         </ComboBox>
                         <CheckBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Name="MultithreadingActive" ToolTip="If activated the simulation will be calculated using all available cores. This may slow down the system significantly.">Multi threading active</CheckBox>
                         <CheckBox Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Name="YieldLimitActive" ToolTip="If activated the simulation will be calculated using all available cores. This may slow down the system significantly.">Yield Limit active</CheckBox>
+                        <CheckBox Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Name="GrainTextureBox">Texture</CheckBox>
                         <TextBox Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" MaxHeight="30" Margin="5,2,5,2" Name="ExperimentSampleArea" ToolTip="Sample Area for active Experiment" TextChanged="ExperimentSampleArea_TextChanged"/>
                         <TextBox Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" MaxHeight="30" Margin="5,2,5,2" Name="SimulationLimit" ToolTip="Sample Area for active Experiment" TextChanged="SimulationLimit_TextChanged"/>
                         <Button Grid.Row="0" Grid.Column="3" MaxHeight="28"  Margin="5,2,5,2" Name="SimulateExperiment" Content="Simulate experiment" Click="SimulateExperiment_Click"/>

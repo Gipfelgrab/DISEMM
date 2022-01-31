@@ -669,6 +669,41 @@ namespace CalScec.Tools
 
             return ret;
         }
+        public static FourthRankTensor AverageInnerProduct(List<Analysis.Stress.Plasticity.PlasticityTensor> pT, List<Analysis.Stress.Plasticity.GrainOrientationParameter> grainList)
+        {
+            FourthRankTensor ret = new FourthRankTensor();
+            double textureWeighting = 0.0;
+            for (int z = 0; z < pT.Count; z++)
+            {
+                textureWeighting += grainList[z].MRD;
+                FourthRankTensor toAdd = new FourthRankTensor();
+                for (int i = 0; i < 3; i++)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        for (int k = 0; k < 3; k++)
+                        {
+                            for (int l = 0; l < 3; l++)
+                            {
+                                for (int m = 0; m < 3; m++)
+                                {
+                                    for (int n = 0; n < 3; n++)
+                                    {
+                                        toAdd[i, j, k, l] += pT[z].GrainStiffness[i, j, m, n] * pT[z].GrainTransitionStiffness[m, n, k, l];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                toAdd = grainList[z].MRD * toAdd; 
+                ret += toAdd;
+            }
+
+            ret /= textureWeighting;
+
+            return ret;
+        }
 
         public double GetDifference(FourthRankTensor compTensor)
         {

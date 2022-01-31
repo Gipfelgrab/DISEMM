@@ -172,6 +172,25 @@ namespace CalScec.Analysis.Stress.Macroskopic
     
     public class PeakStressAssociation
     {
+        #region View
+
+        public string psiAngleView
+        {
+            get
+            {
+                return this.psiAngle.ToString("F3");
+            }
+        }
+        public string strainView
+        {
+            get
+            {
+                return this.Strain.ToString("F3");
+            }
+        }
+
+        #endregion
+
         public double PhaseFractionStress;
         public double Stress;
         public string stress

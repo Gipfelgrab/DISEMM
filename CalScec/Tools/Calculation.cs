@@ -147,6 +147,148 @@ namespace CalScec.Tools
 
         #endregion
 
+        public static void AutoSetDEC(Analysis.Sample sample, bool texture, bool stressPartitioning)
+        {
+            for (int n = 0; n < sample.CrystalData.Count; n++)
+            {
+
+                if (texture)
+                {
+                    sample.DiffractionConstantsTexture[n].Clear();
+                }
+                else
+                {
+                    sample.DiffractionConstants[n].Clear();
+                }
+
+                for (int i = 0; i < sample.CrystalData[n].HKLList.Count; i++)
+                {
+                    Analysis.Stress.Microsopic.REK ActualREK = new Analysis.Stress.Microsopic.REK(sample.CrystalData[n], sample.CrystalData[n].HKLList[i]);
+
+                    for (int j = 0; j < sample.DiffractionPatterns.Count; j++)
+                    {
+                        for (int k = 0; k < sample.DiffractionPatterns[j].FoundPeaks.Count; k++)
+                        {
+                            if (sample.DiffractionPatterns[j].FoundPeaks[k].AssociatedCrystalData.SymmetryGroupID == sample.CrystalData[n].SymmetryGroupID)
+                            {
+                                if (sample.DiffractionPatterns[j].FoundPeaks[k].AssociatedHKLReflex.HKLString == sample.CrystalData[n].HKLList[i].HKLString)
+                                {
+                                    Analysis.Stress.Macroskopic.PeakStressAssociation NewAssociation = new Analysis.Stress.Macroskopic.PeakStressAssociation(sample.DiffractionPatterns[j].Stress, sample.DiffractionPatterns[j].PsiAngle(sample.DiffractionPatterns[j].FoundPeaks[k].Angle), sample.DiffractionPatterns[j].FoundPeaks[k], sample.DiffractionPatterns[j].PhiAngle(sample.DiffractionPatterns[j].FoundPeaks[k].Angle));
+                                    NewAssociation._macroskopicStrain = sample.DiffractionPatterns[j].MacroStrain;
+                                    ActualREK.ElasticStressData.Add(NewAssociation);
+                                }
+                            }
+                        }
+                    }
+
+                    for (int j = 0; j < sample.MacroElasticData.Count; j++)
+                    {
+                        if (sample.MacroElasticData[j][0].HKLAssociation == ActualREK.HKLAssociation)
+                        {
+                            if (sample.MacroElasticData[j][0].PsiAngle == 0)
+                            {
+                                ActualREK.LongitudionalElasticity = sample.MacroElasticData[j];
+                            }
+                            else if (sample.MacroElasticData[j][0].PsiAngle == 90)
+                            {
+                                ActualREK.TransversalElasticity = sample.MacroElasticData[j];
+                            }
+                        }
+                    }
+                    if (texture)
+                    {
+                        sample.DiffractionConstantsTexture[n].Add(ActualREK);
+                    }
+                    else
+                    {
+                        sample.DiffractionConstants[n].Add(ActualREK);
+                    }
+                }
+
+                //Removing empty DEC
+                bool run = true;
+                while (run)
+                {
+                    int deleteIndex = -1;
+                    if (texture)
+                    {
+                        for (int i = 0; i < sample.DiffractionConstantsTexture[n].Count; i++)
+                        {
+
+                            if (sample.DiffractionConstantsTexture[n][i].ElasticStressData.Count == 0)
+                            {
+                                deleteIndex = i;
+                            }
+
+                            if (deleteIndex > -1)
+                            {
+                                sample.DiffractionConstantsTexture[n].RemoveAt(deleteIndex);
+                                break;
+                            }
+                        }
+                        if (deleteIndex == -1)
+                        {
+                            run = false;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < sample.DiffractionConstants[n].Count; i++)
+                        {
+
+                            if (sample.DiffractionConstants[n][i].ElasticStressData.Count == 0)
+                            {
+                                deleteIndex = i;
+                            }
+
+                            if (deleteIndex > -1)
+                            {
+                                sample.DiffractionConstants[n].RemoveAt(deleteIndex);
+                                break;
+                            }
+                        }
+                        if (deleteIndex == -1)
+                        {
+                            run = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (texture)
+                {
+                    for (int i = 0; i < sample.DiffractionConstantsTexture[n].Count; i++)
+                    {
+                        if (stressPartitioning)
+                        {
+                            sample.ODFList[n].SetMRDValues(sample.DiffractionConstantsTexture[n][i].ElasticStressData);
+                            sample.DiffractionConstantsTexture[n][i].FitTexturedPhaseREKFunction();
+                        }
+                        else
+                        {
+                            sample.ODFList[n].SetMRDValues(sample.DiffractionConstantsTexture[n][i].ElasticStressData);
+                            sample.DiffractionConstantsTexture[n][i].FitTexturedREKFunction();
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < sample.DiffractionConstants[n].Count; i++)
+                    {
+                        if (Convert.ToBoolean(stressPartitioning))
+                        {
+                            sample.DiffractionConstants[n][i].FitClassicPhaseREKFunction();
+                        }
+                        else
+                        {
+                            sample.DiffractionConstants[n][i].FitClassicREKFunction();
+                        }
+                    }
+                }
+            }
+        }
+
         public static List<int> IntegrateIndices(double psi, List<Analysis.Stress.Plasticity.GrainOrientationParameter> orientations)
         {
             List<int> ret = new List<int>();

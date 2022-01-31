@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using OxyPlot;
+
 namespace CalScec.Analysis.Stress.Microsopic
 {
     /// <summary>
@@ -37,11 +39,16 @@ namespace CalScec.Analysis.Stress.Microsopic
             this.LoadData();
 
             this.PrepareAnIsoPlot();
+
+            AnIsoPlotDirectionSelection.SelectedIndex = 0;
+            AnIsoParamSelector.SelectedIndex = 0;
+            AnIsoModelSelector.SelectedIndex = 2;
+            AnIsoColorSelector.SelectedIndex = 0;
         }
 
         private void PrepareREKS()
         {
-            for(int n = 0; n < this.ActSample.CrystalData.Count; n++)
+            for (int n = 0; n < this.ActSample.CrystalData.Count; n++)
             {
                 this.ActSample.VoigtTensorData[n].DiffractionConstants = ActSample.DiffractionConstants[n];
                 this.ActSample.ReussTensorData[n].DiffractionConstants = ActSample.DiffractionConstants[n];
@@ -178,6 +185,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             this.StiffnessComlplianceSwitchBox.SelectedIndex = 0;
 
             this.SetTensorData();
+            this.SetTransitionView();
 
             //this.TextureFittingPoolList.ItemsSource = this.TextureFitObjects;
 
@@ -187,95 +195,6 @@ namespace CalScec.Analysis.Stress.Microsopic
         private ElasticityTensors GetSelectedTensor()
         {
             ElasticityTensors ret = null;
-
-            #region Old Code
-
-            //if (Convert.ToBoolean(this.ActivateTexture.IsChecked))
-            //{
-            //    if (Convert.ToBoolean(this.ActivateWeightedTensor.IsChecked))
-            //    {
-            //        switch (this.ModelSwitchBox.SelectedIndex)
-            //        {
-            //            case 0:
-            //                ret = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
-            //                break;
-            //            case 1:
-            //                ret = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
-            //                break;
-            //            case 2:
-            //                ret = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
-            //                break;
-            //            case 3:
-            //                ret = this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
-            //                break;
-            //            case 4:
-            //                ret = this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
-            //                break;
-            //            case 5:
-            //                ret = this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
-            //                break;
-            //            default:
-            //                ret = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.TextureTensor;
-            //                break;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        switch (this.ModelSwitchBox.SelectedIndex)
-            //        {
-            //            case 0:
-            //                ret = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
-            //                break;
-            //            case 1:
-            //                ret = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
-            //                break;
-            //            case 2:
-            //                ret = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
-            //                break;
-            //            case 3:
-            //                ret = this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
-            //                break;
-            //            case 4:
-            //                ret = this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
-            //                break;
-            //            case 5:
-            //                ret = this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
-            //                break;
-            //            default:
-            //                ret = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.BaseTensor;
-            //                break;
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    switch (this.ModelSwitchBox.SelectedIndex)
-            //    {
-            //        case 0:
-            //            ret = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex];
-            //            break;
-            //        case 1:
-            //            ret = this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex];
-            //            break;
-            //        case 2:
-            //            ret = this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex];
-            //            break;
-            //        case 3:
-            //            ret = this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex];
-            //            break;
-            //        case 4:
-            //            ret = this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex];
-            //            break;
-            //        case 5:
-            //            ret = this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex];
-            //            break;
-            //        default:
-            //            ret = this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex];
-            //            break;
-            //    }
-            //}
-
-            #endregion
 
             switch (this.ModelSwitchBox.SelectedIndex)
             {
@@ -308,7 +227,7 @@ namespace CalScec.Analysis.Stress.Microsopic
         private void SetTensorData()
         {
             Stress.Microsopic.ElasticityTensors UsedTensor = this.GetSelectedTensor();
-            
+
             if (Convert.ToBoolean(this.FixAnisotropyCheckBox.IsChecked))
             {
                 UsedTensor.FixedAnIsotropy = true;
@@ -349,7 +268,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 this.T34.Text = UsedTensor.S34.ToString("G3");
                 this.T35.Text = UsedTensor.S35.ToString("G3");
                 this.T36.Text = UsedTensor.S36.ToString("G3");
-            
+
                 this.T41.Text = UsedTensor.S41.ToString("G3");
                 this.T42.Text = UsedTensor.S42.ToString("G3");
                 this.T43.Text = UsedTensor.S43.ToString("G3");
@@ -391,14 +310,14 @@ namespace CalScec.Analysis.Stress.Microsopic
                 this.T34E.Content = UsedTensor.S34Error.ToString("G3");
                 this.T35E.Content = UsedTensor.S35Error.ToString("G3");
                 this.T36E.Content = UsedTensor.S36Error.ToString("G3");
-            
+
                 this.T41E.Content = UsedTensor.S41Error.ToString("G3");
                 this.T42E.Content = UsedTensor.S42Error.ToString("G3");
                 this.T43E.Content = UsedTensor.S43Error.ToString("G3");
                 this.T44E.Content = UsedTensor.S44Error.ToString("G3");
                 this.T45E.Content = UsedTensor.S45Error.ToString("G3");
                 this.T46E.Content = UsedTensor.S46Error.ToString("G3");
-            
+
                 this.T51E.Content = UsedTensor.S51Error.ToString("G3");
                 this.T52E.Content = UsedTensor.S52Error.ToString("G3");
                 this.T53E.Content = UsedTensor.S53Error.ToString("G3");
@@ -578,12 +497,191 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         private void SwitchBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(this.TextEventsActive)
+            if (this.TextEventsActive)
             {
                 this.TextEventsActive = false;
                 this.SetTensorData();
-                SetTransitionView();
                 this.TextEventsActive = true;
+            }
+        }
+
+        private void RefitSEC(int selectedPhase, int fittingMode, int modelIndex, int complianceStiffness)
+        {
+            switch (modelIndex)
+            {
+                case 0:
+                    if (fittingMode == 0)
+                    {
+                        this.ActSample.VoigtTensorData[selectedPhase].FitVoigt(true);
+                    }
+                    else if (fittingMode == 2)
+                    {
+                        this.ActSample.VoigtTensorData[selectedPhase].FitVoigtStrain(true);
+                    }
+                    else
+                    {
+                        this.ActSample.VoigtTensorData[selectedPhase].FitVoigt(false);
+                    }
+                    break;
+                case 1:
+                    if (fittingMode == 0)
+                    {
+                        this.ActSample.ReussTensorData[selectedPhase].FitReuss(true);
+                    }
+                    else if (fittingMode == 1)
+                    {
+                        this.ActSample.ReussTensorData[selectedPhase].FitReuss(false);
+                    }
+                    else if (fittingMode == 2)
+                    {
+                        this.ActSample.ReussTensorData[selectedPhase].FitReussStrain(true);
+                    }
+                    else if (fittingMode == 3)
+                    {
+                        if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
+                        {
+                            this.ActSample.ReussTensorData[selectedPhase].ActivateDECMRDWeighting();
+                        }
+                        else
+                        {
+                            this.ActSample.ReussTensorData[selectedPhase].DeactivateDECMRDWeighting();
+                        }
+
+                        this.ActSample.ReussTensorData[selectedPhase].FitReussTextured(true);
+                    }
+                    else
+                    {
+                        this.ActSample.ReussTensorData[selectedPhase].FitReuss(true);
+                    }
+                    break;
+                case 2:
+                    if (fittingMode == 0)
+                    {
+                        this.ActSample.HillTensorData[selectedPhase].FitHill(true);
+                    }
+                    else if (fittingMode == 1)
+                    {
+                        this.ActSample.HillTensorData[selectedPhase].FitHill(false);
+                    }
+                    else if (fittingMode == 3)
+                    {
+                        if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
+                        {
+                            this.ActSample.HillTensorData[selectedPhase].ActivateDECMRDWeighting();
+                        }
+                        else
+                        {
+                            this.ActSample.HillTensorData[selectedPhase].DeactivateDECMRDWeighting();
+                        }
+
+                        this.ActSample.HillTensorData[selectedPhase].FitHillTextured(true);
+                    }
+                    else
+                    {
+                        this.ActSample.HillTensorData[selectedPhase].FitHill(true);
+                    }
+                    break;
+                case 3:
+                    bool SC = false;
+                    if (complianceStiffness == 1)
+                    {
+                        SC = true;
+                    }
+                    if (fittingMode == 0)
+                    {
+                        this.ActSample.KroenerTensorData[selectedPhase].FitKroener(true, SC);
+                    }
+                    else if (fittingMode == 1)
+                    {
+                        this.ActSample.KroenerTensorData[selectedPhase].FitKroener(false, SC);
+                    }
+                    else if (fittingMode == 3)
+                    {
+                        if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
+                        {
+                            this.ActSample.KroenerTensorData[selectedPhase].ActivateDECMRDWeighting();
+                        }
+                        else
+                        {
+                            this.ActSample.KroenerTensorData[selectedPhase].DeactivateDECMRDWeighting();
+                        }
+
+                        this.ActSample.KroenerTensorData[selectedPhase].FitKroenerTextured(true, SC);
+                    }
+                    else
+                    {
+                        this.ActSample.KroenerTensorData[selectedPhase].FitKroener(true, SC);
+                    }
+                    break;
+                case 4:
+                    bool SC1 = false;
+                    if (complianceStiffness == 1)
+                    {
+                        SC1 = true;
+                    }
+                    if (fittingMode == 0)
+                    {
+                        this.ActSample.DeWittTensorData[selectedPhase].FitDeWitt(true, SC1);
+                    }
+                    else if (fittingMode == 1)
+                    {
+                        this.ActSample.DeWittTensorData[selectedPhase].FitDeWitt(false, SC1);
+                    }
+                    else if (fittingMode == 3)
+                    {
+                        if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
+                        {
+                            this.ActSample.DeWittTensorData[selectedPhase].ActivateDECMRDWeighting();
+                        }
+                        else
+                        {
+                            this.ActSample.DeWittTensorData[selectedPhase].DeactivateDECMRDWeighting();
+                        }
+
+                        this.ActSample.DeWittTensorData[selectedPhase].FitDeWittTextured(true, SC1);
+                    }
+                    else
+                    {
+                        this.ActSample.DeWittTensorData[selectedPhase].FitDeWitt(true, SC1);
+                    }
+                    break;
+                case 5:
+                    if (fittingMode == 0)
+                    {
+                        this.ActSample.GeometricHillTensorData[selectedPhase].FitGeometricHill(true);
+                    }
+                    else if (fittingMode == 1)
+                    {
+                        this.ActSample.GeometricHillTensorData[selectedPhase].FitGeometricHill(false);
+                    }
+                    else if (fittingMode == 3)
+                    {
+                        if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
+                        {
+                            this.ActSample.GeometricHillTensorData[selectedPhase].ActivateDECMRDWeighting();
+                        }
+                        else
+                        {
+                            this.ActSample.GeometricHillTensorData[selectedPhase].DeactivateDECMRDWeighting();
+                        }
+
+                        this.ActSample.GeometricHillTensorData[selectedPhase].FitGeometricHillTextured(true);
+                    }
+                    else
+                    {
+                        this.ActSample.GeometricHillTensorData[selectedPhase].FitGeometricHill(true);
+                    }
+                    break;
+                default:
+                    if (fittingMode == 1)
+                    {
+                        this.ActSample.VoigtTensorData[selectedPhase].FitReuss(false);
+                    }
+                    else
+                    {
+                        this.ActSample.VoigtTensorData[selectedPhase].FitReuss(true);
+                    }
+                    break;
             }
         }
 
@@ -591,456 +689,16 @@ namespace CalScec.Analysis.Stress.Microsopic
         {
             this.TextEventsActive = false;
 
-            #region Old Code
-
-            //if (Convert.ToBoolean(this.ActivateTexture.IsChecked))
-            //{
-            //    switch (this.ModelSwitchBox.SelectedIndex)
-            //    {
-            //        case 0:
-            //            if (!this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
-            //            {
-            //                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 0;
-            //                if (REKSwitchBox.SelectedIndex == 0)
-            //                {
-            //                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
-            //                }
-            //                else
-            //                {
-            //                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false;
-            //                }
-            //                System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
-            //            }
-            //            break;
-            //        case 1:
-            //            if (!this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
-            //            {
-            //                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 1;
-            //                if (REKSwitchBox.SelectedIndex == 0)
-            //                {
-            //                    this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
-            //                }
-            //                else
-            //                {
-            //                    this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false;
-            //                }
-            //                System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
-            //            }
-            //            break;
-            //        case 2:
-            //            if (!this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
-            //            {
-            //                this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 2;
-            //                if (REKSwitchBox.SelectedIndex == 0)
-            //                {
-            //                    this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
-            //                }
-            //                else
-            //                {
-            //                    this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false; ;
-            //                }
-            //                System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
-            //            }
-            //            break;
-            //        case 3:
-            //            if (!this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
-            //            {
-            //                this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.UseStifnessCalculation = false;
-            //                if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
-            //                {
-            //                    this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.UseStifnessCalculation = true;
-            //                }
-            //                this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 4;
-            //                if (REKSwitchBox.SelectedIndex == 0)
-            //                {
-            //                    this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
-            //                }
-            //                else
-            //                {
-            //                    this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false;
-            //                }
-            //                System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
-            //            }
-            //            break;
-            //        case 4:
-            //            if (!this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
-            //            {
-            //                this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.UseStifnessCalculation = false;
-            //                if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
-            //                {
-            //                    this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.UseStifnessCalculation = true;
-            //                }
-            //                this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 5;
-            //                if (REKSwitchBox.SelectedIndex == 0)
-            //                {
-            //                    this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
-            //                }
-            //                else
-            //                {
-            //                    this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false;
-            //                }
-            //                System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
-            //            }
-            //            break;
-            //        case 5:
-            //            if (!this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
-            //            {
-            //                this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 3;
-            //                if (REKSwitchBox.SelectedIndex == 0)
-            //                {
-            //                    this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
-            //                }
-            //                else
-            //                {
-            //                    this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false;
-            //                }
-            //                System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
-            //            }
-            //            break;
-            //        default:
-            //            if (!this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.fitActive)
-            //            {
-            //                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FittingModel = 0;
-            //                if (REKSwitchBox.SelectedIndex == 0)
-            //                {
-            //                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = true;
-            //                }
-            //                else
-            //                {
-            //                    this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.ClassicalCalculation = false;
-            //                }
-            //                System.Threading.ThreadPool.QueueUserWorkItem(this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].ODF.FitTensorCallback);
-            //            }
-            //            break;
-            //    }
-            //}
-            //else
-            //{
-            //    switch (this.ModelSwitchBox.SelectedIndex)
-            //    {
-            //        case 0:
-            //            if (REKSwitchBox.SelectedIndex == 0)
-            //            {
-            //                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(true);
-            //            }
-            //            else if(REKSwitchBox.SelectedIndex == 2)
-            //            {
-            //                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigtStrain(true);
-            //            }
-            //            else
-            //            {
-            //                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(false);
-            //            }
-            //            break;
-            //        case 1:
-            //            if (REKSwitchBox.SelectedIndex == 0)
-            //            {
-            //                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(true);
-            //            }
-            //            else if (REKSwitchBox.SelectedIndex == 2)
-            //            {
-            //                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReussStrain(true);
-            //            }
-            //            else if (REKSwitchBox.SelectedIndex == 3)
-            //            {
-            //                if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-            //                {
-            //                    this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-            //                }
-            //                else
-            //                {
-            //                    this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-            //                }
-
-            //                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReussTextured(true);
-            //            }
-            //            else
-            //            {
-            //                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(false);
-            //            }
-            //            break;
-            //        case 2:
-            //            if (REKSwitchBox.SelectedIndex == 0)
-            //            {
-            //                this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].FitHill(true);
-            //            }
-            //            else if(REKSwitchBox.SelectedIndex == 3)
-            //            {
-            //                if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-            //                {
-            //                    this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-            //                }
-            //                else
-            //                {
-            //                    this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-            //                }
-
-            //                this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].FitHillTextured(true);
-            //            }
-            //            else
-            //            {
-            //                this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].FitHill(false);
-            //            }
-            //            break;
-            //        case 3:
-            //            bool SC = false;
-            //            if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
-            //            {
-            //                SC = true;
-            //            }
-            //            if (REKSwitchBox.SelectedIndex == 0)
-            //            {
-            //                this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].FitKroener(true, SC);
-            //            }
-            //            else if (REKSwitchBox.SelectedIndex == 3)
-            //            {
-            //                if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-            //                {
-            //                    this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-            //                }
-            //                else
-            //                {
-            //                    this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-            //                }
-
-            //                this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].FitKroenerTextured(true, SC);
-            //            }
-            //            else
-            //            {
-            //                this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].FitKroener(false, SC);
-            //            }
-            //            break;
-            //        case 4:
-            //            bool SC1 = false;
-            //            if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
-            //            {
-            //                SC1 = true;
-            //            }
-            //            if (REKSwitchBox.SelectedIndex == 0)
-            //            {
-            //                this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].FitDeWitt(true, SC1);
-            //            }
-            //            else if (REKSwitchBox.SelectedIndex == 3)
-            //            {
-            //                if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-            //                {
-            //                    this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-            //                }
-            //                else
-            //                {
-            //                    this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-            //                }
-
-            //                this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].FitDeWittTextured(true, SC1);
-            //            }
-            //            else
-            //            {
-            //                this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].FitDeWitt(false, SC1);
-            //            }
-            //            break;
-            //        case 5:
-            //            if (REKSwitchBox.SelectedIndex == 0)
-            //            {
-            //                this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].FitGeometricHill(true);
-            //            }
-            //            else if(REKSwitchBox.SelectedIndex == 3)
-            //            {
-            //                if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-            //                {
-            //                    this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-            //                }
-            //                else
-            //                {
-            //                    this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-            //                }
-
-            //                this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].FitGeometricHillTextured(true);
-            //            }
-            //            else
-            //            {
-            //                this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].FitGeometricHill(false);
-            //            }
-            //            break;
-            //        default:
-            //            if (REKSwitchBox.SelectedIndex == 0)
-            //            {
-            //                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(true);
-            //            }
-            //            else
-            //            {
-            //                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(false);
-            //            }
-            //            break;
-            //    }
-            //}
-
-            #endregion
-
-            switch (this.ModelSwitchBox.SelectedIndex)
-            {
-                case 0:
-                    if (REKSwitchBox.SelectedIndex == 0)
-                    {
-                        this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(true);
-                    }
-                    else if (REKSwitchBox.SelectedIndex == 2)
-                    {
-                        this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigtStrain(true);
-                    }
-                    else
-                    {
-                        this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(false);
-                    }
-                    break;
-                case 1:
-                    if (REKSwitchBox.SelectedIndex == 0)
-                    {
-                        this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(true);
-                    }
-                    else if (REKSwitchBox.SelectedIndex == 2)
-                    {
-                        this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReussStrain(true);
-                    }
-                    else if (REKSwitchBox.SelectedIndex == 3)
-                    {
-                        if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-                        {
-                            this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-                        }
-                        else
-                        {
-                            this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-                        }
-
-                        this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReussTextured(true);
-                    }
-                    else
-                    {
-                        this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(false);
-                    }
-                    break;
-                case 2:
-                    if (REKSwitchBox.SelectedIndex == 0)
-                    {
-                        this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].FitHill(true);
-                    }
-                    else if (REKSwitchBox.SelectedIndex == 3)
-                    {
-                        if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-                        {
-                            this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-                        }
-                        else
-                        {
-                            this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-                        }
-
-                        this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].FitHillTextured(true);
-                    }
-                    else
-                    {
-                        this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].FitHill(false);
-                    }
-                    break;
-                case 3:
-                    bool SC = false;
-                    if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
-                    {
-                        SC = true;
-                    }
-                    if (REKSwitchBox.SelectedIndex == 0)
-                    {
-                        this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].FitKroener(true, SC);
-                    }
-                    else if (REKSwitchBox.SelectedIndex == 3)
-                    {
-                        if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-                        {
-                            this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-                        }
-                        else
-                        {
-                            this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-                        }
-
-                        this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].FitKroenerTextured(true, SC);
-                    }
-                    else
-                    {
-                        this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].FitKroener(false, SC);
-                    }
-                    break;
-                case 4:
-                    bool SC1 = false;
-                    if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
-                    {
-                        SC1 = true;
-                    }
-                    if (REKSwitchBox.SelectedIndex == 0)
-                    {
-                        this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].FitDeWitt(true, SC1);
-                    }
-                    else if (REKSwitchBox.SelectedIndex == 3)
-                    {
-                        if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-                        {
-                            this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-                        }
-                        else
-                        {
-                            this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-                        }
-
-                        this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].FitDeWittTextured(true, SC1);
-                    }
-                    else
-                    {
-                        this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].FitDeWitt(false, SC1);
-                    }
-                    break;
-                case 5:
-                    if (REKSwitchBox.SelectedIndex == 0)
-                    {
-                        this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].FitGeometricHill(true);
-                    }
-                    else if (REKSwitchBox.SelectedIndex == 3)
-                    {
-                        if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-                        {
-                            this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-                        }
-                        else
-                        {
-                            this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-                        }
-
-                        this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].FitGeometricHillTextured(true);
-                    }
-                    else
-                    {
-                        this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].FitGeometricHill(false);
-                    }
-                    break;
-                default:
-                    if (REKSwitchBox.SelectedIndex == 0)
-                    {
-                        this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(true);
-                    }
-                    else
-                    {
-                        this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(false);
-                    }
-                    break;
-            }
+            RefitSEC(this.PhaseSwitchBox.SelectedIndex, REKSwitchBox.SelectedIndex, this.ModelSwitchBox.SelectedIndex, this.StiffnessComlplianceSwitchBox.SelectedIndex);
 
             this.SetTensorData();
 
             this.TextEventsActive = true;
         }
-        
+
         private void Tensor_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if(this.TextEventsActive)
+            if (this.TextEventsActive)
             {
                 Stress.Microsopic.ElasticityTensors UsedTensor = this.GetSelectedTensor();
 
@@ -1543,7 +1201,7 @@ namespace CalScec.Analysis.Stress.Microsopic
         private void ActivateWeightedTensor_Checked(object sender, RoutedEventArgs e)
         {
             this.TextEventsActive = false;
-            
+
             this.SetTensorData();
             this.TextEventsActive = true;
         }
@@ -1579,7 +1237,7 @@ namespace CalScec.Analysis.Stress.Microsopic
 
             Dispatcher.Invoke(FittingDelegate, sender as Texture.OrientationDistributionFunction);
         }
-        
+
 
         private void TextureFitStartedHandler(Texture.OrientationDistributionFunction oDF)
         {
@@ -1616,9 +1274,9 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         private void TextureFitFinishedHandler(Texture.OrientationDistributionFunction oDF)
         {
-            for(int n = 0; n < TextureFitObjects.Count; n++)
+            for (int n = 0; n < TextureFitObjects.Count; n++)
             {
-                if(oDF.FitDisplayInfo.iD == TextureFitObjects[n].iD)
+                if (oDF.FitDisplayInfo.iD == TextureFitObjects[n].iD)
                 {
                     TextureFitObjects.RemoveAt(n);
                     break;
@@ -1736,7 +1394,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             }
             else
             {
-                switch(AnIsoModelSelector.SelectedIndex)
+                switch (AnIsoModelSelector.SelectedIndex)
                 {
                     case 0:
                         s1 = usedTensor.S1VoigtCubic();
@@ -1804,7 +1462,7 @@ namespace CalScec.Analysis.Stress.Microsopic
             MathNet.Numerics.LinearAlgebra.Vector<double> plainDirection = MathNet.Numerics.LinearAlgebra.CreateVector.Dense(3, 0.0);
 
             ElasticityTensors usedTensor = this.GetSelectedTensor();
-            
+
             switch (AnIsoPlotDirectionSelection.SelectedIndex)
             {
                 case 0:
@@ -1933,7 +1591,7 @@ namespace CalScec.Analysis.Stress.Microsopic
 
             double viewCheck = angleDirection * plainDirection;
 
-            if(usedTensor != null && viewCheck == 0)
+            if (usedTensor != null && viewCheck == 0)
             {
                 OxyPlot.Series.LineSeries parameterSeries = new OxyPlot.Series.LineSeries();
                 parameterSeries.LineStyle = OxyPlot.LineStyle.None;
@@ -2105,13 +1763,13 @@ namespace CalScec.Analysis.Stress.Microsopic
 
                 double param1Count = 0;
                 double param2Count = 0;
-                for(int n = 0; n < 3; n++)
+                for (int n = 0; n < 3; n++)
                 {
-                    if(angleDirection[n] != 0)
+                    if (angleDirection[n] != 0)
                     {
                         param1Count++;
                     }
-                    if(plainDirection[n] != 0)
+                    if (plainDirection[n] != 0)
                     {
                         param2Count++;
                     }
@@ -2243,7 +1901,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                                         }
                                         break;
                                     case 12:
-                                        
+
                                         break;
                                     case 13:
                                         if ((k <= 0 && l > 0) && Math.Abs(k) < l)
@@ -2264,7 +1922,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                                         //}
                                         break;
                                     case 14:
-                                        
+
                                         break;
                                     default:
                                         goto case 2;
@@ -2277,7 +1935,7 @@ namespace CalScec.Analysis.Stress.Microsopic
                 }
 
                 #endregion
-                
+
                 //AnIsoValueAxis.Minimum = double.MaxValue;
                 //AnIsoValueAxis.Maximum = 0;
 
@@ -2323,7 +1981,7 @@ namespace CalScec.Analysis.Stress.Microsopic
 
             try
             {
-                UsedTensor.AnIsotropy = Convert.ToDouble(this.FixedAnisotropy.Text);
+                UsedTensor.AnIsotropy = 1.0 / Convert.ToDouble(this.FixedAnisotropy.Text);
                 this.TextEventsActive = false;
                 this.SetTensorData();
                 this.TextEventsActive = true;
@@ -2355,7 +2013,7 @@ namespace CalScec.Analysis.Stress.Microsopic
 
                 Stress.Microsopic.ElasticityTensors UsedTensor = this.GetSelectedTensor();
                 int model = 0;
-                
+
                 if (this.REKSwitchBox.SelectedIndex != 3)
                 {
                     UsedTensor.AutoAnisotropyFit(VWindow.lborder, VWindow.uborder, VWindow.step, VWindow.SC, XlsxSaveFile.FileName, model, true);
@@ -2369,84 +2027,95 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         private void SetTransitionView()
         {
-            if(this.PhaseSwitchBox.SelectedIndex != -1)
+            if (this.ActSample.CrystalData.Count > 1 && this.ActSample.StressTransitionFactors.Count > 0)
             {
-                List<StressFactorView> stressFactorView = new List<StressFactorView>();
+                this.StressDistributionGroup.Visibility = Visibility.Visible;
 
-                for(int n = 0; n < this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex].RowCount; n++)
+                PlotModel distributionPieModel = new PlotModel();
+
+                OxyPlot.Series.PieSeries distributionPieSeries = new OxyPlot.Series.PieSeries();
+                distributionPieSeries.AngleSpan = 360;
+                distributionPieSeries.StartAngle = 0;
+                distributionPieSeries.InsideLabelPosition = 0.8;
+                distributionPieSeries.StrokeThickness = 2;
+
+                for (int n = 0; n < this.ActSample.CrystalData.Count; n++)
                 {
-                    StressFactorView tmp = new StressFactorView();
+                    OxyPlot.Series.PieSlice phaseSlice = new OxyPlot.Series.PieSlice(this.ActSample.CrystalData[n].SymmetryGroup, this.ActSample.StressTransitionFactors[n][2, 2]);
 
-                    tmp.f1 = this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex][n, 0];
-                    tmp.f2 = this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex][n, 1];
-                    tmp.f3 = this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex][n, 2];
-                    tmp.f4 = this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex][n, 3];
-                    tmp.f5 = this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex][n, 4];
-                    tmp.f6 = this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex][n, 5];
+                    if (n == 0)
+                    {
+                        phaseSlice.Fill = OxyColors.DarkBlue;
+                    }
+                    else if (n == 1)
+                    {
+                        phaseSlice.Fill = OxyColors.DarkGreen;
+                    }
+                    else if (n == 2)
+                    {
+                        phaseSlice.Fill = OxyColors.DarkRed;
+                    }
 
-                    stressFactorView.Add(tmp);
+                    distributionPieSeries.Slices.Add(phaseSlice);
                 }
 
-                this.StressTransitionFactorView.ItemsSource = stressFactorView;
+                distributionPieModel.Series.Add(distributionPieSeries);
+                this.StressDistributionPlot.Model = distributionPieModel;
+                this.StressDistributionPlot.InvalidatePlot(true);
             }
+            else
+            {
+                this.StressDistributionGroup.Visibility = Visibility.Collapsed;
+            }
+
+            #region old code
+
+            //if(this.PhaseSwitchBox.SelectedIndex != -1)
+            //{
+            //    List<StressFactorView> stressFactorView = new List<StressFactorView>();
+
+            //    for(int n = 0; n < this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex].RowCount; n++)
+            //    {
+            //        StressFactorView tmp = new StressFactorView();
+
+            //        tmp.f1 = this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex][n, 0];
+            //        tmp.f2 = this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex][n, 1];
+            //        tmp.f3 = this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex][n, 2];
+            //        tmp.f4 = this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex][n, 3];
+            //        tmp.f5 = this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex][n, 4];
+            //        tmp.f6 = this.ActSample.StressTransitionFactors[this.PhaseSwitchBox.SelectedIndex][n, 5];
+
+            //        stressFactorView.Add(tmp);
+            //    }
+
+            //    this.StressTransitionFactorView.ItemsSource = stressFactorView;
+            //}
+
+            #endregion
         }
 
         private void SetTransitionFactors_Click(object sender, RoutedEventArgs e)
         {
-            if (this.ActSample.CrystalData.Count > 1)
+            if (this.ActSample.CrystalData.Count > 1 && this.ModelSwitchBox.SelectedIndex != -1)
             {
                 int matrixPhase = 0;
                 int inclusionPhase = 1;
 
-                if(this.ActSample.CrystalData[1].Matrix)
+                if (this.ActSample.CrystalData[1].Matrix)
                 {
                     matrixPhase = 1;
                     inclusionPhase = 0;
                 }
 
                 bool incType = false;
-                if(this.ActSample.CrystalData[inclusionPhase].InclusionType == 0)
+                if (this.ActSample.CrystalData[inclusionPhase].InclusionType == 0)
                 {
                     incType = true;
                 }
 
-                this.ActSample.SetStressTransitionFactors(matrixPhase, inclusionPhase, incType);
+                this.ActSample.SetStressTransitionFactors(matrixPhase, inclusionPhase, incType, this.ModelSwitchBox.SelectedIndex);
 
                 SetTransitionView();
-                MessageBox.Show("Calculation finished.", "Stresses factors ready!", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else
-            {
-                MessageBox.Show("Only one phase found in the crystallographic data! \n at least two destinct phases are requried.", "Only one phase detected", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void ResetPhaseStresses_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.ActSample.CrystalData.Count > 1)
-            {
-                if (this.ActSample.StressTransitionFactors[0][2, 2] != 0)
-                {
-                    this.ActSample.SetPhaseStresses();
-                    MessageBox.Show("Reset finished.", "Stresses ready!", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Please set the transition factors first.", "Transition factors not set!", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Only one phase found in the crystallographic data! \n at least two destinct phases are requried.", "Only one phase detected", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void RefitAllDEC_Click(object sender, RoutedEventArgs e)
-        {
-            if (this.ActSample.CrystalData.Count > 1)
-            {
-                this.ActSample.RefitAllDECStressCorrected();
-                MessageBox.Show("Refit finished.", "DEC are ready!", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
@@ -2459,200 +2128,63 @@ namespace CalScec.Analysis.Stress.Microsopic
 
             this.TextEventsActive = false;
 
-            if (this.ActSample.CrystalData.Count > 1)
+            if (this.ActSample.CrystalData.Count > 1 && this.ModelSwitchBox.SelectedIndex != -1)
             {
-                for (int n = 0; n < 10; n++)
+                bool modelCheck = false;
+                if (this.ModelSwitchBox.SelectedIndex != 1)
                 {
-                    #region Setting of transition Factors
+                    MessageBoxResult mBR = MessageBox.Show("To calculate the stress distribution it is recommendet to use Reuss Model. This is due to a conflict of assumptions in the physical theory. Proceed anyway?", "Model Conflict!", MessageBoxButton.YesNo, MessageBoxImage.Information);
 
-                    int matrixPhase = 0;
-                    int inclusionPhase = 1;
-
-                    if (this.ActSample.CrystalData[1].Matrix)
+                    if (mBR == MessageBoxResult.Yes)
                     {
-                        matrixPhase = 1;
-                        inclusionPhase = 0;
+                        modelCheck = true;
                     }
-
-                    bool incType = false;
-                    if (this.ActSample.CrystalData[inclusionPhase].InclusionType == 0)
-                    {
-                        incType = true;
-                    }
-
-                    this.ActSample.SetStressTransitionFactors(matrixPhase, inclusionPhase, incType);
-
-                    #endregion
-
-                    this.ActSample.SetPhaseStresses();
-                    this.ActSample.RefitAllDECStressCorrected();
-
-                    #region Constant Fit
-
-                    switch (this.ModelSwitchBox.SelectedIndex)
-                    {
-                        case 0:
-                            if (REKSwitchBox.SelectedIndex == 0)
-                            {
-                                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(true);
-                            }
-                            else if (REKSwitchBox.SelectedIndex == 2)
-                            {
-                                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigtStrain(true);
-                            }
-                            else
-                            {
-                                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitVoigt(false);
-                            }
-                            break;
-                        case 1:
-                            if (REKSwitchBox.SelectedIndex == 0)
-                            {
-                                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(true);
-                            }
-                            else if (REKSwitchBox.SelectedIndex == 2)
-                            {
-                                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReussStrain(true);
-                            }
-                            else if (REKSwitchBox.SelectedIndex == 3)
-                            {
-                                if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-                                {
-                                    this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-                                }
-                                else
-                                {
-                                    this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-                                }
-
-                                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReussTextured(true);
-                            }
-                            else
-                            {
-                                this.ActSample.ReussTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(false);
-                            }
-                            break;
-                        case 2:
-                            if (REKSwitchBox.SelectedIndex == 0)
-                            {
-                                this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].FitHill(true);
-                            }
-                            else if (REKSwitchBox.SelectedIndex == 3)
-                            {
-                                if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-                                {
-                                    this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-                                }
-                                else
-                                {
-                                    this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-                                }
-
-                                this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].FitHillTextured(true);
-                            }
-                            else
-                            {
-                                this.ActSample.HillTensorData[this.PhaseSwitchBox.SelectedIndex].FitHill(false);
-                            }
-                            break;
-                        case 3:
-                            bool SC = false;
-                            if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
-                            {
-                                SC = true;
-                            }
-                            if (REKSwitchBox.SelectedIndex == 0)
-                            {
-                                this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].FitKroener(true, SC);
-                            }
-                            else if (REKSwitchBox.SelectedIndex == 3)
-                            {
-                                if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-                                {
-                                    this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-                                }
-                                else
-                                {
-                                    this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-                                }
-
-                                this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].FitKroenerTextured(true, SC);
-                            }
-                            else
-                            {
-                                this.ActSample.KroenerTensorData[this.PhaseSwitchBox.SelectedIndex].FitKroener(false, SC);
-                            }
-                            break;
-                        case 4:
-                            bool SC1 = false;
-                            if (this.StiffnessComlplianceSwitchBox.SelectedIndex == 1)
-                            {
-                                SC1 = true;
-                            }
-                            if (REKSwitchBox.SelectedIndex == 0)
-                            {
-                                this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].FitDeWitt(true, SC1);
-                            }
-                            else if (REKSwitchBox.SelectedIndex == 3)
-                            {
-                                if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-                                {
-                                    this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-                                }
-                                else
-                                {
-                                    this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-                                }
-
-                                this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].FitDeWittTextured(true, SC1);
-                            }
-                            else
-                            {
-                                this.ActSample.DeWittTensorData[this.PhaseSwitchBox.SelectedIndex].FitDeWitt(false, SC1);
-                            }
-                            break;
-                        case 5:
-                            if (REKSwitchBox.SelectedIndex == 0)
-                            {
-                                this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].FitGeometricHill(true);
-                            }
-                            else if (REKSwitchBox.SelectedIndex == 3)
-                            {
-                                if (CalScec.Properties.Settings.Default.ActivateDECTextureWeighting)
-                                {
-                                    this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].ActivateDECMRDWeighting();
-                                }
-                                else
-                                {
-                                    this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].DeactivateDECMRDWeighting();
-                                }
-
-                                this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].FitGeometricHillTextured(true);
-                            }
-                            else
-                            {
-                                this.ActSample.GeometricHillTensorData[this.PhaseSwitchBox.SelectedIndex].FitGeometricHill(false);
-                            }
-                            break;
-                        default:
-                            if (REKSwitchBox.SelectedIndex == 0)
-                            {
-                                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(true);
-                            }
-                            else
-                            {
-                                this.ActSample.VoigtTensorData[this.PhaseSwitchBox.SelectedIndex].FitReuss(false);
-                            }
-                            break;
-                    }
-
-                    #endregion
+                }
+                else
+                {
+                    modelCheck = true;
                 }
 
-                SetTransitionView();
+                if (modelCheck)
+                {
+                    for (int n = 0; n < 10; n++)
+                    {
+                        #region Setting of transition Factors
+
+                        int matrixPhase = 0;
+                        int inclusionPhase = 1;
+
+                        if (this.ActSample.CrystalData[1].Matrix)
+                        {
+                            matrixPhase = 1;
+                            inclusionPhase = 0;
+                        }
+
+                        bool incType = false;
+                        if (this.ActSample.CrystalData[inclusionPhase].InclusionType == 0)
+                        {
+                            incType = true;
+                        }
+
+                        this.ActSample.SetStressTransitionFactors(matrixPhase, inclusionPhase, incType, this.ModelSwitchBox.SelectedIndex);
+
+                        #endregion
+
+                        this.ActSample.SetPhaseStresses();
+                        this.ActSample.RefitAllDECStressCorrected();
+
+                        for (int i = 0; i < this.ActSample.CrystalData.Count; i++)
+                        {
+                            this.RefitSEC(i, REKSwitchBox.SelectedIndex, this.ModelSwitchBox.SelectedIndex, this.StiffnessComlplianceSwitchBox.SelectedIndex);
+                        }
+
+
+                    }
+                }
+
+                this.SetTransitionView();
                 this.SetTensorData();
                 this.TextEventsActive = true;
-                MessageBox.Show("Calculation finished.", "Constants ready!", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
@@ -2671,7 +2203,7 @@ namespace CalScec.Analysis.Stress.Microsopic
         }
         private void SaveAnIsoPlotClipboard_Click(object sender, RoutedEventArgs e)
         {
-            OxyPlot.Wpf.PngExporter pngExporter = new OxyPlot.Wpf.PngExporter{ Width = 1200, Height = 1200, Background = OxyPlot.OxyColors.White };
+            OxyPlot.Wpf.PngExporter pngExporter = new OxyPlot.Wpf.PngExporter { Width = 1200, Height = 1200, Background = OxyPlot.OxyColors.White };
             var bitmap = pngExporter.ExportToBitmap(this.AnIsoPlotModel);
             Clipboard.SetImage(bitmap);
         }
@@ -2685,8 +2217,24 @@ namespace CalScec.Analysis.Stress.Microsopic
         }
 
         #endregion
-    }
 
+        private void REKSwitchBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            this.TextEventsActive = false;
+
+            this.SetTensorData();
+
+            this.TextEventsActive = true;
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            this.AniIsoPlotWindow.PreventClosing = false;
+            this.AniIsoPlotWindow.Close();
+
+            base.OnClosed(e);
+        }
+    }
     public struct StressFactorView
     {
         public double f1

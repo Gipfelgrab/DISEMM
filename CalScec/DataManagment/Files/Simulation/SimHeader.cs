@@ -69,6 +69,48 @@ namespace CalScec.DataManagment.Files.Simulation
             }
         }
 
+        public SimHeader(Analysis.Stress.Plasticity.ElastoPlasticExperiment Ep, string path, string name, int stepWidth)
+        {
+            //Setting header information
+            this.SavePath = path;
+            this.SaveName = name;
+            this._chiAngle = Ep.ChiAngle;
+            this._omegaAngle = Ep.OmegaAngle;
+            this._sampleArea = Ep.SampleArea;
+            this.StepWidth = stepWidth;
+
+            for (int n = 0; n < Ep.YieldInformation.Count; n++)
+            {
+                this.YieldInformation.Add(new YieldSurfaceInformation(Ep.YieldInformation[n]));
+            }
+
+            if (Ep.GrainOrientations != null)
+            {
+                this.GrainOrientations = Ep.GrainOrientations;
+            }
+            else
+            {
+                this.GrainOrientations = new List<List<Analysis.Stress.Plasticity.GrainOrientationParameter>>();
+            }
+
+            //Seperating the cases for the body
+            if (Ep.StressRateSFHistory.Count == Ep.StrainRateSFHistory.Count)
+            {
+                if (Ep.StressSFHistory.Count == 0)
+                {
+                    this.totalBodies = 0;
+                }
+                else
+                {
+                    this.SetSymmetricBodies(Ep);
+                }
+            }
+            else
+            {
+                this.SetAssymmetricBodies(Ep);
+            }
+        }
+
         public SimHeader()
         {
 

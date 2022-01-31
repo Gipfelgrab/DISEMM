@@ -2006,6 +2006,12 @@ namespace CalScec.DataManagment.CrystalData
             this._inclusionType = 0;
         }
 
+        public void RefreshHKLList()
+        {
+            this.HKLList.Clear();
+            Tools.Calculation.AddHKLList(this);
+        }
+
         public CODData(CODData ToClone)
         {
             this.Loaded = ToClone.Loaded;

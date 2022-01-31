@@ -23,6 +23,7 @@
                 <MenuItem Header="Load tensile test" Click="LoadTensileTest_Click"/>
                 <MenuItem Header="Export">
                     <MenuItem Header="To xlsx" Click="ExportToxlsx_Click"/>
+                    <MenuItem Header="To txt" Click="ExportToTxt_Click"/>
                 </MenuItem>
                 <MenuItem Header="Load reflex data">
                     <MenuItem Header="From file" Click="OpenReflexInformationFile_Click"/>
@@ -61,7 +62,8 @@
             </MenuItem>
             <MenuItem Header="Texture">
                 <MenuItem Header="Load texture" Click="LoadTexture_Click"/>
-                <!--<MenuItem Header="Show polefigures" Click="ShowPoleFigures_Click"/>-->
+                <MenuItem Header="Show raw data" Click="ShowRawTextureData_Click"/>
+                <MenuItem Header="Show polefigures" Click="ShowPoleFigures_Click" Visibility="Collapsed"/>
             </MenuItem>
             <Separator/>
             <MenuItem Header="_Settings">
@@ -213,7 +215,7 @@
                 <Label Content="Version" />
             </StatusBarItem>
             <StatusBarItem Grid.Column="2">
-                <Label Content="0.8.1" />
+                <Label Content="0.9.5" />
             </StatusBarItem>
             <StatusBarItem Grid.Column="4">
                 <Label Name="ErrorLog1" Foreground="DarkRed"/>
@@ -244,7 +246,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <GroupBox Header="Samples and basic properties" Grid.RowSpan="2" >
+                <GroupBox Header="Samples and basic properties" Grid.RowSpan="2" FontSize="14" >
                     <Grid Grid.Column="0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="0.3*"/>
@@ -268,9 +270,9 @@
                             <Label Grid.Column="0" Grid.Row="0" Content="Name:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
                             <Label Grid.Column="0" Grid.Row="1" Content="Area (mm²):" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
                             <Label Grid.Column="0" Grid.Row="2" Content="Phase:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                            <TextBox Name="SampleName" Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="SampleName_TextChanged"/>
-                            <TextBox Name="SampleArea" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="SampleArea_TextChanged"/>
-                            <ComboBox Grid.Row="2" Grid.Column="1" Margin="5,2,5,2" Name="PhaseSelection" MaxWidth="350" MaxHeight="30" SelectionChanged="PhaseSelection_SelectionChanged"/>
+                            <TextBox Name="SampleName" Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="SampleName_TextChanged" ToolTip="Name of the investigated sample."/>
+                            <TextBox Name="SampleArea" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="SampleArea_TextChanged" ToolTip="Area of the applied force. Used for conversion from force in Newton to stress in MPa"/>
+                            <ComboBox Grid.Row="2" Grid.Column="1" Margin="5,2,5,2" Name="PhaseSelection" MaxWidth="350" MaxHeight="30" SelectionChanged="PhaseSelection_SelectionChanged" ToolTip="The currently selected phase. Determines which composition and crystal parameters are selected."/>
                         </Grid>
                         <Grid Grid.Column="1">
                             <Grid.ColumnDefinitions>
@@ -286,11 +288,9 @@
                                 <RowDefinition Height="0.1*"/>
                             </Grid.RowDefinitions>
 
-                            <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="170" Content="Diffraction Elastic Constants" Click="REKCalculation_Click"/>
-                            <Button Grid.Column="1" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="170" Content="Single Crystal Elastic Constants" Click="ElasticityTensorCalculation_Click"/>
-                            <Button Grid.Column="1" Grid.Row="3" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="170" Content="EPSC" Click="YieldSurfaceWindow_Click"/>
+                            <Button Grid.Column="1" Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="170" Click="YieldSurfaceWindow_Click" Content="EPSC" ToolTip="Opens the window for the Elasto-Plastic Self-Consistent Modeling (EPSC)."/>
                         </Grid>
-                        <GroupBox Header="Composition" Grid.Row="1">
+                        <GroupBox Header="Composition" Grid.Row="1" FontSize="14">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
@@ -307,7 +307,7 @@
                                 </Grid.ColumnDefinitions>
                                 <Label Grid.Column="0" Grid.Row="0" Content="Phase type" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
                                 <Label Grid.Column="0" Grid.Row="1" Content="Inclusion type" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                                <Label Grid.Column="0" Grid.Row="2" Content="PhaseFraction" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
+                                <Label Grid.Column="0" Grid.Row="2" Content="Phase fraction" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
                                 <Label Grid.Column="0" Grid.Row="3" Content="Phase parameter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Name="PhaseParameter1Label"/>
                                 <Label Grid.Column="0" Grid.Row="4" Content="Phase parameter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Name="PhaseParameter2Label"/>
                                 <Label Grid.Column="0" Grid.Row="5" Content="Phase parameter" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Name="PhaseParameter3Label"/>
@@ -323,7 +323,7 @@
 
                             </Grid>
                         </GroupBox>
-                        <GroupBox Header="Crystal parameters" Grid.Row="1" Grid.Column="1">
+                        <GroupBox Header="Crystal parameters" Grid.Row="1" Grid.Column="1" FontSize="14">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*"/>
@@ -335,44 +335,247 @@
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="0.35*"/>
+                                    <ColumnDefinition Width="0.6*"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="0.9*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Label Grid.Column="0" Grid.Row="1" Content="A:" ToolTip="Cell parameter A in Angström"/>
-                                <Label Grid.Column="0" Grid.Row="2" Content="B:" ToolTip="Cell parameter B in Angström"/>
-                                <Label Grid.Column="0" Grid.Row="3" Content="C:" ToolTip="Cell parameter C in Angström"/>
-                                <Label Grid.Column="2" Grid.Row="1" Content="Alpha:" ToolTip="Angle Alpha in Degree"/>
-                                <Label Grid.Column="2" Grid.Row="2" Content="Beta:" ToolTip="Angle Beta in Degree"/>
-                                <Label Grid.Column="2" Grid.Row="3" Content="Gamma:" ToolTip="Angle Gamma in Degree"/>
-                                <Label Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Content="Name:"/>
+                                <Label Grid.Column="0" Grid.Row="1"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Content="a (Å):" ToolTip="Cell parameter A in Angström"/>
+                                <Label Grid.Column="0" Grid.Row="2"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Content="b (Å):" ToolTip="Cell parameter B in Angström"/>
+                                <Label Grid.Column="0" Grid.Row="3"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Content="c (Å):" ToolTip="Cell parameter C in Angström"/>
+                                <Label Grid.Column="2" Grid.Row="1"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Content="α (Deg):" ToolTip="Unit cell angle α in Degree"/>
+                                <Label Grid.Column="2" Grid.Row="2"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Content="ꞵ (Deg):" ToolTip="Unit cell angle ꞵ in Degree"/>
+                                <Label Grid.Column="2" Grid.Row="3"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Content="γ (Deg):" ToolTip="Unit cell angle γ in Degree"/>
+                                <Label Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Content="Name:"/>
                                 <TextBox Grid.Column="1" Grid.Row="5" Grid.ColumnSpan="2" Name="ElementalCompositionText" Margin="5,2,5,2" MaxHeight="28" MaxWidth="250" ToolTip="The elemental composition of the crystallographic data. Please use space as a sepperator otherwise it won't recognize the number of elements correctly!"/>
-                                <Label Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4" Content="Symmetry group:"/>
-                                <TextBox Grid.Column="1" Grid.Row="1" Height="28" HorizontalAlignment="Stretch" Name="CellAText" Margin="0,2,0,2" MaxHeight="35"/>
-                                <TextBox Grid.Column="1" Grid.Row="2" Height="28" HorizontalAlignment="Stretch" Name="CellBText" Margin="0,2,0,2" MaxHeight="35"/>
-                                <TextBox Grid.Column="1" Grid.Row="3" Height="28" HorizontalAlignment="Stretch" Name="CellCText" Margin="0,2,0,2" MaxHeight="35"/>
-                                <TextBox Grid.Column="3" Grid.Row="1" Height="28" HorizontalAlignment="Stretch" Name="CellAlphaText" Margin="0,2,0,2" MaxHeight="35"/>
-                                <TextBox Grid.Column="3" Grid.Row="2" Height="28" HorizontalAlignment="Stretch" Name="CellBetaText" Margin="0,2,0,2" MaxHeight="35"/>
-                                <TextBox Grid.Column="3" Grid.Row="3" Height="28" HorizontalAlignment="Stretch" Name="CellGammaText" Margin="0,2,0,2" MaxHeight="35"/>
+                                <Label Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" Content="Symmetry group:"/>
+                                <TextBox Grid.Column="1" Grid.Row="1" Height="28" HorizontalAlignment="Stretch" Name="CellAText" Margin="0,2,0,2" MaxHeight="35" ToolTip="Cell parameter A in Angström (Å)"/>
+                                <TextBox Grid.Column="1" Grid.Row="2" Height="28" HorizontalAlignment="Stretch" Name="CellBText" Margin="0,2,0,2" MaxHeight="35" ToolTip="Cell parameter B in Angström (Å)"/>
+                                <TextBox Grid.Column="1" Grid.Row="3" Height="28" HorizontalAlignment="Stretch" Name="CellCText" Margin="0,2,0,2" MaxHeight="35" ToolTip="Cell parameter C in Angström (Å)"/>
+                                <TextBox Grid.Column="3" Grid.Row="1" Height="28" HorizontalAlignment="Stretch" Name="CellAlphaText" Margin="0,2,0,2" MaxHeight="35" ToolTip="Unit cell angle α in Degree"/>
+                                <TextBox Grid.Column="3" Grid.Row="2" Height="28" HorizontalAlignment="Stretch" Name="CellBetaText" Margin="0,2,0,2" MaxHeight="35" ToolTip="Unit cell angle ꞵ in Degree"/>
+                                <TextBox Grid.Column="3" Grid.Row="3" Height="28" HorizontalAlignment="Stretch" Name="CellGammaText" Margin="0,2,0,2" MaxHeight="35" ToolTip="Unit cell angle γ in Degree"/>
                                 <TextBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" HorizontalAlignment="Stretch" Name="CrystalNameText" Margin="0,2,0,2" MaxHeight="35"/>
                                 <TextBox Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="4" Height="32"  Name="SymetryBox" HorizontalAlignment="Stretch" Margin="0,2,0,2" MaxHeight="35"/>
-                                <Button Grid.Column="3" Grid.Row="6" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="100" Content="Save"/>
+                                <Button Grid.Column="3" Grid.Row="6" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="100" Content="Save" Click="CrystalSettingsChanged_Click"/>
                             </Grid>
                         </GroupBox>
                     </Grid>
                 </GroupBox>
-                <GroupBox Header="Diffraction pattern" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2">
+                <TabControl Grid.Row="0" Grid.Column="1"  Grid.RowSpan="2" Grid.ColumnSpan="2"  FontSize="14">
+                    <TabItem Header="Evaluation">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="2*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Row="0" Grid.Column="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Canvas Width="75" Height="75" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Ellipse Width="75" Height="75" Fill="DarkRed" Name="StructureEllipse"/>
+                                </Canvas>
+                                <Label Grid.Column="0" Grid.Row="1" Content="Sample Composition" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+                            </Grid>
+                            <Grid Grid.Row="0" Grid.Column="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Canvas Width="75" Height="75" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Ellipse Width="75" Height="75" Fill="DarkRed" Name="PatternPeakEllipse"/>
+                                </Canvas>
+                                <Label Grid.Column="0" Grid.Row="1"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                    <TextBlock TextAlignment="Center" >Diffraction Pattern <LineBreak/> and Peaks</TextBlock>
+                                </Label>
+                            </Grid>
+                            <Grid Grid.Row="0" Grid.Column="4">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Canvas Width="75" Height="75" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Ellipse Width="75" Height="75" Fill="DarkRed" Name="DECEllipse"/>
+                                </Canvas>
+                                <Label Grid.Column="0" Grid.Row="1"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                    <TextBlock TextAlignment="Center" >Diffraction <LineBreak/> Elastic Constants</TextBlock>
+                                </Label>
+                            </Grid>
+                            <Grid Grid.Row="0" Grid.Column="6">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Canvas Width="75" Height="75" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Ellipse Width="75" Height="75" Fill="DarkRed" Name="SECEllipse"/>
+                                </Canvas>
+                                <Label Grid.Column="0" Grid.Row="1"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                    <TextBlock TextAlignment="Center" >Single Crystal <LineBreak/> Elastic Constants</TextBlock>
+                                </Label>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Canvas Width="75" Height="75" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Path   Stretch="Fill" Fill="DarkRed" 
+                                            Data="M 0,110 70,110 45,90 75,90 120,120 75,150 45,150 70,130 0,130 Z"
+                                            HorizontalAlignment="Right"  Width="75" Height="50" Margin="0,0,2,0"
+                                            RenderTransformOrigin="0,0" Name="SampleToPatternPath">
+                                        <Path.RenderTransform>
+                                            <RotateTransform Angle="0" />
+                                        </Path.RenderTransform>
+                                    </Path>
+
+                                </Canvas>
+                            </Grid>
+                            <Grid Grid.Column="3">
+                                <Canvas Width="75" Height="75" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Path   Stretch="Fill" Fill="DarkRed" 
+                                            Data="M 0,110 70,110 45,90 75,90 120,120 75,150 45,150 70,130 0,130 Z"
+                                            HorizontalAlignment="Right"  Width="75" Height="50" Margin="0,0,2,0"
+                                            RenderTransformOrigin="0,0" Name="PatternToDECPath">
+                                        <Path.RenderTransform>
+                                            <RotateTransform Angle="0" />
+                                        </Path.RenderTransform>
+                                    </Path>
+
+                                </Canvas>
+                            </Grid>
+                            <Grid Grid.Column="5">
+                                <Canvas Width="75" Height="75" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Path   Stretch="Fill" Fill="DarkRed" 
+                                            Data="M 0,110 70,110 45,90 75,90 120,120 75,150 45,150 70,130 0,130 Z"
+                                            HorizontalAlignment="Right"  Width="75" Height="50" Margin="0,0,2,0"
+                                            RenderTransformOrigin="0,0" Name="DECToSECPath">
+                                        <Path.RenderTransform>
+                                            <RotateTransform Angle="0" />
+                                        </Path.RenderTransform>
+                                    </Path>
+                                </Canvas>
+                            </Grid>
+                            <Grid Grid.Column="0" Grid.Row="1" Name="CompositionTutorial" Visibility="Visible">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Label Grid.Column="0" Grid.Row="0"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                    <TextBlock TextAlignment="Center" >
+                                        This is a new project.
+                                        <LineBreak/>
+                                        To start the evaluation
+                                        <LineBreak/>
+                                        first add the
+                                        <LineBreak/>
+                                        crystallographic data
+                                        <LineBreak/>
+                                        of each phase.
+                                    </TextBlock>
+                                </Label>
+                                <Label Grid.Column="0" Grid.Row="2"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                    <TextBlock TextAlignment="Center" >
+                                        Or simply 
+                                        <LineBreak/>
+                                        an old project.
+                                    </TextBlock>
+                                </Label>
+                                <Button Grid.Column="0" Grid.Row="1" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="100" Content="Load CIF" Click="OpenCrystallographyDataFile_Click"/>
+                                <Button Grid.Column="0" Grid.Row="3" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="100" Content="Load SCEC"  Click="LoadFromSCEC_Click"/>
+                            </Grid>
+                            <Grid Grid.Column="2" Grid.Row="1" Name="PatternPeakTutorial" Visibility="Visible">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="3*"/>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Label Grid.Column="0" Grid.Row="0"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                    <TextBlock TextAlignment="Center" >
+                                        Add 1D diffraction
+                                        <LineBreak/>
+                                        pattern files by
+                                        <LineBreak/>
+                                        dragging the files
+                                        <LineBreak/>
+                                        onto the diffraction
+                                        <LineBreak/>
+                                        pattern listbelow and
+                                        <LineBreak/>
+                                        dropping them.
+                                    </TextBlock>
+                                </Label>
+                                <Label Grid.Column="0" Grid.Row="1"  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                    <TextBlock TextAlignment="Center" >
+                                        Alternatively load a
+                                        <LineBreak/>
+                                        peak list from a
+                                        <LineBreak/>
+                                         text file.
+                                    </TextBlock>
+                                </Label>
+                                <Button Grid.Column="0" Grid.Row="2" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="100" Content="Load peak file" Click="OpenReflexInformationFile_Click"/>
+                            </Grid>
+                            <Grid Grid.Column="4" Grid.Row="1" Name="DECTutorial" Visibility="Visible">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Button Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" Margin="10,2,10,0" MaxHeight="32" MaxWidth="170" Content="DEC" Click="REKCalculation_Click" Height="36" VerticalAlignment="Top"/>
+                            </Grid>
+                            <Grid Grid.Column="6" Grid.Row="1" Name="SECTutorial" Visibility="Visible">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="2*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <Button Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" Margin="10,2,10,2" MaxHeight="32" MaxWidth="170" Content="SEC" Click="ElasticityTensorCalculation_Click"  Height="36" VerticalAlignment="Top"/>
+                            </Grid>
+                            <GroupBox Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3" Header="Diffraction elastic constants" Name="DECList" Visibility="Collapsed">
+                                <ListView Name="REKClassicCalculationList" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Width="100" Header="(H K L)" DisplayMemberBinding="{Binding Path=HKLAssociation}"/>
+                                            <GridViewColumn Width="100" Header="S1" DisplayMemberBinding="{Binding Path=ViewS1}"/>
+                                            <GridViewColumn Width="100" Header="½S2" DisplayMemberBinding="{Binding Path=ViewHS2}"/>
+                                            <GridViewColumn Width="120" Header="E(hkl)" DisplayMemberBinding="{Binding Path=ViewEModulus}"/>
+                                            <GridViewColumn Width="120" Header="γ(hkl)" DisplayMemberBinding="{Binding Path=ViewShearModulus}"/>
+                                            <GridViewColumn Width="120" Header="ν(hkl)" DisplayMemberBinding="{Binding Path=ViewTransverseContraction}"/>
+                                            <GridViewColumn Width="120" Header="μ(hkl)" DisplayMemberBinding="{Binding Path=ViewBulkModulus}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                            </GroupBox>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Diffraction Pattern">
+                        <oxy:PlotView Name="MainDiffPlot" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5" MouseLeftButtonUp="MainPlot_MouseLeftButtonUp"/>
+                    </TabItem>
+                </TabControl>
+                <!--<GroupBox Header="Diffraction pattern" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Grid.ColumnSpan="2">
                     <oxy:PlotView Name="MainDiffPlot" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5,5,5,5" MouseLeftButtonUp="MainPlot_MouseLeftButtonUp"/>
-                </GroupBox>
-                <GroupBox Header="Diffraction Experiments" Grid.Row="2" Grid.ColumnSpan="3">
+                </GroupBox>-->
+                <GroupBox Header="Diffraction Experiments" Grid.Row="2" Grid.ColumnSpan="3" FontSize="14">
                     <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="0.6*"/>
                             <ColumnDefinition Width="0.2*"/>
                             <ColumnDefinition Width="0.4*"/>
                         </Grid.ColumnDefinitions>
-                        
+
                         <Grid Grid.Column="0" Grid.ColumnSpan="2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -381,9 +584,9 @@
                             <GroupBox Grid.Row="1" Header="Pattern data">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="0.7*"/>
+                                        <ColumnDefinition Width="0.4*"/>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="0.6*"/>
+                                        <ColumnDefinition Width="0.4*"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <Grid.RowDefinitions>
@@ -394,21 +597,21 @@
                                         <RowDefinition Height="*"/>
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
-                                    <Label Grid.Column="0" Grid.Row="0" Content="Name:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                                    <Label Grid.Column="0" Grid.Row="1" Content="Chi angle:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                                    <Label Grid.Column="2" Grid.Row="1" Content="Omega angle:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                                    <Label Grid.Column="0" Grid.Row="2" Content="Phi sample angle:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                                    <Label Grid.Column="0" Grid.Row="3" Content="Applied force:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                                    <Label Grid.Column="2" Grid.Row="3" Content="Applied stress:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                                    <Label Grid.Column="0" Grid.Row="4" Content="Macro strain:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-                                    <TextBox Name="PatternName" Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" Height="27"/>
-                                    <TextBox Name="PatternChiAngle" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternChiAngle_TextChanged"/>
-                                    <TextBox Name="PatternOmegaAngle" Grid.Row="1" Grid.Column="3" VerticalAlignment="Stretch" Height="27" TextChanged="PatternOmegaAngle_TextChanged"/>
-                                    <TextBox Name="PatternPhiSampleAngle" Grid.Row="2" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternPhiSampleAngle_TextChanged"/>
-                                    <TextBox Name="PatternAppliedForce" Grid.Row="3" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternAppliedForce_TextChanged"/>
-                                    <TextBox Name="PatternAppliedStress" Grid.Row="3" Grid.Column="3" VerticalAlignment="Stretch" Height="27" TextChanged="PatternAppliedStress_TextChanged"/>
-                                    <TextBox Name="PatternMacroStrain" Grid.Row="4" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternMacroStrain_TextChanged"/>
-                                    <Button Name="Autofill" Grid.Row="5" Grid.Column="3" Content="Auto fill" Margin="5,5,5,5" Click="AutofillPattern_Click"/>
+                                    <Label Grid.Column="0" Grid.Row="0" Content="Name:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" ToolTip="Name of the selected diffraction pattern. In case of a pattern the filename will be used and in case of a peaklist the peak (hkl) will be used."/>
+                                    <Label Grid.Column="0" Grid.Row="1" Content="Χ (Deg):" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" ToolTip="Angle to orient the load axis to the scattering vector. For more details please see Heldmann et al. 2019."/>
+                                    <Label Grid.Column="2" Grid.Row="1" Content="Ω (Deg):" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" ToolTip="Angle to orient the load axis to the scattering vector. For more details please see Heldmann et al. 2019."/>
+                                    <Label Grid.Column="0" Grid.Row="2" Content="ρ (Deg):" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" ToolTip="Angle to orient the load axis to the scattering vector. For more details please see Heldmann et al. 2019."/>
+                                    <Label Grid.Column="0" Grid.Row="3" Content="F (N):" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" ToolTip="Force applied to the sample in Newton. This value is connected to the applied stress and is converted by the area."/>
+                                    <Label Grid.Column="2" Grid.Row="3" Content="σ (MPa):" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" ToolTip="Stress applied in MPascal to the sample. This value is connected to the applied force and is converted by the area."/>
+                                    <Label Grid.Column="0" Grid.Row="4" Content="ε:" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Left" VerticalContentAlignment="Center" ToolTip="Strain measured along the hole sample, i.e. total strain of the sample."/>
+                                    <TextBox Name="PatternName" Grid.Row="0" Grid.Column="1" VerticalAlignment="Stretch" Height="27" ToolTip="Name of the selected diffraction pattern. In case of a pattern the filename will be used and in case of a peaklist the peak (hkl) will be used."/>
+                                    <TextBox Name="PatternChiAngle" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternChiAngle_TextChanged" ToolTip="Angle to orient the load axis to the scattering vector. For more details please see Heldmann et al. 2019."/>
+                                    <TextBox Name="PatternOmegaAngle" Grid.Row="1" Grid.Column="3" VerticalAlignment="Stretch" Height="27" TextChanged="PatternOmegaAngle_TextChanged" ToolTip="Angle to orient the load axis to the scattering vector. For more details please see Heldmann et al. 2019."/>
+                                    <TextBox Name="PatternPhiSampleAngle" Grid.Row="2" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternPhiSampleAngle_TextChanged" ToolTip="Angle to orient the load axis to the scattering vector. For more details please see Heldmann et al. 2019."/>
+                                    <TextBox Name="PatternAppliedForce" Grid.Row="3" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternAppliedForce_TextChanged" ToolTip="Force applied to the sample in Newton. This value is connected to the applied stress and is converted by the area."/>
+                                    <TextBox Name="PatternAppliedStress" Grid.Row="3" Grid.Column="3" VerticalAlignment="Stretch" Height="27" TextChanged="PatternAppliedStress_TextChanged" ToolTip="Stress applied in MPa to the sample. This value is connected to the applied force and is converted by the area."/>
+                                    <TextBox Name="PatternMacroStrain" Grid.Row="4" Grid.Column="1" VerticalAlignment="Stretch" Height="27" TextChanged="PatternMacroStrain_TextChanged" ToolTip="Strain measured along the hole sample, i.e. total strain of the sample."/>
+                                    <Button Name="Autofill" Grid.Row="4" Grid.Column="3" Grid.RowSpan="2" MaxHeight="32" Content="Fast fill" Margin="5,5,5,5" Click="AutofillPattern_Click"/>
                                 </Grid>
                             </GroupBox>
                             <GroupBox Header="Diffraction pattern list" Grid.Column="1">
@@ -478,7 +681,7 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                 </Grid>
-                
+
             </Grid>
         </DockPanel>
     </DockPanel>

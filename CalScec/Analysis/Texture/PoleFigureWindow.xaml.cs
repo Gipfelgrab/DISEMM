@@ -219,22 +219,22 @@ namespace CalScec.Analysis.Texture
             double YCount = 0;
             if (angle == 0)
             {
-                TData = this.InvestigatedSample.ReussTensorData[phase].ODF.GetPoleFigurePhi(eReflex);
+                TData = this.InvestigatedSample.ODFList[phase].GetPoleFigurePhi(eReflex);
                 MainPoleFigure.Y1 = TData[TData.Count - 1][1];
-                YCount = 360 / this.InvestigatedSample.ReussTensorData[phase].ODF.StepSizePhi2;
+                YCount = 360 / this.InvestigatedSample.ODFList[phase].StepSizePhi2;
             }
             else if (angle == 1)
             {
-                TData = this.InvestigatedSample.ReussTensorData[phase].ODF.GetPoleFigureVarPhi2(eReflex);
+                TData = this.InvestigatedSample.ODFList[phase].GetPoleFigureVarPhi2(eReflex);
                 MainPoleFigure.Y1 = 90.0;
-                YCount = 90 / this.InvestigatedSample.ReussTensorData[phase].ODF.StepSizePhi2;
+                YCount = 90 / this.InvestigatedSample.ODFList[phase].StepSizePhi2;
             }
 
             MainPoleFigure.X0 = 0.0;
             MainPoleFigure.X1 = TData[TData.Count - 1][0];
             MainPoleFigure.Y0 = 0.0;
             
-            double maxStepsVarPhi1 = 360.0 / this.InvestigatedSample.ReussTensorData[phase].ODF.StepSizePhi1;
+            double maxStepsVarPhi1 = 360.0 / this.InvestigatedSample.ODFList[phase].StepSizePhi1;
             var PlotData = new double[Convert.ToInt32(maxStepsVarPhi1), Convert.ToInt32(YCount)];
 
             for (int n = 0; n < maxStepsVarPhi1; n++)

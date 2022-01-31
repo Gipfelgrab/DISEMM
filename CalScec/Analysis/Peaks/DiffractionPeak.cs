@@ -10,6 +10,32 @@ namespace CalScec.Analysis.Peaks
     {
         #region Parameters
 
+        #region Display
+
+        public string AngleView
+        {
+            get
+            {
+                return this.Angle.ToString("F3");
+            }
+        }
+        public string LatticeDistanceView
+        {
+            get
+            {
+                return this.LatticeDistance.ToString("F3");
+            }
+        }
+        public string LatticeDistanceErrorView
+        {
+            get
+            {
+                return this.LatticeDistanceError.ToString("F3");
+            }
+        }
+
+        #endregion
+
         #region Detection parameters
 
         private string _associatedPatternName;

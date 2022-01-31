@@ -24,6 +24,67 @@ namespace CalScec.Analysis.Stress.Microsopic
 
         #endregion
 
+        #region Display
+
+        public string ViewS1
+        {
+            get
+            {
+                return this.ClassicS1.ToString("G3");
+            }
+        }
+        public string ViewS1Error
+        {
+            get
+            {
+                return this.ClassicS1Error.ToString("G3");
+            }
+        }
+        public string ViewHS2
+        {
+            get
+            {
+                return this.ClassicHS2.ToString("G3");
+            }
+        }
+        public string ViewHS2Error
+        {
+            get
+            {
+                return this.ClassicHS2Error.ToString("G3");
+            }
+        }
+        public string ViewEModulus
+        {
+            get
+            {
+                return this.ClassicEModulus.ToString("G3");
+            }
+        }
+        public string ViewTransverseContraction
+        {
+            get
+            {
+                return this.ClassicTransverseContraction.ToString("G3");
+            }
+        }
+        public string ViewShearModulus
+        {
+            get
+            {
+                return this.ClassicShearModulus.ToString("G3");
+            }
+        }
+        public string ViewBulkModulus
+        {
+            get
+            {
+                return this.ClassicBulkModulus.ToString("G3");
+            }
+        }
+
+        #endregion  
+
         public REK(DataManagment.CrystalData.CODData phaseInformation, DataManagment.CrystalData.HKLReflex hKLReflex)
         {
             this.PhaseInformation = phaseInformation;
@@ -74,11 +135,13 @@ namespace CalScec.Analysis.Stress.Microsopic
 
             //S1Error /= (TotalWeight * TotalWeightS1);
             //S2Error /= (TotalWeight * TotalWeightS2);
-            S1Error /= (TotalWeight);
-            S2Error /= (TotalWeight);
+            S1Error = Math.Sqrt(S1Error)/(TotalWeight);
+            S2Error = Math.Sqrt(S2Error)/(TotalWeight);
 
-            this._classicS1Error = Math.Sqrt(S1Error);
-            this._classicS2Error = Math.Sqrt(S2Error);
+            //this._classicS1Error = Math.Sqrt(S1Error);
+            //this._classicS2Error = Math.Sqrt(S2Error);
+            this._classicS1Error = S1Error;
+            this._classicS2Error = S2Error;
         }
 
         private double _classicChi2;
