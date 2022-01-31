@@ -5,9 +5,35 @@ The software DISEMM is designed to analyse diffraction data from in situ loading
 experiments for the determination of single-crystal elastic constants and an
 elasto-plastic self-consistent modelling (EPSC) of lattice strains.
 
-# Video Tutorials
+# Functionality
 
-A collection of video tutorials is uploaded to:
+DISEMM implements a variety methods to analize the mechanical behavior of solids with X-ray or neutron diffraction data:
+
+## Elastic Deformation
+
+- 1-D diffraction pattern analysis (peak finding, peak fitting) <br>
+- Up to hexagonal crystal symmetries <br>
+- Strain calculation and fitting of diffraction elastic constants <br>
+- Fitting of single-crystal elastic constants <br>
+- Texture support <br>
+- Dual-Phase support and calculation of the elastic load transfer <br>
+- Full plotting support <br>
+- Anisotropy analysis <br>
+
+## Plastic Deformation
+
+- Elasto-Plastic Self-Consistent Modeling (EPSC) <br>
+- Arbitrary loading <br>
+- Texture support <br>
+- Lattice strain analysis <br>
+- Slip activity <br>
+- Multi-threading <br>
+
+# Tutorials
+
+The maunal is found here: https://github.com/Gipfelgrab/DISEMM/raw/master/DISEMMManual.pdf
+
+A collection of video tutorials is uploaded to:<br>
 https://www.youtube.com/channel/UCg58LttOgWpBopD1i2mOw5g
 
 Part 1: https://www.youtube.com/watch?v=Nw_nXp5aFB0 <br>
