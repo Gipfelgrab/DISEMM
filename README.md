@@ -7,7 +7,7 @@ elasto-plastic self-consistent modelling (EPSC) of lattice strains.
 
 # Functionality
 
-DISEMM implements a variety methods to analize the mechanical behavior of solids with X-ray or neutron diffraction data:
+DISEMM implements a variety methods to analyze the mechanical behavior of solids with X-ray or neutron diffraction data:
 
 ## Elastic Deformation
 
